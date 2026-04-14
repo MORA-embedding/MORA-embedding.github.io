@@ -23,21 +23,22 @@
             align-items: center;
         }
 
-        /* 右上角二维码容器样式 */
+        /* 放大右上角二维码容器 */
         .qr-container {
             position: absolute;
             top: 20px;
             right: 20px;
             text-align: center;
             background: #ffffff;
-            padding: 10px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 15px; /* 增加留白辅助识别 */
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
             border: 1px solid #eee;
+            z-index: 100;
         }
         .qr-container p {
-            margin: 5px 0 0 0;
-            font-size: 10px;
+            margin: 10px 0 0 0;
+            font-size: 12px;
             color: #70757a;
             font-weight: 500;
         }
@@ -94,10 +95,9 @@
             background-color: var(--primary-color);
         }
 
-        /* 移动端适配：手机访问时隐藏右上角二维码，避免遮挡标题 */
-        @media (max-width: 600px) {
+        @media (max-width: 768px) {
             .qr-container {
-                display: none;
+                display: none; /* 移动端隐藏以防遮挡内容 */
             }
         }
     </style>
@@ -106,12 +106,11 @@
 
     <div class="qr-container">
         <div id="qrcode"></div>
-        <p>Scan to Share</p>
+        <p>Scan to Share MoRA</p>
     </div>
 
     <div class="container">
         <div class="conference">ICLR 2026 (Accepted)</div>
-
         <h1>MoRA: Mobility as the Backbone for Geospatial Representation Learning at Scale</h1>
         
         <div class="links">
@@ -122,21 +121,21 @@
         <div class="abstract-box">
             <h2>Abstract</h2>
             <p>
-                MoRA explores a novel framework where mobility data serves as the foundational backbone for learning geospatial representations at a global scale. By leveraging large-scale trajectory tokenization and spatio-temporal data mining, our approach achieves state-of-the-art performance in location intelligence and recommendation tasks...
+                MoRA explores a novel framework where mobility data serves as the foundational backbone for learning geospatial representations at a global scale. By leveraging large-scale trajectory tokenization and spatio-temporal data mining...
             </p>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-        // 初始化二维码
+        // 增加宽高到 160，并确保容错率合适
         new QRCode(document.getElementById("qrcode"), {
             text: "https://mora-embedding.github.io",
-            width: 90,
-            height: 90,
-            colorDark : "#202124",
+            width: 160,
+            height: 160,
+            colorDark : "#000000",
             colorLight : "#ffffff",
-            correctLevel : QRCode.CorrectLevel.H
+            correctLevel : QRCode.CorrectLevel.H // 高容错率，即使局部遮挡也能识别
         });
     </script>
 
