@@ -205,11 +205,42 @@
             font-size: 10px;
         }
 
-        #map {
+        #map,
+        .hero-map-image {
             position: absolute;
             inset: 0;
-            transform: scale(1.13);
             transform-origin: 74% center;
+        }
+
+        /* static map (used in other sections) */
+        #map {
+            transform: scale(1.13);
+        }
+
+        /* hero static image: fade-in + slow cinematic drift */
+        .hero-map-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            filter: saturate(1.02) contrast(1.02);
+            opacity: 0;
+            will-change: transform, opacity;
+            animation:
+                hero-reveal 1.6s ease-out 0.3s forwards,
+                hero-drift  80s ease-in-out 0.5s infinite alternate;
+        }
+
+        @keyframes hero-reveal {
+            to { opacity: 1; }
+        }
+
+        /* scale 1.0→1.05: slightly zoomed out vs before, pan ≈ ±2% */
+        @keyframes hero-drift {
+            0%   { transform: scale(0.88) translate(0%,     0%);    }
+            28%  { transform: scale(0.91) translate(-2.2%,  0.7%);  }
+            55%  { transform: scale(0.89) translate( 1.1%,  0.4%);  }
+            100% { transform: scale(0.90) translate(-1.4%,  -0.5%); }
         }
 
         .map-shell::before {
@@ -222,64 +253,6 @@
                 linear-gradient(90deg, rgba(5, 5, 5, 0.985) 0%, rgba(5, 5, 5, 0.9) 24%, rgba(5, 5, 5, 0.52) 43%, rgba(5, 5, 5, 0.18) 66%, rgba(5, 5, 5, 0.04) 100%),
                 radial-gradient(circle at 16% 30%, rgba(0, 0, 0, 0.22), transparent 24%),
                 radial-gradient(circle at 80% 36%, rgba(34, 211, 238, 0.09), transparent 18%);
-        }
-
-        .loading {
-            position: absolute;
-            inset: 0;
-            z-index: 5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.72);
-            backdrop-filter: blur(12px);
-        }
-
-        .loading-card {
-            width: min(520px, calc(100% - 40px));
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(10, 10, 10, 0.95);
-            border-radius: 24px;
-            padding: 24px;
-        }
-
-        .loading-title {
-            color: #ffffff;
-            font-size: 22px;
-            margin-bottom: 8px;
-            font-family: "IBM Plex Serif", serif;
-        }
-
-        .loading-text {
-            color: var(--muted);
-            font-size: 14px;
-            line-height: 1.8;
-            margin-bottom: 18px;
-        }
-
-        .progress-bar {
-            height: 10px;
-            border-radius: 999px;
-            background: rgba(255, 255, 255, 0.08);
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            width: 0%;
-            height: 100%;
-            background: linear-gradient(90deg, var(--cyan), var(--pink));
-            transition: width 120ms ease;
-        }
-
-        .status-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            margin-top: 12px;
-            color: var(--muted);
-            font-size: 12px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
         }
 
         .scroll-bridge {
@@ -1015,258 +988,6 @@
             background: #10b981;
         }
 
-        .demo-section {
-            padding: 18vh 4.8vw 12vh;
-            background: linear-gradient(180deg, rgba(255, 255, 255, 0.012) 0%, rgba(255, 255, 255, 0.028) 100%);
-        }
-
-        .demo-inner {
-            max-width: 1280px;
-            margin: 0 auto;
-        }
-
-        .demo-header {
-            max-width: 900px;
-            margin: 0 0 42px;
-        }
-
-        .demo-kicker {
-            margin: 0 0 12px;
-            color: rgba(34, 211, 238, 0.9);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.86rem;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .demo-title {
-            margin: 0 0 14px;
-            color: #f8fafc;
-            font-family: "IBM Plex Sans", sans-serif;
-            font-size: clamp(2rem, 3.4vw, 3.15rem);
-            line-height: 1.06;
-            letter-spacing: -0.045em;
-            font-weight: 700;
-        }
-
-        .demo-copy {
-            margin: 0;
-            max-width: 760px;
-            color: rgba(203, 213, 225, 0.78);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: clamp(1rem, 1.4vw, 1.24rem);
-            line-height: 1.56;
-            font-weight: 300;
-        }
-
-        .demo-layout {
-            display: grid;
-            grid-template-columns: minmax(360px, 1.3fr) minmax(300px, 0.7fr);
-            gap: 28px;
-            align-items: stretch;
-        }
-
-        .demo-map-panel,
-        .demo-info-panel {
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(8, 8, 8, 0.84);
-            backdrop-filter: blur(10px);
-        }
-
-        .demo-map-panel {
-            overflow: hidden;
-        }
-
-        .demo-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 16px;
-            padding: 16px 18px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(12, 12, 12, 0.92);
-        }
-
-        .demo-select-wrap {
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .demo-label {
-            color: rgba(161, 161, 170, 0.82);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.76rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-
-        .demo-select {
-            min-width: 210px;
-            padding: 10px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            background: rgba(18, 18, 18, 0.95);
-            color: #f8fafc;
-            font-family: "IBM Plex Sans", sans-serif;
-            font-size: 0.96rem;
-            outline: none;
-        }
-
-        .demo-toolbar-note {
-            color: rgba(161, 161, 170, 0.82);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.94rem;
-            line-height: 1.45;
-            max-width: 380px;
-        }
-
-        .demo-map {
-            position: relative;
-            height: 560px;
-        }
-
-        #demo-map {
-            width: 100%;
-            height: 100%;
-        }
-
-        .demo-map-status {
-            position: absolute;
-            left: 18px;
-            bottom: 18px;
-            z-index: 2;
-            padding: 10px 12px;
-            border-radius: 12px;
-            background: rgba(7, 7, 7, 0.72);
-            color: rgba(248, 250, 252, 0.82);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.9rem;
-            line-height: 1.45;
-            backdrop-filter: blur(8px);
-            pointer-events: none;
-        }
-
-        .demo-info-panel {
-            padding: 22px 20px 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 18px;
-        }
-
-        .demo-info-title {
-            margin: 0;
-            color: #f8fafc;
-            font-family: "IBM Plex Sans", sans-serif;
-            font-size: 1.08rem;
-            font-weight: 600;
-            letter-spacing: -0.02em;
-        }
-
-        .demo-info-copy {
-            margin: 0;
-            color: rgba(161, 161, 170, 0.9);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.96rem;
-            line-height: 1.55;
-            font-weight: 300;
-        }
-
-        .demo-metadata {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 12px;
-        }
-
-        .demo-meta-card {
-            padding: 12px 14px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(15, 15, 15, 0.8);
-            border-radius: 14px;
-        }
-
-        .demo-meta-label {
-            margin: 0 0 6px;
-            color: rgba(161, 161, 170, 0.74);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.72rem;
-            letter-spacing: 0.16em;
-            text-transform: uppercase;
-        }
-
-        .demo-meta-value {
-            margin: 0;
-            color: #f8fafc;
-            font-family: "IBM Plex Sans", sans-serif;
-            font-size: 0.96rem;
-            line-height: 1.42;
-            word-break: break-word;
-        }
-
-        .demo-chart-wrap {
-            padding-top: 6px;
-        }
-
-        .demo-chart-header {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-
-        .demo-chart-title {
-            margin: 0;
-            color: #f8fafc;
-            font-family: "IBM Plex Sans", sans-serif;
-            font-size: 1rem;
-            font-weight: 600;
-        }
-
-        .demo-chart-note {
-            color: rgba(161, 161, 170, 0.74);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.8rem;
-            letter-spacing: 0.12em;
-            text-transform: uppercase;
-        }
-
-        .demo-chart {
-            height: 220px;
-            display: grid;
-            grid-template-columns: repeat(24, minmax(0, 1fr));
-            align-items: end;
-            gap: 6px;
-            padding: 14px 8px 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .demo-bar {
-            border-radius: 999px 999px 4px 4px;
-            background: linear-gradient(180deg, rgba(34, 211, 238, 0.98), rgba(236, 72, 153, 0.82));
-            min-height: 8px;
-            opacity: 0.94;
-            transition: height 180ms ease;
-        }
-
-        .demo-footer-note {
-            margin: 0;
-            color: rgba(161, 161, 170, 0.78);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.88rem;
-            line-height: 1.5;
-        }
-
-        .demo-point-marker {
-            width: 14px;
-            height: 14px;
-            border-radius: 999px;
-            background: #22d3ee;
-            border: 2px solid rgba(255, 255, 255, 0.92);
-            box-shadow: 0 0 0 6px rgba(34, 211, 238, 0.18);
-        }
 
         @keyframes architecture-gradient-shift {
             0% { background-position: 0% 50%; }
@@ -1526,14 +1247,6 @@
                 min-height: 320px;
             }
 
-            .demo-layout {
-                grid-template-columns: 1fr;
-            }
-
-            .demo-map {
-                height: 500px;
-            }
-
             .results-chart {
                 grid-template-columns: 40px minmax(0, 1fr);
             }
@@ -1602,10 +1315,6 @@
                 padding: 14vh 18px 8vh;
             }
 
-            .demo-section {
-                padding: 14vh 18px 12vh;
-            }
-
             .results-section {
                 padding: 14vh 18px 12vh;
             }
@@ -1636,27 +1345,6 @@
             .box-3 {
                 top: 148px;
                 left: 148px;
-            }
-
-            .demo-toolbar {
-                align-items: flex-start;
-            }
-
-            .demo-select {
-                min-width: 0;
-                width: 100%;
-            }
-
-            .demo-map {
-                height: 420px;
-            }
-
-            .demo-metadata {
-                grid-template-columns: 1fr;
-            }
-
-            .demo-chart {
-                gap: 4px;
             }
 
             .results-card {
@@ -1730,8 +1418,8 @@
                 <div class="text-container">
                     <div class="eyebrow">MoRA:</div>
                     <h1>
-                        <span>Understand Locations through</span>
-                        <span class="highlight">How People Live In It.</span>
+                        <span>Location representations powered by</span>
+                        <span class="highlight">human mobility.</span>
                     </h1>
                     <p class="subtitle">
                        MoRA encodes locations across the entirety of China into compact 128-dimensional representations capturing their socio-economic and functional DNA by anchoring satellite imagery, 100M+ POIs, and demographics to a billion-edge mobility graph.
@@ -1741,7 +1429,7 @@
 
             <section class="map-shell">
                 <div class="map-header">
-                    <div class="map-title">Similarity View (East China for demonstration)</div>
+                    <div class="map-title">Similarity View</div>
                     <div class="map-subtitle">Shows the cosine similarity between the representation of a chosen hexagonal grid cell and the remaining cells.</div>
                     <div class="map-legend">
                         <div class="legend-label">Cosine Similarity</div>
@@ -1753,23 +1441,11 @@
                     </div>
                 </div>
 
-                <div id="map"></div>
-
-                <div id="loading" class="loading">
-                    <div class="loading-card">
-                        <div class="loading-title">Building the H3 similarity map</div>
-                        <div id="loading-text" class="loading-text">
-                            Loading the CSV and generating H3 polygons in the browser.
-                        </div>
-                        <div class="progress-bar">
-                            <div id="progress-fill" class="progress-fill"></div>
-                        </div>
-                        <div class="status-row">
-                            <span id="status-left">Starting</span>
-                            <span id="status-right">0%</span>
-                        </div>
-                    </div>
-                </div>
+                <img
+                    src="hero_similarity.svg"
+                    alt="Static similarity map of East China"
+                    class="hero-map-image"
+                />
             </section>
         </main>
 
@@ -1877,7 +1553,7 @@
 
         <section class="choice-section" aria-label="Next sections">
             <div class="choice-inner">
-                <a class="choice-link primary" href="#demonstration">
+                <a class="choice-link primary" href="#cp-section">
                     <span>See it in action</span>
                     <span class="choice-arrow">→</span>
                 </a>
@@ -2162,414 +1838,302 @@
 
         <div class="results-tooltip" id="results-tooltip" role="tooltip" aria-hidden="true"></div>
 
-        <section class="demo-section" id="demonstration" aria-labelledby="demo-title">
-            <div class="demo-inner">
-                <div class="demo-header">
-                    <p class="demo-kicker">Demonstration</p>
-                    <h2 class="demo-title" id="demo-title">Direct representation query by coordinates only. </h2>
-                    <p class="demo-copy">
-                        Select a city, and click any location within the boundary to read the latitude, longitude, and the corresponding representation.
-                    </p>
-                </div>
-
-                <div class="demo-layout">
-                    <div class="demo-map-panel">
-                        <div class="demo-toolbar">
-                            <div class="demo-select-wrap">
-                                <label class="demo-label" for="demo-city-select">City</label>
-                                <select class="demo-select" id="demo-city-select">
-                                    <option value="beijing">Beijing</option>
-                                    <option value="shanghai">Shanghai</option>
-                                    <!-- <option value="shenzhen">Shenzhen</option> -->
-                                    <option value="chengdu">Chengdu</option>
-                                    <option value="chongqing">Chongqing</option>
-                                    <option value="wuhan">Wuhan</option>
-                                </select>
-                            </div>
-
-                            <p class="demo-toolbar-note">
-                                The map displays only a sampled boundary of the city. Click within the outlined area to select a point and examine its embedding components.
-                            </p>
-                        </div>
-
-                        <div class="demo-map">
-                            <div id="demo-map"></div>
-                            <div class="demo-map-status" id="demo-map-status">Loading city raster…</div>
-                        </div>
-                    </div>
-
-                    <aside class="demo-info-panel">
-
-                        <div class="demo-metadata">
-                            <div class="demo-meta-card">
-                                <p class="demo-meta-label">City</p>
-                                <p class="demo-meta-value" id="demo-city-value">Beijing</p>
-                            </div>
-                            <div class="demo-meta-card">
-                                <p class="demo-meta-label">Coordinate</p>
-                                <p class="demo-meta-value" id="demo-coord-value">Click inside the boundary</p>
-                            </div>
-                        </div>
-
-                        <div class="demo-chart-wrap">
-                            <div class="demo-chart-header">
-                                <h3 class="demo-chart-title">Embedding distribution</h3>
-                                <span class="demo-chart-note" id="demo-chart-note">No point selected</span>
-                            </div>
-                            <div class="demo-chart" id="demo-chart" aria-hidden="true"></div>
-                        </div>
-
-                        <p class="demo-footer-note" id="demo-footer-note">
-                            The chart displays the first 24 dimensions from the clicked pixel.
-                        </p>
-                    </aside>
-                </div>
-            </div>
-        </section>
         <!-- ============================================================ -->
-<!--  Anchor-Selector Similarity Explorer  – insert after Demo    -->
-<!-- ============================================================ -->
+        <!--  Embedding Comparator  – insert after Demonstration          -->
+        <!-- ============================================================ -->
 
-<style>
-/* ---------- section shell ---------- */
-#ue-section{padding:4.5rem 1.5rem;background:#06060e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,sans-serif}
-.ue-inner{max-width:1200px;margin:0 auto}
-.ue-header{text-align:left;margin-bottom:2rem;max-width:760px}
-.ue-label{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#10b981;margin-bottom:.6rem}
-.ue-title{font-size:2.25rem;font-weight:700;color:#f0f0f5;margin:0 0 .7rem;line-height:1.2}
-.ue-sub{font-size:1.05rem;color:#777;line-height:1.65;max-width:660px;margin:0}
-@media(max-width:768px){.ue-title{font-size:1.5rem}}
+        <style>
+        #cp-section{padding:4.5rem 1.5rem;background:#06060e;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Oxygen,sans-serif}
+        .cp-inner{max-width:1100px;margin:0 auto}
+        .cp-header{text-align:center;margin-bottom:2rem}
+        .cp-label{display:inline-block;font-size:.72rem;font-weight:600;letter-spacing:.2em;text-transform:uppercase;color:#10b981;margin-bottom:.6rem}
+        .cp-title{font-size:2.25rem;font-weight:700;color:#f0f0f5;margin:0 0 .7rem;line-height:1.2}
+        .cp-sub{font-size:1.05rem;color:#777;line-height:1.65;max-width:680px;margin:0 auto}
+        @media(max-width:768px){.cp-title{font-size:1.5rem}}
+        .cp-pills{display:flex;flex-wrap:wrap;gap:.5rem;justify-content:center;margin-bottom:1.5rem}
+        .cp-pill{padding:.5rem 1.2rem;border:1px solid rgba(255,255,255,.14);border-radius:2rem;background:transparent;color:#aaa;font-size:.85rem;font-weight:500;cursor:pointer;transition:all .25s;text-transform:capitalize}
+        .cp-pill:hover{border-color:rgba(255,255,255,.35);color:#ddd;background:rgba(255,255,255,.04)}
+        .cp-pill.on{border-color:#10b981;color:#10b981;background:rgba(16,185,129,.1)}
+        .cp-mapbox{position:relative;border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,.07);background:#0d1117;margin-bottom:1.2rem}
+        #cp-map2{width:100%;height:48vh;min-height:300px;max-height:520px}
+        @media(max-width:768px){#cp-map2{height:40vh;min-height:250px}}
+        #cp-guide{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,20,.82);backdrop-filter:blur(8px);border:1px solid rgba(16,185,129,.22);border-radius:.7rem;padding:.8rem 1.4rem;color:#bbb;font-size:.85rem;z-index:10;text-align:center;transition:opacity .4s;pointer-events:none}
+        #cp-guide strong{color:#10b981}
+        #cp-guide.hidden{opacity:0}
+        .cpm{width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.1);border:2px solid rgba(255,255,255,.4);color:#fff;font-size:.82rem;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .3s;backdrop-filter:blur(4px);line-height:1}
+        .cpm:hover{transform:scale(1.12);border-color:#fff}
+        .cpm.s1{background:#fde725;border-color:#fde725;color:#111;transform:scale(1.25);box-shadow:0 0 14px rgba(253,231,37,.45)}
+        .cpm.s2{background:#3bc9db;border-color:#3bc9db;color:#111;transform:scale(1.25);box-shadow:0 0 14px rgba(59,201,219,.45)}
+        .cp-bar{display:flex;gap:.6rem;align-items:center;justify-content:center;flex-wrap:wrap;margin-bottom:1.4rem;min-height:2rem}
+        .cp-tag{padding:.35rem .9rem;border-radius:.4rem;font-size:.8rem;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);color:#888}
+        .cp-tag b{margin-right:.3rem}
+        .cp-tag.t1 b{color:#fde725}
+        .cp-tag.t2 b{color:#3bc9db}
+        .cp-tag.ghost{color:#555;font-style:italic;border-style:dashed}
+        #cp-rst{padding:.32rem .75rem;border:1px solid rgba(255,255,255,.14);border-radius:.35rem;background:transparent;color:#777;font-size:.72rem;cursor:pointer;transition:all .2s}
+        #cp-rst:hover{color:#fff;border-color:#fff}
+        #cp-res{opacity:0;transition:opacity .5s;pointer-events:none}
+        #cp-res.show{opacity:1;pointer-events:auto}
+        .cp-sim{text-align:center;margin-bottom:1.5rem;padding:1.3rem;border-radius:.8rem;background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.06)}
+        .cp-sim-l{font-size:.7rem;font-weight:600;letter-spacing:.15em;text-transform:uppercase;color:#888;margin-bottom:.4rem}
+        #cp-sim-n{font-size:3.2rem;font-weight:800;color:#10b981;font-variant-numeric:tabular-nums;transition:color .4s}
+        @media(max-width:768px){#cp-sim-n{font-size:2.2rem}}
+        .cp-charts{display:flex;flex-direction:column;gap:1rem}
+        .cp-cbox{border-radius:.7rem;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);padding:.75rem .85rem .65rem}
+        .cp-chdr{display:flex;align-items:center;gap:.55rem;margin-bottom:.4rem}
+        .cp-cdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+        .cp-cdot.d1{background:#fde725}
+        .cp-cdot.d2{background:#3bc9db}
+        .cp-cname{font-size:.78rem;font-weight:600;color:#ccc}
+        .cp-ccoord{font-size:.7rem;color:#555;margin-left:auto}
+        .cp-cbox canvas{width:100%;display:block}
+        .cp-dim{text-align:right;font-size:.62rem;color:#444;margin-top:.2rem}
+        </style>
 
-/* ---------- map wrapper ---------- */
-.ue-wrap{position:relative;border-radius:1rem;overflow:hidden;border:1px solid rgba(255,255,255,.07);background:#0d1117}
-#ue-map{width:100%;height:70vh;min-height:400px;max-height:700px}
-@media(max-width:768px){#ue-map{height:55vh;min-height:300px}}
+        <section id="cp-section">
+        <div class="cp-inner">
+          <div class="cp-header">
+            <span class="cp-label">Embedding Comparator</span>
+            <h2 class="cp-title">Compare Two Location Representations</h2>
+            <p class="cp-sub">Choose a city, then click any two sample points to visualise their
+              128-dimensional MoRA embeddings side-by-side and compute cosine similarity.</p>
+          </div>
 
-/* ---------- overlays ---------- */
-#ue-status{position:absolute;bottom:1.4rem;left:50%;transform:translateX(-50%);background:rgba(10,10,20,.92);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:.7rem;padding:.65rem 1.4rem;color:#ccc;font-size:.82rem;z-index:10;text-align:center;min-width:250px;transition:opacity .4s}
-#ue-status.hidden{opacity:0;pointer-events:none}
-#ue-pbar-wrap{width:100%;height:3px;background:rgba(255,255,255,.08);border-radius:2px;margin-top:.45rem;overflow:hidden}
-#ue-pbar{height:100%;width:0%;background:#10b981;border-radius:2px;transition:width .15s}
+          <div class="cp-pills" id="cp-pills"></div>
 
-#ue-legend{position:absolute;top:1rem;right:1rem;background:rgba(10,10,20,.88);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);border-radius:.55rem;padding:.55rem .8rem;z-index:10;opacity:0;transition:opacity .5s;pointer-events:none}
-#ue-legend.vis{opacity:1;pointer-events:auto}
-.ue-ltitle{font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.1em;color:#999;margin-bottom:.35rem}
-.ue-lbar{width:140px;height:10px;border-radius:5px;background:linear-gradient(to right,#0d0887,#5b02a3,#9a179b,#cc4778,#ed7953,#fdb42f,#f0f921)}
-.ue-llabels{display:flex;justify-content:space-between;font-size:.58rem;color:#888;margin-top:.2rem}
+          <div class="cp-mapbox">
+            <div id="cp-map2"></div>
+            <div id="cp-guide">Pick a <strong>city</strong> above to begin</div>
+          </div>
 
-#ue-back{position:absolute;top:1rem;left:1rem;background:rgba(10,10,20,.88);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.15);border-radius:.5rem;padding:.45rem .9rem;color:#ccc;font-size:.78rem;cursor:pointer;z-index:10;opacity:0;transition:opacity .3s,background .2s;pointer-events:none}
-#ue-back.vis{opacity:1;pointer-events:auto}
-#ue-back:hover{background:rgba(30,30,50,.95);color:#fff}
+          <div class="cp-bar" id="cp-bar">
+            <span class="cp-tag ghost">Select a city to view sample points</span>
+          </div>
 
-#ue-inst{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(10,10,20,.82);backdrop-filter:blur(8px);border:1px solid rgba(16,185,129,.25);border-radius:.7rem;padding:.9rem 1.4rem;color:#bbb;font-size:.88rem;z-index:10;text-align:center;transition:opacity .4s;pointer-events:none}
-#ue-inst strong{color:#10b981}
-#ue-inst.hidden{opacity:0}
+          <div id="cp-res">
+            <div class="cp-sim">
+              <div class="cp-sim-l">Cosine Similarity</div>
+              <div id="cp-sim-n">&mdash;</div>
+            </div>
+            <div class="cp-charts">
+              <div class="cp-cbox">
+                <div class="cp-chdr"><span class="cp-cdot d1"></span>
+                  <span class="cp-cname" id="cp-n1">Point 1</span>
+                  <span class="cp-ccoord" id="cp-co1"></span></div>
+                <canvas id="cp-cv1"></canvas>
+                <div class="cp-dim">128 dimensions -&gt;</div>
+              </div>
+              <div class="cp-cbox">
+                <div class="cp-chdr"><span class="cp-cdot d2"></span>
+                  <span class="cp-cname" id="cp-n2">Point 2</span>
+                  <span class="cp-ccoord" id="cp-co2"></span></div>
+                <canvas id="cp-cv2"></canvas>
+                <div class="cp-dim">128 dimensions -&gt;</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        </section>
 
-.ue-tip{position:absolute;background:rgba(10,10,20,.92);border:1px solid rgba(255,255,255,.12);border-radius:.35rem;padding:.35rem .6rem;color:#eee;font-size:.72rem;pointer-events:none;z-index:20;white-space:nowrap;transform:translate(-50%,-120%);display:none}
-</style>
+        <script>
+        (function(){
+        "use strict";
 
-<section id="ue-section">
-<div class="ue-inner">
-  <div class="ue-header">
-    <span class="ue-label">Demonstration</span>
-    <h2 class="ue-title">Similarity search: Pick an Anchor, See the Neighborhood</h2>
-    <p class="ue-sub">Each highlighted cell is a pre-selected anchor location.
-      Click one to reveal the cosine similarity of its MoRA representation
-      with every other cell in East China — rendered live in your browser.</p>
-  </div>
-  <div class="ue-wrap">
-    <div id="ue-map"></div>
-    <div id="ue-legend">
-      <div class="ue-ltitle">Cosine Similarity</div>
-      <div class="ue-lbar"></div>
-      <div class="ue-llabels"><span>Lower</span><span>Higher</span></div>
-    </div>
-    <button id="ue-back">← All anchors</button>
-    <div id="ue-inst">Zoom in and <strong>Click</strong> a highlighted anchor cell to explore</div>
-    <div id="ue-status">
-      <div id="ue-stxt">Discovering data files…</div>
-      <div id="ue-pbar-wrap"><div id="ue-pbar"></div></div>
-    </div>
-    <div class="ue-tip" id="ue-tip"></div>
-  </div>
-</div>
-</section>
+        var CITIES=["beijing","shanghai","shenzhen","chengdu","wuhan","chongqing"];
+        var ZOOM={beijing:[116.43,39.84],shanghai:[121.43,31.16],shenzhen:[114.1,22.5],chengdu:[104.14,30.76],wuhan:[114.24,30.49],chongqing:[106.46,29.6]};
+        var D=null,map2=null,mks=[],city=null,p1=null,p2=null;
 
-<script>
-(function(){
-  "use strict";
+        var $pills=document.getElementById("cp-pills"),
+            $guide=document.getElementById("cp-guide"),
+            $bar=document.getElementById("cp-bar"),
+            $res=document.getElementById("cp-res"),
+            $simN=document.getElementById("cp-sim-n");
 
-  function boot(){
-    /* ---- DOM ---- */
-    var $status  = document.getElementById("ue-status");
-    var $stxt    = document.getElementById("ue-stxt");
-    var $pbar    = document.getElementById("ue-pbar");
-    var $legend  = document.getElementById("ue-legend");
-    var $back    = document.getElementById("ue-back");
-    var $inst    = document.getElementById("ue-inst");
-    var $tip     = document.getElementById("ue-tip");
+        function parseEmb(txt){
+          var c=txt.replace(/^\uFEFF/,"").trim(),ls=c.split("\n"),out={};
+          for(var i=1;i<ls.length;i++){
+            var l=ls[i].trim(); if(!l)continue;
+            var ai=l.indexOf('"['); if(ai===-1)continue;
+            var m=l.substring(0,ai).replace(/,\s*$/,"").split(",");
+            var ct=m[0].trim(),id=+m[1],lo=+m[2],la=+m[3];
+            var es=l.substring(ai+1,l.lastIndexOf('"'));
+            try{var em=JSON.parse(es);}catch(e){continue;}
+            if(!out[ct])out[ct]=[];
+            out[ct].push({id:id,lon:lo,lat:la,emb:em});
+          }
+          return out;
+        }
 
-    if (typeof maplibregl === "undefined") { $stxt.textContent = "maplibre-gl not loaded"; return; }
-    if (typeof h3 === "undefined") { $stxt.textContent = "h3-js not loaded"; return; }
+        function cosine(a,b){
+          var d=0,na=0,nb=0;
+          for(var i=0;i<a.length;i++){d+=a[i]*b[i];na+=a[i]*a[i];nb+=b[i]*b[i];}
+          return d/(Math.sqrt(na)*Math.sqrt(nb));
+        }
 
-    /* ---- h3 compat (v3 / v4) ---- */
-    var _boundary = (h3.cellToBoundary)
-        ? h3.cellToBoundary.bind(h3)
-        : (h3.h3ToGeoBoundary)
-          ? h3.h3ToGeoBoundary.bind(h3) : null;
-    if(!_boundary){ $stxt.textContent="h3-js not loaded"; return; }
+        function drawEmb(cvId,emb,col){
+          var cv=document.getElementById(cvId);
+          if(!cv)return;
+          var dpr=window.devicePixelRatio||1;
+          var w=cv.offsetWidth||cv.parentElement.clientWidth||500;
+          var h=130;
+          cv.width=w*dpr; cv.height=h*dpr;
+          cv.style.height=h+"px";
+          var ctx=cv.getContext("2d"); ctx.scale(dpr,dpr);
+          var n=emb.length,mx=0;
+          for(var i=0;i<n;i++) mx=Math.max(mx,Math.abs(emb[i]));
+          if(mx<1e-6)mx=1;
+          var bW=w/n, mid=h/2;
+          ctx.save();
+          ctx.strokeStyle="rgba(255,255,255,.12)";
+          ctx.lineWidth=1;ctx.setLineDash([4,4]);
+          ctx.beginPath();ctx.moveTo(0,mid);ctx.lineTo(w,mid);ctx.stroke();
+          ctx.restore();
+          for(var j=0;j<n;j++){
+            var v=emb[j], p=Math.abs(v)/mx, bh=p*(mid-3);
+            ctx.globalAlpha=.35+.65*p;
+            ctx.fillStyle=col;
+            var x=j*bW, bw=Math.max(bW-.5,.8);
+            if(v>=0) ctx.fillRect(x,mid-bh,bw,bh);
+            else ctx.fillRect(x,mid,bw,bh);
+          }
+          ctx.globalAlpha=1;
+          ctx.fillStyle="rgba(255,255,255,.22)";
+          ctx.font="9px sans-serif";ctx.textAlign="left";
+          ctx.fillText("+"+mx.toFixed(1),2,10);
+          ctx.fillText("\u2212"+mx.toFixed(1),2,h-3);
+        }
 
-    /* ---- state ---- */
-    var datasets=[], map=null, view="anchors";
+        function mkPills(){
+          CITIES.forEach(function(c){
+            var b=document.createElement("button");
+            b.className="cp-pill";b.textContent=c;
+            b.addEventListener("click",function(){pickCity(c);});
+            $pills.appendChild(b);
+          });
+        }
 
-  /* ======== CSV helpers ======== */
-  function parseCSV(txt){
-    var clean=txt.replace(/^\uFEFF/,"").trim(), lines=clean.split("\n");
-    var data=[], best={h3:"",s:-Infinity}, exact=null;
-    for(var i=1;i<lines.length;i++){
-      var ln=lines[i].trim(); if(!ln) continue;
-      var ci=ln.lastIndexOf(","); if(ci===-1) continue;
-      var id=ln.substring(0,ci).trim(), s=parseFloat(ln.substring(ci+1));
-      if(isNaN(s)) continue;
-      data.push({h3:id,similarity:s});
-      if(exact===null && s>=0.999999){ exact={h3:id,s:s}; }
-      if(s>best.s){best={h3:id,s:s};}
-    }
-    return {data:data,anchor:(exact||best)};
-  }
+        function pickCity(c){
+          city=c; p1=null; p2=null;
+          [].forEach.call($pills.children,function(b){b.classList.toggle("on",b.textContent===c);});
+          mks.forEach(function(m){m.mk.remove();}); mks=[];
+          var pts=D[c]; if(!pts)return;
+          pts.forEach(function(pt){
+            var el=document.createElement("div");
+            el.className="cpm";el.textContent=pt.id;
+            var mk=new maplibregl.Marker({element:el,anchor:"center"}).setLngLat([pt.lon,pt.lat]).addTo(map2);
+            el.addEventListener("click",function(e){e.stopPropagation();pickPt(pt);});
+            mks.push({mk:mk,el:el,d:pt});
+          });
+          var bounds=new maplibregl.LngLatBounds();
+          pts.forEach(function(p){bounds.extend([p.lon,p.lat]);});
+          map2.fitBounds(bounds,{padding:70,maxZoom:12});
+          $guide.innerHTML="Click a marker to select <strong>Point 1</strong>";
+          $guide.classList.remove("hidden");
+          refreshBar(); $res.classList.remove("show");
+        }
 
-  async function discoverFiles(){
-    var found=[], misses=0;
-    for(var i=1; misses<5 && i<=30; i++){
-      var url="EastChina_h3_similarity_userselected_no"+i+".csv";
-      try{
-        var r=await fetch(url);
-        if(r.ok){ misses=0;
-          $stxt.textContent="Loading file "+String(found.length+1)+"…";
-          var t=await r.text(), p=parseCSV(t);
-          if(p.data.length && p.anchor.h3) found.push({idx:i,url:url,data:p.data,anchor:p.anchor});
-        }else{ misses++; }
-      }catch(e){ misses++; }
-      $pbar.style.width=Math.min(i/20*100,95)+"%";
-    }
-    return found;
-  }
+        function pickPt(pt){
+          if(!p1){p1=pt;$guide.innerHTML="Now click a different marker for <strong>Point 2</strong>";}
+          else if(!p2){if(pt.id===p1.id)return;p2=pt;$guide.classList.add("hidden");}
+          else{p1=pt;p2=null;$guide.innerHTML="Now click a different marker for <strong>Point 2</strong>";$guide.classList.remove("hidden");}
+          mks.forEach(function(m){
+            m.el.classList.remove("s1","s2");
+            m.el.style.zIndex="1";
+            if(p1&&m.d.id===p1.id){m.el.classList.add("s1");m.el.style.zIndex="3";}
+            if(p2&&m.d.id===p2.id){m.el.classList.add("s2");m.el.style.zIndex="3";}
+          });
+          refreshBar();
+          if(p1&&p2) showRes(); else $res.classList.remove("show");
+        }
 
-  /* ======== geo helpers ======== */
-  function ring(h3id){
-    var b=_boundary(h3id), r=b.map(function(c){return[c[1],c[0]];});
-    r.push(r[0]); return r;
-  }
+        function refreshBar(){
+          var h="";
+          if(!city){h='<span class="cp-tag ghost">Select a city to view sample points</span>';}
+          else{
+            if(p1) h+='<span class="cp-tag t1"><b>P1</b> #'+p1.id+" ("+p1.lon.toFixed(4)+", "+p1.lat.toFixed(4)+")</span>";
+            else h+='<span class="cp-tag ghost">Click a marker for Point 1</span>';
+            if(p2) h+='<span class="cp-tag t2"><b>P2</b> #'+p2.id+" ("+p2.lon.toFixed(4)+", "+p2.lat.toFixed(4)+")</span>";
+            else if(p1) h+='<span class="cp-tag ghost">Click another marker for Point 2</span>';
+            if(p1) h+=' <button id="cp-rst">Reset</button>';
+          }
+          $bar.innerHTML=h;
+          var rb=document.getElementById("cp-rst");
+          if(rb) rb.addEventListener("click",function(){
+            p1=null;p2=null;
+            mks.forEach(function(m){m.el.classList.remove("s1","s2");m.el.style.zIndex="1";});
+            refreshBar();$res.classList.remove("show");
+            $guide.innerHTML="Click a marker to select <strong>Point 1</strong>";
+            $guide.classList.remove("hidden");
+          });
+        }
 
-  function anchorsGJ(){
-    return {type:"FeatureCollection",features:datasets.map(function(d){
-      return {type:"Feature",properties:{idx:d.idx,h3:d.anchor.h3},
-              geometry:{type:"Polygon",coordinates:[ring(d.anchor.h3)]}};
-    })};
-  }
+        function showRes(){
+          $res.classList.add("show");
+          var sim=cosine(p1.emb,p2.emb);
+          animSim(sim);
+          document.getElementById("cp-n1").textContent="Point "+p1.id;
+          document.getElementById("cp-co1").textContent=p1.lon.toFixed(4)+", "+p1.lat.toFixed(4);
+          document.getElementById("cp-n2").textContent="Point "+p2.id;
+          document.getElementById("cp-co2").textContent=p2.lon.toFixed(4)+", "+p2.lat.toFixed(4);
+          setTimeout(function(){
+            drawEmb("cp-cv1",p1.emb,"#fde725");
+            drawEmb("cp-cv2",p2.emb,"#3bc9db");
+          },60);
+        }
 
-  async function simGJ(data,cb){
-    var feats=[], total=data.length, B=800;
-    for(var i=0;i<total;i+=B){
-      var end=Math.min(i+B,total);
-      for(var j=i;j<end;j++){
-        try{ feats.push({type:"Feature",
-          properties:{similarity:data[j].similarity},
-          geometry:{type:"Polygon",coordinates:[ring(data[j].h3)]}});
-        }catch(e){}
-      }
-      if(cb) cb(end/total);
-      await new Promise(function(r){setTimeout(r,0);});
-    }
-    return {type:"FeatureCollection",features:feats};
-  }
+        function animSim(target){
+          var col;
+          if(target>=.8) col="#10b981";
+          else if(target>=.5) col="#a3e635";
+          else if(target>=.2) col="#f59e0b";
+          else col="#ef4444";
+          $simN.style.color=col;
+          var t0=performance.now(),dur=900;
+          (function tick(){
+            var p=Math.min((performance.now()-t0)/dur,1);
+            var e=1-Math.pow(1-p,3);
+            $simN.textContent=(target*e).toFixed(4);
+            if(p<1) requestAnimationFrame(tick);
+            else $simN.textContent=target.toFixed(4);
+          })();
+        }
 
-  /* ======== map init ======== */
-  function initMap(){
-    map=new maplibregl.Map({
-      container:"ue-map",
-      style:{version:8,
-        sources:{"carto":{type:"raster",
-          tiles:["https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-                 "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"],
-          tileSize:256,maxzoom:18}},
-        layers:[{id:"bg",type:"raster",source:"carto"}]},
-      center:[119.5,30.5],zoom:5.5,maxZoom:14,minZoom:4
-    });
-    map.addControl(new maplibregl.NavigationControl(),"bottom-right");
-    return new Promise(function(ok){map.on("load",ok);});
-  }
+        function initMap2(){
+          map2=new maplibregl.Map({
+            container:"cp-map2",
+            style:{version:8,sources:{ct:{type:"raster",tiles:["https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png","https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"],tileSize:256,maxzoom:18}},layers:[{id:"bg2",type:"raster",source:"ct"}]},
+            center:(ZOOM.beijing||[108,34]),
+            zoom:3.8,maxZoom:14,minZoom:3
+          });
+          map2.addControl(new maplibregl.NavigationControl(),"bottom-right");
+          return new Promise(function(ok){map2.on("load",ok);});
+        }
 
-  /* ======== visibility util ======== */
-  function vis(id,v){if(map.getLayer(id))map.setLayoutProperty(id,"visibility",v?"visible":"none");}
+        async function main(){
+          try{
+            var r=await fetch("city_embeddings.csv");
+            var t=await r.text();
+            D=parseEmb(t);
+          }catch(e){
+            $guide.textContent="Failed to load city_embeddings.csv";return;
+          }
+          if(!Object.keys(D).length){$guide.textContent="No data found.";return;}
+          await initMap2();
+          mkPills();
+          window.addEventListener("resize",function(){
+            if(p1&&p2){drawEmb("cp-cv1",p1.emb,"#fde725");drawEmb("cp-cv2",p2.emb,"#3bc9db");}
+          });
+        }
 
-  /* ======== render anchors ======== */
-  var _aGJ;
-  function showAnchors(){
-    view="anchors";
-    /* show anchor layers */
-    vis("ue-afill",true); vis("ue-aline",true);
-    /* hide sim layers */
-    vis("ue-sfill",false); vis("ue-sline",false);
-    vis("ue-sel-fill",false); vis("ue-sel-line",false);
-    $legend.classList.remove("vis"); $back.classList.remove("vis");
-    $inst.classList.remove("hidden");
-    /* fit */
-    var bounds=new maplibregl.LngLatBounds();
-    _aGJ.features.forEach(function(f){f.geometry.coordinates[0].forEach(function(c){bounds.extend(c);});});
-    map.fitBounds(bounds,{padding:80,maxZoom:8});
-  }
-
-  /* ======== render similarity ======== */
-  async function showSim(ds){
-    view="similarity";
-    $inst.classList.add("hidden");
-    vis("ue-afill",false); vis("ue-aline",false);
-
-    $status.classList.remove("hidden");
-    $stxt.textContent="Building H3 similarity map…";
-    $pbar.style.width="0%";
-
-    var gj=await simGJ(ds.data,function(p){$pbar.style.width=Math.round(p*100)+"%";});
-    $stxt.textContent="Rendering…"; $pbar.style.width="100%";
-
-    /* sim source */
-    if(map.getSource("ue-sim")) map.getSource("ue-sim").setData(gj);
-    else map.addSource("ue-sim",{type:"geojson",data:gj});
-
-    if(!map.getLayer("ue-sfill")){
-      map.addLayer({id:"ue-sfill",type:"fill",source:"ue-sim",paint:{
-        "fill-color":["interpolate",["linear"],["get","similarity"],
-          -0.3,"#0d0887",0,"#3b049a",0.15,"#5b02a3",0.3,"#8b0aa5",
-          0.42,"#b93289",0.54,"#db5c68",0.65,"#ed7953",0.75,"#f89540",
-          0.85,"#fdb42f",0.95,"#f0f921",1,"#ffffff"],
-        "fill-opacity":0}});
-    }else{ vis("ue-sfill",true); map.setPaintProperty("ue-sfill","fill-opacity",0); }
-
-    if(!map.getLayer("ue-sline")){
-      map.addLayer({id:"ue-sline",type:"line",source:"ue-sim",paint:{
-        "line-color":"rgba(255,255,255,0.03)","line-width":0.4}});
-    }else vis("ue-sline",true);
-
-    /* selected anchor highlight */
-    var selfGJ={type:"FeatureCollection",features:[{type:"Feature",properties:{},
-      geometry:{type:"Polygon",coordinates:[ring(ds.anchor.h3)]}}]};
-    if(map.getSource("ue-sel")) map.getSource("ue-sel").setData(selfGJ);
-    else map.addSource("ue-sel",{type:"geojson",data:selfGJ});
-
-    if(!map.getLayer("ue-sel-fill")){
-      map.addLayer({id:"ue-sel-fill",type:"fill",source:"ue-sel",paint:{
-        "fill-color":"#ffffff","fill-opacity":0.85}});
-      map.addLayer({id:"ue-sel-line",type:"line",source:"ue-sel",paint:{
-        "line-color":"#ffffff","line-width":2.5}});
-    }else{ vis("ue-sel-fill",true); vis("ue-sel-line",true); }
-
-    /* animate in */
-    await new Promise(function(done){
-      var t0=performance.now(), dur=1200;
-      (function tick(){
-        var p=Math.min((performance.now()-t0)/dur,1);
-        var e=1-Math.pow(1-p,3);
-        map.setPaintProperty("ue-sfill","fill-opacity",0.78*e);
-        if(p<1) requestAnimationFrame(tick); else done();
-      })();
-    });
-
-    $status.classList.add("hidden");
-    $legend.classList.add("vis"); $back.classList.add("vis");
-  }
-
-  /* ======== tooltip ======== */
-  function setupTip(){
-    map.on("mousemove","ue-sfill",function(e){
-      if(!e.features||!e.features.length) return;
-      var s=e.features[0].properties.similarity;
-      $tip.textContent="Similarity: "+s.toFixed(4);
-      $tip.style.display="block";
-      $tip.style.left=e.point.x+"px"; $tip.style.top=e.point.y+"px";
-      map.getCanvas().style.cursor="crosshair";
-    });
-    map.on("mouseleave","ue-sfill",function(){
-      $tip.style.display="none"; map.getCanvas().style.cursor="";
-    });
-  }
-
-  /* ======== main ======== */
-  async function main(){
-    datasets=await discoverFiles();
-    if(!datasets.length){ $stxt.textContent="No similarity files found."; $pbar.style.width="0%"; return; }
-    $stxt.textContent="Found "+datasets.length+" anchor"+(datasets.length>1?"s":"")+". Initializing map…";
-    $pbar.style.width="100%";
-
-    await initMap();
-
-    _aGJ=anchorsGJ();
-    map.addSource("ue-anchors",{type:"geojson",data:_aGJ});
-    map.addLayer({id:"ue-afill",type:"fill",source:"ue-anchors",paint:{
-      "fill-color":"#fde725","fill-opacity":0.55}});
-    map.addLayer({id:"ue-aline",type:"line",source:"ue-anchors",paint:{
-      "line-color":"#fde725","line-width":2,"line-opacity":0.9}});
-
-    showAnchors();
-    setupTip();
-
-    map.on("click","ue-afill",function(e){
-      if(view!=="anchors"||!e.features||!e.features.length) return;
-      var idx=e.features[0].properties.idx;
-      var ds=datasets.find(function(d){return d.idx===idx;});
-      if(ds) showSim(ds);
-    });
-    map.on("mouseenter","ue-afill",function(){if(view==="anchors")map.getCanvas().style.cursor="pointer";});
-    map.on("mouseleave","ue-afill",function(){map.getCanvas().style.cursor="";});
-
-    $back.addEventListener("click",showAnchors);
-    setTimeout(function(){$status.classList.add("hidden");},800);
-  }
-
-  main();
-  }
-
-  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",boot);
-  else boot();
-})();
-</script>
+        if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",main);
+        else main();
+        })();
+        </script>
     </div>
 
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdn.jsdelivr.net/npm/geotiff@2.1.3/dist-browser/geotiff.js"></script>
-    <script src="https://unpkg.com/papaparse@5.4.1/papaparse.min.js"></script>
-    <script src="https://unpkg.com/h3-js@4.1.0/dist/h3-js.umd.js"></script>
     <script src="https://unpkg.com/maplibre-gl@5.3.0/dist/maplibre-gl.js"></script>
     <script>
-        const CSV_FILE = "EastChina_one_h3_similarity.csv";
-        const SOURCE_ID = "mora-h3-source";
-        const FILL_LAYER_ID = "mora-h3-fill";
-        const LINE_LAYER_ID = "mora-h3-line";
-        const DEMO_SOURCE_ID = "demo-raster-source";
-        const DEMO_LAYER_ID = "demo-raster-layer";
-        const DEMO_BOUNDARY_SOURCE_ID = "demo-boundary-source";
-        const DEMO_BOUNDARY_FILL_ID = "demo-boundary-fill";
-        const DEMO_BOUNDARY_LINE_ID = "demo-boundary-line";
-        const DEMO_CITY_FILES = {
-            beijing: { label: "Beijing", file: "geotiff_clipped_output/beijing_clipped.tif" },
-            shanghai: { label: "Shanghai", file: "geotiff_clipped_output/shanghai_clipped.tif" },
-            // shenzhen: { label: "Shenzhen", file: "geotiff_clipped_output/shenzhen_clipped.tif" },
-            chengdu: { label: "Chengdu", file: "geotiff_clipped_output/chengdu_clipped.tif" },
-            chongqing: { label: "Chongqing", file: "geotiff_clipped_output/chongqing_clipped.tif" },
-            wuhan: { label: "Wuhan", file: "geotiff_clipped_output/wuhan_clipped.tif" },
-        };
-
-        const state = {
-            map: null,
-            globalView: null,
-            cinematicIntroTimer: null,
-            cinematicDriftTimer: null,
-            demoMap: null,
-            demoMarker: null,
-            demoRaster: null,
-            demoImageUrl: null,
-        };
-
         const layerData = {
             hex: {
                 title: "Hexagonal Spatial Grid",
@@ -2615,22 +2179,6 @@
             },
         };
 
-        const loading = document.getElementById("loading");
-        const loadingText = document.getElementById("loading-text");
-        const progressFill = document.getElementById("progress-fill");
-        const statusLeft = document.getElementById("status-left");
-        const statusRight = document.getElementById("status-right");
-        let cinematicTimer = null;
-
-        function updateLoading(progress, left, right, detail) {
-            progressFill.style.width = `${Math.max(0, Math.min(100, progress))}%`;
-            statusLeft.textContent = left;
-            statusRight.textContent = right;
-            if (detail) {
-                loadingText.textContent = detail;
-            }
-        }
-
         function refreshLucideIcons() {
             if (window.lucide && typeof window.lucide.createIcons === "function") {
                 window.lucide.createIcons();
@@ -2661,233 +2209,6 @@
 
         function resetLayerInfo() {
             updateLayerInfo("default");
-        }
-
-        function getDemoElements() {
-            return {
-                citySelect: document.getElementById("demo-city-select"),
-                mapStatus: document.getElementById("demo-map-status"),
-                cityValue: document.getElementById("demo-city-value"),
-                coordValue: document.getElementById("demo-coord-value"),
-                pixelValue: document.getElementById("demo-pixel-value"),
-                bandCount: document.getElementById("demo-band-count"),
-                chart: document.getElementById("demo-chart"),
-                chartNote: document.getElementById("demo-chart-note"),
-                footerNote: document.getElementById("demo-footer-note"),
-            };
-        }
-
-        function setDemoStatus(text) {
-            const { mapStatus } = getDemoElements();
-            if (mapStatus) {
-                mapStatus.textContent = text;
-            }
-        }
-
-        function updateDemoChart(values) {
-            const { chart, chartNote, footerNote } = getDemoElements();
-            if (!chart || !chartNote || !footerNote) return;
-
-            chart.innerHTML = "";
-
-            if (!values || values.length === 0) {
-                chartNote.textContent = "No point selected";
-                footerNote.textContent = "The chart displays the first 24 dimensions from the clicked pixel.";
-                return;
-            }
-
-            const visibleValues = values.slice(0, 24);
-            const absMax = Math.max(...visibleValues.map((value) => Math.abs(value)), 1e-6);
-
-            visibleValues.forEach((value) => {
-                const bar = document.createElement("div");
-                bar.className = "demo-bar";
-                bar.style.height = `${Math.max(8, (Math.abs(value) / absMax) * 100)}%`;
-                bar.title = value.toFixed(4);
-                chart.appendChild(bar);
-            });
-
-            chartNote.textContent = `${visibleValues.length} dimension${visibleValues.length > 1 ? "s" : ""} shown`;
-            footerNote.textContent = `Values are sampled directly from the clicked pixel. The visualization is normalized to the largest absolute component in the current selection.`;
-        }
-
-        function updateDemoMetadata({ cityLabel, lngLat, row, col, bandCount }) {
-            const { cityValue, coordValue, pixelValue, bandCount: bandCountEl } = getDemoElements();
-            if (cityValue) cityValue.textContent = cityLabel || "—";
-            if (coordValue) {
-                coordValue.textContent = lngLat
-                    ? `${lngLat.lat.toFixed(5)}, ${lngLat.lng.toFixed(5)}`
-                    : "Click inside the boundary";
-            }
-            if (pixelValue) {
-                pixelValue.textContent = Number.isFinite(row) && Number.isFinite(col)
-                    ? `row ${row}, col ${col}`
-                    : "Waiting for selection";
-            }
-            if (bandCountEl) {
-                bandCountEl.textContent = Number.isFinite(bandCount) ? String(bandCount) : "—";
-            }
-        }
-
-        async function loadDemoCity(cityKey) {
-            const city = DEMO_CITY_FILES[cityKey];
-            const elements = getDemoElements();
-            if (!city || !state.demoMap || !elements.citySelect) return;
-
-            elements.citySelect.value = cityKey;
-            updateDemoMetadata({ cityLabel: city.label, lngLat: null, row: null, col: null, bandCount: null });
-            updateDemoChart([]);
-            setDemoStatus(`Loading ${city.label} raster…`);
-
-            try {
-                const tiff = await GeoTIFF.fromUrl(city.file);
-                const image = await tiff.getImage();
-                const width = image.getWidth();
-                const height = image.getHeight();
-                const bbox = image.getBoundingBox();
-                const raster = await image.readRasters({ interleave: false });
-                const bandCount = Array.isArray(raster) ? raster.length : 1;
-                const rasterBands = Array.isArray(raster) ? raster : [raster];
-                const boundaryGeoJSON = {
-                    type: "FeatureCollection",
-                    features: [
-                        {
-                            type: "Feature",
-                            properties: { city: city.label },
-                            geometry: {
-                                type: "Polygon",
-                                coordinates: [[
-                                    [bbox[0], bbox[1]],
-                                    [bbox[2], bbox[1]],
-                                    [bbox[2], bbox[3]],
-                                    [bbox[0], bbox[3]],
-                                    [bbox[0], bbox[1]],
-                                ]],
-                            },
-                        },
-                    ],
-                };
-
-                if (state.demoMap.getSource(DEMO_SOURCE_ID)) {
-                    state.demoMap.removeLayer(DEMO_LAYER_ID);
-                    state.demoMap.removeSource(DEMO_SOURCE_ID);
-                }
-
-                if (state.demoMap.getLayer(DEMO_BOUNDARY_LINE_ID)) {
-                    state.demoMap.removeLayer(DEMO_BOUNDARY_LINE_ID);
-                }
-                if (state.demoMap.getLayer(DEMO_BOUNDARY_FILL_ID)) {
-                    state.demoMap.removeLayer(DEMO_BOUNDARY_FILL_ID);
-                }
-                if (state.demoMap.getSource(DEMO_BOUNDARY_SOURCE_ID)) {
-                    state.demoMap.removeSource(DEMO_BOUNDARY_SOURCE_ID);
-                }
-
-                state.demoMap.addSource(DEMO_BOUNDARY_SOURCE_ID, {
-                    type: "geojson",
-                    data: boundaryGeoJSON,
-                });
-
-                state.demoMap.addLayer({
-                    id: DEMO_BOUNDARY_FILL_ID,
-                    type: "fill",
-                    source: DEMO_BOUNDARY_SOURCE_ID,
-                    paint: {
-                        "fill-color": "rgba(34, 211, 238, 0.04)",
-                        "fill-opacity": 0.08,
-                    },
-                });
-
-                state.demoMap.addLayer({
-                    id: DEMO_BOUNDARY_LINE_ID,
-                    type: "line",
-                    source: DEMO_BOUNDARY_SOURCE_ID,
-                    paint: {
-                        "line-color": "rgba(34, 211, 238, 0.95)",
-                        "line-width": 2,
-                        "line-opacity": 0.96,
-                    },
-                });
-
-                state.demoMap.fitBounds([[bbox[0], bbox[1]], [bbox[2], bbox[3]]], {
-                    padding: 32,
-                    duration: 900,
-                });
-
-                state.demoRaster = {
-                    cityKey,
-                    cityLabel: city.label,
-                    width,
-                    height,
-                    bbox,
-                    rasterBands,
-                    bandCount,
-                };
-
-                updateDemoMetadata({ cityLabel: city.label, lngLat: null, row: null, col: null, bandCount });
-                setDemoStatus(`${city.label} loaded. The boundary shows the available raster extent. Click inside it to sample a point.`);
-            } catch (error) {
-                console.error(error);
-                setDemoStatus(`Failed to load ${city.label}.`);
-            }
-        }
-
-        function sampleDemoRaster(lngLat) {
-            if (!state.demoRaster) return;
-            const { bbox, width, height, rasterBands, bandCount, cityLabel } = state.demoRaster;
-            const [minX, minY, maxX, maxY] = bbox;
-
-            const xRatio = (lngLat.lng - minX) / (maxX - minX);
-            const yRatio = (maxY - lngLat.lat) / (maxY - minY);
-            const col = Math.floor(xRatio * width);
-            const row = Math.floor(yRatio * height);
-
-            if (col < 0 || col >= width || row < 0 || row >= height) {
-                setDemoStatus("Selected point is outside the raster extent.");
-                return;
-            }
-
-            const index = row * width + col;
-            const values = rasterBands.map((band) => band[index]);
-            updateDemoMetadata({ cityLabel, lngLat, row, col, bandCount });
-            updateDemoChart(values);
-            setDemoStatus(`Sampled ${cityLabel} at ${lngLat.lat.toFixed(5)}, ${lngLat.lng.toFixed(5)}.`);
-
-            if (!state.demoMarker) {
-                const markerNode = document.createElement("div");
-                markerNode.className = "demo-point-marker";
-                state.demoMarker = new maplibregl.Marker({ element: markerNode });
-            }
-
-            state.demoMarker.setLngLat([lngLat.lng, lngLat.lat]).addTo(state.demoMap);
-        }
-
-        function initDemoMap() {
-            const mapContainer = document.getElementById("demo-map");
-            const { citySelect } = getDemoElements();
-            if (!mapContainer || !citySelect) return;
-
-            state.demoMap = new maplibregl.Map({
-                container: "demo-map",
-                style: "https://basemaps.cartocdn.com/gl/dark-matter-gl-style/style.json",
-                center: [116.3913, 39.9075],
-                zoom: 9,
-                attributionControl: true,
-            });
-
-            state.demoMap.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), "top-right");
-
-            state.demoMap.on("load", () => {
-                loadDemoCity(citySelect.value || "beijing");
-            });
-
-            citySelect.addEventListener("change", (event) => {
-                loadDemoCity(event.target.value);
-            });
-
-            state.demoMap.on("click", (event) => {
-                sampleDemoRaster(event.lngLat);
-            });
         }
 
         function initResultsTooltip() {
@@ -2950,330 +2271,6 @@
             });
 
             window.addEventListener("scroll", hide, { passive: true });
-        }
-
-        // Map a similarity score to a display color.
-        function similarityColor(score) {
-            if (score == null || Number.isNaN(score)) {
-                return "#111827";
-            }
-            // Assume similarity is in the range [-1, 1] and normalize it to [0, 1].
-            const t = Math.max(0, Math.min(1, (score + 1) / 2));
-            const colorStops = [
-                [17, 24, 39],
-                [76, 29, 149],
-                [236, 72, 153],
-                [245, 158, 11],
-            ];
-
-            const scaled = t * (colorStops.length - 1);
-            const index = Math.min(colorStops.length - 2, Math.floor(scaled));
-            const frac = scaled - index;
-            const start = colorStops[index];
-            const end = colorStops[index + 1];
-            const rgb = start.map((channel, channelIndex) =>
-                Math.round(channel + (end[channelIndex] - channel) * frac)
-            );
-            return `rgb(${rgb[0]}, ${rgb[1]}, ${rgb[2]})`;
-        }
-
-        function createFeature(record) {
-            const boundary = h3.cellToBoundary(record.h3, true);
-            const coordinates = [...boundary, boundary[0]]; 
-            
-            return {
-                type: "Feature",
-                id: record.h3,
-                properties: {
-                    h3: record.h3,
-                    similarity: record.similarity,
-                    color: similarityColor(record.similarity),
-                },
-                geometry: {
-                    type: "Polygon",
-                    coordinates: [coordinates],
-                },
-            };
-        }
-
-        function buildGeoJSON(records) {
-            return {
-                type: "FeatureCollection",
-                features: records.map(createFeature),
-            };
-        }
-
-        function getAnchorCenter(feature) {
-            if (!feature || !feature.properties || !feature.properties.h3) {
-                return null;
-            }
-
-            const [lat, lng] = h3.cellToLatLng(feature.properties.h3);
-            if (Number.isNaN(lat) || Number.isNaN(lng)) {
-                return null;
-            }
-
-            return [lng, lat];
-        }
-
-        function addMapLayers(geojson) {
-            state.map.addSource(SOURCE_ID, {
-                type: "geojson",
-                data: geojson,
-            });
-
-            state.map.addLayer({
-                id: FILL_LAYER_ID,
-                type: "fill",
-                source: SOURCE_ID,
-                paint: {
-                    "fill-color": ["get", "color"],
-                    "fill-opacity": 0.44,
-                },
-            });
-
-            state.map.addLayer({
-                id: LINE_LAYER_ID,
-                type: "line",
-                source: SOURCE_ID,
-                paint: {
-                    "line-color": "rgba(255,255,255,0.08)",
-                    "line-width": 0.6,
-                },
-            });
-        }
-
-        function createMap(geojson) {
-            state.map = new maplibregl.Map({
-                container: "map",
-                style: {
-                    version: 8,
-                    sources: {
-                        "carto-dark": {
-                            type: "raster",
-                            tiles: [
-                                "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                                "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                                "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}.png",
-                            ],
-                            tileSize: 256,
-                            attribution: '&copy; OpenStreetMap contributors &copy; CARTO',
-                        },
-                    },
-                    layers: [
-                        {
-                            id: "carto-dark",
-                            type: "raster",
-                            source: "carto-dark",
-                            minzoom: 0,
-                            maxzoom: 22,
-                        },
-                    ],
-                },
-                center: [104.1954, 35.8617], // Initial map center over China.
-                zoom: 4.0,
-                pitch: 0,
-                bearing: 0,
-                attributionControl: true,
-            });
-
-            // Place the navigation control in the bottom-right corner.
-            state.map.addControl(new maplibregl.NavigationControl({ showCompass: false }), "bottom-right");
-            state.map.scrollZoom.disable();
-            state.map.boxZoom.disable();
-            state.map.doubleClickZoom.disable();
-
-            state.map.on("load", () => {
-                addMapLayers(geojson);
-
-                const bounds = new maplibregl.LngLatBounds();
-                let hasValidBounds = false;
-
-                geojson.features.forEach((feature) => {
-                    if (feature.geometry && feature.geometry.coordinates[0]) {
-                        feature.geometry.coordinates[0].forEach((coord) => {
-                            if (coord && !isNaN(coord[0]) && !isNaN(coord[1])) {
-                                bounds.extend(coord);
-                                hasValidBounds = true;
-                            }
-                        });
-                    }
-                });
-
-                let anchorCenter = null;
-
-                if (geojson.features.length > 0) {
-                    anchorCenter = getAnchorCenter(geojson.features[0]);
-                }
-
-                if (hasValidBounds) {
-                    const leftPadding = window.innerWidth > 1200 ? 430 : window.innerWidth > 800 ? 300 : 40;
-                    state.map.fitBounds(bounds, {
-                        padding: { top: 32, right: 56, bottom: 32, left: leftPadding },
-                        duration: 0,
-                    });
-                    state.globalView = {
-                        center: state.map.getCenter().toArray(),
-                        zoom: state.map.getZoom(),
-                        bearing: 0,
-                        pitch: 0,
-                    };
-                }
-
-                startCinematicMotion(anchorCenter);
-                loading.style.display = "none";
-            });
-        }
-
-        function startCinematicMotion(anchorCenter) {
-            if (!state.map) return;
-            if (cinematicTimer) {
-                clearInterval(cinematicTimer);
-            }
-
-            if (state.cinematicIntroTimer) {
-                clearTimeout(state.cinematicIntroTimer);
-            }
-            if (state.cinematicDriftTimer) {
-                clearTimeout(state.cinematicDriftTimer);
-            }
-
-            const globalView = state.globalView ?? {
-                center: state.map.getCenter().toArray(),
-                zoom: state.map.getZoom(),
-                bearing: 0,
-                pitch: 0,
-            };
-
-            const introAnchorZoom = Math.max(globalView.zoom + 2.15, 7.45);
-
-            if (anchorCenter) {
-                state.map.jumpTo({
-                    center: [anchorCenter[0] + 0.08, anchorCenter[1]],
-                    zoom: introAnchorZoom,
-                    bearing: -10,
-                    pitch: 16,
-                });
-
-                state.cinematicIntroTimer = setTimeout(() => {
-                    state.map.easeTo({
-                        center: globalView.center,
-                        zoom: globalView.zoom,
-                        bearing: globalView.bearing,
-                        pitch: 0,
-                        duration: 18000,
-                        easing: (t) => 1 - Math.pow(1 - t, 2.2),
-                        essential: true,
-                    });
-                }, 900);
-            } else {
-                state.map.jumpTo({
-                    center: globalView.center,
-                    zoom: globalView.zoom,
-                    bearing: globalView.bearing,
-                    pitch: globalView.pitch,
-                });
-            }
-
-            const keyframes = [
-                { lngOffset: 0.48, latOffset: 0.05, zoomDelta: 0.24, bearing: -9, pitch: 7, duration: 26000 },
-                { lngOffset: -0.12, latOffset: -0.03, zoomDelta: -0.08, bearing: 4, pitch: 10, duration: 24000 },
-                { lngOffset: 0.28, latOffset: 0.03, zoomDelta: 0.12, bearing: 9, pitch: 8, duration: 23000 },
-            ];
-
-            let frameIndex = 0;
-
-            const runFrame = () => {
-                if (!state.map) return;
-                const frame = keyframes[frameIndex % keyframes.length];
-                const center = state.map.getCenter();
-                const zoom = state.map.getZoom();
-
-                state.map.easeTo({
-                    center: [center.lng + frame.lngOffset, center.lat + frame.latOffset],
-                    zoom: zoom + frame.zoomDelta,
-                    bearing: frame.bearing,
-                    pitch: frame.pitch,
-                    duration: frame.duration,
-                    easing: (t) => 1 - Math.pow(1 - t, 2),
-                    essential: true,
-                });
-
-                frameIndex += 1;
-            };
-
-            const startDrift = () => {
-                runFrame();
-                cinematicTimer = setInterval(runFrame, 18000);
-            };
-
-            const introDuration = anchorCenter ? 19000 : 0;
-            state.cinematicDriftTimer = setTimeout(startDrift, introDuration);
-        }
-
-        function loadCSV() {
-            if (window.location.protocol === "file:") {
-                loadingText.textContent = "This page cannot load the CSV when opened directly with file://. Please open it through GitHub Pages or a local static server.";
-                statusLeft.textContent = "Local file blocked";
-                statusRight.textContent = "Serve over HTTP";
-                progressFill.style.width = "100%";
-                return;
-            }
-
-            updateLoading(5, "Loading CSV", "5%", "Downloading the similarity file and parsing H3 rows.");
-
-            Papa.parse(CSV_FILE, {
-                download: true,
-                header: true,
-                skipEmptyLines: true,
-                worker: false,
-                complete: (results) => {
-                    if (!results.data || results.data.length === 0 || !results.data[0].h3) {
-                        loadingText.textContent = `Error: CSV file is empty, not found, or invalid format. Please ensure '${CSV_FILE}' exists in the correct path.`;
-                        statusLeft.textContent = "Error";
-                        statusRight.textContent = "Failed";
-                        return; 
-                    }
-
-                    const totalRows = results.data.length;
-                    updateLoading(28, "Parsing similarities", "28%", `Loaded ${totalRows.toLocaleString()} rows. Building H3 geometries.`);
-
-                    const records = [];
-
-                    for (let i = 0; i < results.data.length; i += 1) {
-                        const row = results.data[i];
-                        // Only read rows that contain both h3 and similarity values.
-                        if (!row.h3 || row.similarity === undefined) continue;
-
-                        records.push({
-                            h3: row.h3,
-                            similarity: parseFloat(row.similarity) || 0,
-                        });
-
-                        if ((i + 1) % 5000 === 0 || i === results.data.length - 1) {
-                            const progress = 28 + ((i + 1) / results.data.length) * 42;
-                            updateLoading(
-                                progress,
-                                "Building records",
-                                `${Math.round(progress)}%`,
-                                `Parsed ${Math.min(i + 1, results.data.length).toLocaleString()} of ${results.data.length.toLocaleString()} rows.`
-                            );
-                        }
-                    }
-
-                    updateLoading(75, "Generating map", "75%", "Converting H3 indices into polygons.");
-
-                    const geojson = buildGeoJSON(records);
-                    updateLoading(92, "Rendering map", "92%", "The browser is now rendering the hexagonal field.");
-                    createMap(geojson);
-                },
-                error: (error) => {
-                    const message = error && error.message ? error.message : "The CSV request failed. If you opened index.html directly, use GitHub Pages or a local static server instead.";
-                    loadingText.textContent = message;
-                    statusLeft.textContent = "Error";
-                    statusRight.textContent = "Stopped";
-                },
-            });
         }
 
         function initFusionAnimation() {
@@ -3473,9 +2470,7 @@
             refreshLucideIcons();
             resetLayerInfo();
             initFusionAnimation();
-            initDemoMap();
             initResultsTooltip();
-            loadCSV();
         });
     </script>
 </body>
