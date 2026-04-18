@@ -19,7 +19,12 @@ ZOOM        = 8
 LON_CENTER  = 117.5
 LAT_CENTER  = 30.5
 TILE_SIZE   = 256
-S_PX_PER_RAD = 256 * (2 ** ZOOM) / (2 * math.pi)   # ~10430 px/rad at zoom 8
+# Render at a larger intermediate canvas then downscale — keeps tiles & hexagons
+# perfectly aligned at zoom-8 while achieving a zoom-out effect.
+ZOOM_SCALE  = 0.76          # <1 = zoom out; 1.0 = native zoom-8
+WI = int(W / ZOOM_SCALE)    # intermediate canvas width  (~2526)
+HI = int(H / ZOOM_SCALE)    # intermediate canvas height (~1421)
+S_PX_PER_RAD = 256 * (2 ** ZOOM) / (2 * math.pi)  # 10430 — tile-aligned, applied to WI×HI canvas
 
 # ── Tile source (CartoDB dark, English labels) ─────────────────────────────
 TILE_SERVERS = [
@@ -43,7 +48,8 @@ STOPS = [
     ( 0.95, (240, 249,  33)),
     ( 1.00, (255, 255, 255)),
 ]
-FILL_ALPHA = int(0.52 * 255)   # ~133 — more transparent so base map shows through
+FILL_ALPHA    = int(0.60 * 255)   # 153 — semi-transparent so base map reads through
+LINE_COLOR    = (255, 255, 255, 120)  # ~47% — clearly visible grid boundary
 
 # ─────────────────────────────────────────────────────────────────────────────
 def _merc_y(lat_deg):
@@ -53,8 +59,8 @@ def _merc_y(lat_deg):
 _MY0 = _merc_y(LAT_CENTER)
 
 def geo_to_px(lon, lat):
-    x = math.radians(lon - LON_CENTER) * S_PX_PER_RAD + W / 2
-    y = -(_merc_y(lat) - _MY0) * S_PX_PER_RAD + H / 2
+    x = math.radians(lon - LON_CENTER) * S_PX_PER_RAD + WI / 2
+    y = -(_merc_y(lat) - _MY0) * S_PX_PER_RAD + HI / 2
     return x, y
 
 def sim_to_rgba(sim):
@@ -108,15 +114,15 @@ def build_base_map():
     cx_px = tx0f * TILE_SIZE
     cy_px = ty0f * TILE_SIZE
 
-    # canvas top-left in tile-pixels
-    canvas_left_px = cx_px - W / 2
-    canvas_top_px  = cy_px - H / 2
+    # canvas top-left in tile-pixels (use intermediate WI×HI canvas)
+    canvas_left_px = cx_px - WI / 2
+    canvas_top_px  = cy_px - HI / 2
 
     # tile range needed
     tx_min = int(math.floor(canvas_left_px / TILE_SIZE))
-    tx_max = int(math.ceil((canvas_left_px + W) / TILE_SIZE))
+    tx_max = int(math.ceil((canvas_left_px + WI) / TILE_SIZE))
     ty_min = int(math.floor(canvas_top_px / TILE_SIZE))
-    ty_max = int(math.ceil((canvas_top_px + H) / TILE_SIZE))
+    ty_max = int(math.ceil((canvas_top_px + HI) / TILE_SIZE))
 
     n_tiles = (2 ** ZOOM)
     jobs = []
@@ -125,8 +131,8 @@ def build_base_map():
             tx_wrapped = tx % n_tiles
             jobs.append((tx, ty, tx_wrapped))
 
-    print(f"Fetching {len(jobs)} tiles (zoom={ZOOM})…")
-    canvas = Image.new("RGBA", (W, H), (20, 20, 20, 255))
+    print(f"Fetching {len(jobs)} tiles (zoom={ZOOM}, intermediate {WI}×{HI})…")
+    canvas = Image.new("RGBA", (WI, HI), (20, 20, 20, 255))
 
     results = {}
     idx = 0
@@ -159,33 +165,40 @@ def draw_hexagons(base_img):
         return base_img
 
     print("Loading CSV…")
-    cells = []
+    sim_map = {}
     with open(CSV_PATH, newline="", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            cells.append((row["h3"], float(row["similarity"])))
-    print(f"  {len(cells)} cells loaded")
+            sim_map[row["h3"]] = float(row["similarity"])
+    print(f"  {len(sim_map)} data cells loaded")
 
-    # draw onto a separate RGBA overlay, then composite
-    overlay = Image.new("RGBA", (W, H), (0, 0, 0, 0))
-    draw = ImageDraw.Draw(overlay)
-
-    drawn = 0
-    for h3_id, sim in cells:
-        boundary = h3lib.cell_to_boundary(h3_id)   # list of (lat, lon)
+    # collect visible CSV cells only
+    data_visible = []
+    for h3_id, sim in sim_map.items():
+        boundary = h3lib.cell_to_boundary(h3_id)
         pts = [geo_to_px(lon, lat) for lat, lon in boundary]
-        # clip: skip if all vertices outside canvas with margin
-        xs = [p[0] for p in pts]
-        ys = [p[1] for p in pts]
-        if max(xs) < -20 or min(xs) > W + 20 or max(ys) < -20 or min(ys) > H + 20:
+        xs = [p[0] for p in pts]; ys = [p[1] for p in pts]
+        if max(xs) < -20 or min(xs) > WI + 20 or max(ys) < -20 or min(ys) > HI + 20:
             continue
-        color = sim_to_rgba(sim)
         pts_int = [(int(round(x)), int(round(y))) for x, y in pts]
-        draw.polygon(pts_int, fill=color)
-        drawn += 1
+        data_visible.append((pts_int, sim_to_rgba(sim)))
 
-    print(f"  {drawn} hexagons drawn")
-    result = Image.alpha_composite(base_img, overlay)
+    print(f"  {len(data_visible)} cells rendered")
+
+    # pass 1: fills
+    fill_layer = Image.new("RGBA", (WI, HI), (0, 0, 0, 0))
+    draw_f = ImageDraw.Draw(fill_layer)
+    for pts_int, color in data_visible:
+        draw_f.polygon(pts_int, fill=color)
+
+    # pass 2: outlines
+    line_layer = Image.new("RGBA", (WI, HI), (0, 0, 0, 0))
+    draw_l = ImageDraw.Draw(line_layer)
+    for pts_int, _ in data_visible:
+        draw_l.polygon(pts_int, fill=None, outline=LINE_COLOR)
+
+    result = Image.alpha_composite(base_img, fill_layer)
+    result = Image.alpha_composite(result, line_layer)
     return result
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -193,28 +206,30 @@ def draw_hexagons(base_img):
 # ─────────────────────────────────────────────────────────────────────────────
 def apply_vignettes(img):
     arr = np.array(img, dtype=np.float32)
+    xs = np.linspace(0.0, 1.0, WI)
+    ys = np.linspace(0.0, 1.0, HI)
 
-    # Left vignette: darkens left edge
-    # stops: x=0%→α=0.985, 24%→0.9, 43%→0.52, 66%→0.18, 100%→0.04
-    xs = np.linspace(0.0, 1.0, W)
-    vx_stops = [(0.00, 0.985), (0.24, 0.900), (0.43, 0.520), (0.66, 0.180), (1.00, 0.040)]
-    left_mult = np.interp(xs, [s[0] for s in vx_stops], [s[1] for s in vx_stops])
-    # convert: multiply = 1 means no change; at x=0, mult=0.985 means slight darkening
-    # Actually the vignette darkens: alpha of a black overlay = (1 - mult)
-    left_dark = 1.0 - left_mult   # 0 at right, ~0.96 at left edge
-    # flip so left edge is darkest
-    left_dark = left_dark[::-1]
-    left_dark_2d = left_dark[np.newaxis, :, np.newaxis]   # (1, W, 1)
+    # Left vignette: soft fade, keeps map labels faintly visible
+    vx_l = [(0.00, 0.82), (0.15, 0.60), (0.30, 0.20), (0.45, 0.00)]
+    left_dark = np.interp(xs, [s[0] for s in vx_l], [s[1] for s in vx_l])
 
-    arr[:, :, :3] *= (1.0 - left_dark_2d)
+    # Right vignette: only the last ~10% to hide ocean edge after coastline
+    vx_r = [(0.00, 0.00), (0.88, 0.00), (0.93, 0.55), (0.97, 0.90), (1.00, 0.98)]
+    right_dark = np.interp(xs, [s[0] for s in vx_r], [s[1] for s in vx_r])
 
-    # Bottom vignette: 70%→0, 85%→0.42, 100%→0.92
-    ys = np.linspace(0.0, 1.0, H)
-    vy_stops = [(0.00, 0.0), (0.70, 0.0), (0.85, 0.42), (1.00, 0.92)]
-    bot_alpha = np.interp(ys, [s[0] for s in vy_stops], [s[1] for s in vy_stops])
-    bot_alpha_2d = bot_alpha[:, np.newaxis, np.newaxis]   # (H, 1, 1)
+    h_mult = (1.0 - left_dark) * (1.0 - right_dark)
+    arr[:, :, :3] *= h_mult[np.newaxis, :, np.newaxis]
 
-    arr[:, :, :3] *= (1.0 - bot_alpha_2d)
+    # Top vignette
+    vy_t = [(0.00, 0.92), (0.08, 0.55), (0.18, 0.10), (0.28, 0.00)]
+    top_dark = np.interp(ys, [s[0] for s in vy_t], [s[1] for s in vy_t])
+
+    # Bottom vignette
+    vy_b = [(0.00, 0.00), (0.70, 0.00), (0.85, 0.42), (1.00, 0.92)]
+    bot_dark = np.interp(ys, [s[0] for s in vy_b], [s[1] for s in vy_b])
+
+    v_mult = (1.0 - top_dark) * (1.0 - bot_dark)
+    arr[:, :, :3] *= v_mult[:, np.newaxis, np.newaxis]
 
     arr = np.clip(arr, 0, 255).astype(np.uint8)
     return Image.fromarray(arr, "RGBA")
@@ -224,10 +239,10 @@ def main():
     print("=== Generating hero_map.png ===")
     base = build_base_map()
     with_hex = draw_hexagons(base)
-    final = apply_vignettes(with_hex)
-    # convert to RGB for smaller PNG
-    final_rgb = final.convert("RGB")
-    final_rgb.save(OUT_PNG, "PNG", optimize=False, compress_level=6)
+    full = apply_vignettes(with_hex)
+    # Downscale intermediate canvas to final output size (anti-aliased)
+    final = full.resize((W, H), Image.LANCZOS)
+    final.convert("RGB").save(OUT_PNG, "PNG", optimize=False, compress_level=6)
     size_mb = os.path.getsize(OUT_PNG) / 1e6
     print(f"Saved {OUT_PNG}  ({size_mb:.1f} MB)")
 
