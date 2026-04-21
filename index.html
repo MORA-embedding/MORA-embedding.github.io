@@ -499,8 +499,7 @@
         .mobility-svg {
             width: 100%;
             max-width: 900px;
-            height: auto;
-            overflow: visible;
+            display: block;
             border-radius: 12px;
         }
 
@@ -568,9 +567,9 @@
 
         .architecture-grid {
             display: grid;
-            grid-template-columns: minmax(320px, 1fr) minmax(150px, 0.34fr) minmax(320px, 1fr);
-            gap: 36px;
-            align-items: center;
+            grid-template-columns: minmax(320px, 1.3fr) minmax(240px, 1fr);
+            gap: 40px;
+            align-items: start;
         }
 
         .architecture-panel {
@@ -679,11 +678,87 @@
 
         .architecture-info {
             width: 100%;
-            min-height: 110px;
-            padding: 18px 20px;
+            min-height: 72px;
+            padding: 14px 18px;
             border: 1px solid rgba(39, 39, 42, 1);
             background: rgba(10, 10, 10, 0.92);
+            margin-bottom: 10px;
             transition: border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        .arch-hover-hint {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 9px 14px;
+            margin-bottom: 12px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 6px;
+            flex-wrap: wrap;
+        }
+        .arch-hover-hint-label {
+            color: rgba(148,163,184,0.55);
+            font-size: 0.7rem;
+            font-family: "IBM Plex Sans", sans-serif;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+        .arch-hover-steps {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .arch-step {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 9px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.07);
+            color: rgba(203,213,225,0.65);
+            font-size: 0.72rem;
+            font-family: "IBM Plex Sans", sans-serif;
+            cursor: default;
+            transition: border-color 150ms, color 150ms, background 150ms;
+        }
+        .arch-step:hover {
+            border-color: rgba(34,211,238,0.38);
+            color: rgba(34,211,238,0.9);
+            background: rgba(34,211,238,0.05);
+        }
+        .arch-step-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            color: rgba(255,255,255,0.5);
+            font-size: 0.6rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+        .arch-step-sep {
+            color: rgba(255,255,255,0.18);
+            font-size: 0.65rem;
+            padding: 0 1px;
+        }
+
+        .arch-dense-reps {
+            margin-top: 28px;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            display: flex;
+            align-items: flex-start;
+            gap: 28px;
+        }
+        .arch-dense-reps .representation-output-icon {
+            margin-bottom: 8px;
         }
 
         .architecture-info-header {
@@ -1608,8 +1683,7 @@
                     <p class="paradigm-subtitle">Geographic space is tokenized into H3 hexagonal cells. Human movement between cells forms sentences. The mobility graph — 200K nodes, 1.2 billion edges — becomes the structural backbone through which all other modalities are interpreted.</p>
                 </div>
                 <div class="mobility-viz-wrap">
-                    <svg id="mobility-svg" class="mobility-svg" viewBox="0 0 900 520" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"></svg>
-                    <div class="mobility-scroll-hint" aria-hidden="true">↓</div>
+                    <canvas id="mobility-svg" class="mobility-svg" aria-hidden="true"></canvas>
                 </div>
             </div>
         </section>
@@ -1626,6 +1700,35 @@
 
                 <div class="architecture-grid">
                     <div class="architecture-panel architecture-diagram">
+
+                        <!-- Layer info: now at top -->
+                        <div class="architecture-info" id="layer-info-box">
+                            <div class="architecture-info-header">
+                                <i data-lucide="layers" class="architecture-info-icon" id="layer-icon" style="width:16px;height:16px;"></i>
+                                <h4 class="architecture-info-title" id="layer-title">Multi-modal Inputs</h4>
+                            </div>
+                            <p class="architecture-info-desc" id="layer-desc">
+                                Hover each layer from bottom to top to explore how MoRA stacks its input signals.
+                            </p>
+                        </div>
+
+                        <!-- Ordered hover hint -->
+                        <div class="arch-hover-hint" aria-label="Hover order hint">
+                            <span class="arch-hover-hint-label">Hover ↓ → ↑</span>
+                            <div class="arch-hover-steps">
+                                <span class="arch-step" onmouseenter="updateLayerInfo('hex')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">1</span>H3 Grid</span>
+                                <span class="arch-step-sep">→</span>
+                                <span class="arch-step" onmouseenter="updateLayerInfo('graph')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">2</span>Mobility</span>
+                                <span class="arch-step-sep">→</span>
+                                <span class="arch-step" onmouseenter="updateLayerInfo('poi')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">3</span>POI</span>
+                                <span class="arch-step-sep">→</span>
+                                <span class="arch-step" onmouseenter="updateLayerInfo('imagery')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">4</span>Imagery</span>
+                                <span class="arch-step-sep">→</span>
+                                <span class="arch-step" onmouseenter="updateLayerInfo('demo')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">5</span>Demographics</span>
+                            </div>
+                        </div>
+
+                        <!-- Isometric diagram -->
                         <div class="iso-scene">
                             <div class="iso-wrapper">
                                 <div class="iso-layer iso-bottom" onmouseenter="updateLayerInfo('hex')" onmouseleave="resetLayerInfo()">
@@ -1695,25 +1798,9 @@
                                 </div>
                             </div>
                         </div>
-
-                        <div class="architecture-info" id="layer-info-box">
-                            <div class="architecture-info-header">
-                                <i data-lucide="layers" class="architecture-info-icon" id="layer-icon" style="width:16px;height:16px;"></i>
-                                <h4 class="architecture-info-title" id="layer-title">Multi-modal Inputs</h4>
-                            </div>
-                            <p class="architecture-info-desc" id="layer-desc">
-                                Hover over the layered blocks to inspect the different signals MoRA aligns before building each representation.
-                            </p>
-                        </div>
                     </div>
 
-                    <div class="architecture-arrow" aria-hidden="true">
-                        <svg class="architecture-arrow-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M5 12H19" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
-                            <path d="M13 6L19 12L13 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" />
-                        </svg>
-                    </div>
-
+                    <!-- Right: encoder only -->
                     <div class="architecture-panel">
                         <div class="encoder-box">
                             <div class="encoder-icon">
@@ -1722,39 +1809,42 @@
                             <h3 class="encoder-title">Encoder</h3>
                             <p class="encoder-copy">Contrastive alignment maps each modality onto the mobility graph so every signal is interpreted in one shared space.</p>
                         </div>
+                    </div>
+                </div>
 
-                        <div class="representation-output" style="margin-top:28px;">
-                            <div class="representation-output-icon">
-                                <i data-lucide="database" style="width:20px;height:20px;"></i>
-                            </div>
-                            <h3 class="representation-output-title">Dense Representations</h3>
-                            <p class="representation-output-subtitle">128-dimensional vector</p>
-                            <div class="representation-output-grid" aria-hidden="true">
-                                <div class="representation-output-cell" style="background:#06b6d4;opacity:.9;"></div>
-                                <div class="representation-output-cell" style="background:#f472b6;opacity:.62;"></div>
-                                <div class="representation-output-cell" style="background:#38bdf8;opacity:.82;"></div>
-                                <div class="representation-output-cell" style="background:#3f3f46;opacity:.45;"></div>
-                                <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
-                                <div class="representation-output-cell" style="background:#0891b2;opacity:.74;"></div>
-                                <div class="representation-output-cell" style="background:#52525b;opacity:.55;"></div>
-                                <div class="representation-output-cell" style="background:#38bdf8;opacity:.9;"></div>
-                                <div class="representation-output-cell" style="background:#27272a;opacity:.34;"></div>
-                                <div class="representation-output-cell" style="background:#06b6d4;opacity:.82;"></div>
-                                <div class="representation-output-cell" style="background:#f472b6;opacity:.9;"></div>
-                                <div class="representation-output-cell" style="background:#3f3f46;opacity:.5;"></div>
-                                <div class="representation-output-cell" style="background:#38bdf8;opacity:.72;"></div>
-                                <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
-                                <div class="representation-output-cell" style="background:#52525b;opacity:.4;"></div>
-                                <div class="representation-output-cell" style="background:#0891b2;opacity:.82;"></div>
-                                <div class="representation-output-cell" style="background:#38bdf8;opacity:.74;"></div>
-                                <div class="representation-output-cell" style="background:#3f3f46;opacity:.6;"></div>
-                                <div class="representation-output-cell" style="background:#06b6d4;opacity:.9;"></div>
-                                <div class="representation-output-cell" style="background:#38bdf8;opacity:.84;"></div>
-                                <div class="representation-output-cell" style="background:#f472b6;opacity:.52;"></div>
-                                <div class="representation-output-cell" style="background:#0891b2;opacity:.9;"></div>
-                                <div class="representation-output-cell" style="background:#27272a;opacity:.42;"></div>
-                                <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
-                            </div>
+                <!-- Dense representations: moved below the grid -->
+                <div class="arch-dense-reps">
+                    <div class="representation-output-icon">
+                        <i data-lucide="database" style="width:20px;height:20px;"></i>
+                    </div>
+                    <div style="flex:1;">
+                        <h3 class="representation-output-title">Dense Representations</h3>
+                        <p class="representation-output-subtitle">128-dimensional vector</p>
+                        <div class="representation-output-grid" aria-hidden="true" style="max-width:none;">
+                            <div class="representation-output-cell" style="background:#06b6d4;opacity:.9;"></div>
+                            <div class="representation-output-cell" style="background:#f472b6;opacity:.62;"></div>
+                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.82;"></div>
+                            <div class="representation-output-cell" style="background:#3f3f46;opacity:.45;"></div>
+                            <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
+                            <div class="representation-output-cell" style="background:#0891b2;opacity:.74;"></div>
+                            <div class="representation-output-cell" style="background:#52525b;opacity:.55;"></div>
+                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.9;"></div>
+                            <div class="representation-output-cell" style="background:#27272a;opacity:.34;"></div>
+                            <div class="representation-output-cell" style="background:#06b6d4;opacity:.82;"></div>
+                            <div class="representation-output-cell" style="background:#f472b6;opacity:.9;"></div>
+                            <div class="representation-output-cell" style="background:#3f3f46;opacity:.5;"></div>
+                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.72;"></div>
+                            <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
+                            <div class="representation-output-cell" style="background:#52525b;opacity:.4;"></div>
+                            <div class="representation-output-cell" style="background:#0891b2;opacity:.82;"></div>
+                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.74;"></div>
+                            <div class="representation-output-cell" style="background:#3f3f46;opacity:.6;"></div>
+                            <div class="representation-output-cell" style="background:#06b6d4;opacity:.9;"></div>
+                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.84;"></div>
+                            <div class="representation-output-cell" style="background:#f472b6;opacity:.52;"></div>
+                            <div class="representation-output-cell" style="background:#0891b2;opacity:.9;"></div>
+                            <div class="representation-output-cell" style="background:#27272a;opacity:.42;"></div>
+                            <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
                         </div>
                     </div>
                 </div>
@@ -2592,253 +2682,154 @@
 
     <script>
     (function () {
-        const svg = document.getElementById('mobility-svg');
-        if (!svg) return;
-        const NS = 'http://www.w3.org/2000/svg';
-        const VW = 900, VH = 520;
-        const R = 27;
-        const bCX = 450, bCY = 235, bRX = 332, bRY = 172;
+        const canvas = document.getElementById('mobility-svg');
+        if (!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const DPR = Math.min(window.devicePixelRatio || 1, 2);
+        const ASPECT = 520 / 900;
 
-        svg.setAttribute('viewBox', `0 0 ${VW} ${VH}`);
-        svg.innerHTML = '';
+        let W, H, nodes = [], flows = [];
 
-        function inBlob(x, y) {
-            const dx = (x - bCX) / bRX;
-            const dy = (y - bCY) / bRY;
-            const wobble = 0.05 * Math.sin(x * 0.021) - 0.04 * Math.cos(y * 0.028);
-            return dx * dx + dy * dy < 0.94 + wobble;
+        function resize() {
+            const cssW = canvas.getBoundingClientRect().width || canvas.offsetWidth || 900;
+            const cssH = cssW * ASPECT;
+            W = Math.round(cssW * DPR);
+            H = Math.round(cssH * DPR);
+            canvas.width = W;
+            canvas.height = H;
+            canvas.style.height = cssH + 'px';
+            init();
         }
 
-        const defs = document.createElementNS(NS, 'defs');
-        const softGlow = document.createElementNS(NS, 'filter');
-        softGlow.setAttribute('id', 'mob-soft-glow');
-        softGlow.setAttribute('x', '-60%');
-        softGlow.setAttribute('y', '-60%');
-        softGlow.setAttribute('width', '220%');
-        softGlow.setAttribute('height', '220%');
-        const blur = document.createElementNS(NS, 'feGaussianBlur');
-        blur.setAttribute('stdDeviation', '1.8');
-        blur.setAttribute('result', 'blur');
-        softGlow.appendChild(blur);
-        defs.appendChild(softGlow);
+        function init() {
+            nodes = [];
+            for (let i = 0; i < 280; i++) {
+                const s = Math.random();
+                nodes.push({
+                    x: Math.random() * W,
+                    y: Math.random() * H,
+                    r: s < 0.02  ? (6 + Math.random() * 6) * DPR
+                     : s < 0.10  ? (2.5 + Math.random() * 2.5) * DPR
+                     :             (0.6 + Math.random() * 1.0) * DPR,
+                });
+            }
 
-        const cp = document.createElementNS(NS, 'clipPath');
-        cp.setAttribute('id', 'mob-clip');
-        const clipPath = document.createElementNS(NS, 'path');
-        clipPath.setAttribute('d', `
-            M 143 254
-            L 143 223
-            L 176 175
-            L 223 142
-            L 287 121
-            L 355 96
-            L 417 80
-            L 525 80
-            L 635 88
-            L 718 111
-            L 782 121
-            L 826 147
-            L 841 181
-            L 833 209
-            L 852 230
-            L 852 267
-            L 826 294
-            L 790 325
-            L 750 343
-            L 704 373
-            L 650 409
-            L 576 448
-            L 493 482
-            L 404 494
-            L 320 465
-            L 251 417
-            L 204 371
-            L 166 334
-            L 143 289 Z
-        `);
-        cp.appendChild(clipPath);
-        defs.appendChild(cp);
-        svg.appendChild(defs);
+            const weights = nodes.map(n => n.r * n.r);
+            const totalW = weights.reduce((s, w) => s + w, 0);
+            function weightedPick() {
+                let v = Math.random() * totalW;
+                for (let i = 0; i < nodes.length; i++) {
+                    v -= weights[i];
+                    if (v <= 0) return nodes[i];
+                }
+                return nodes[nodes.length - 1];
+            }
 
-        const baseRect = document.createElementNS(NS, 'rect');
-        baseRect.setAttribute('x', '0');
-        baseRect.setAttribute('y', '0');
-        baseRect.setAttribute('width', String(VW));
-        baseRect.setAttribute('height', String(VH));
-        baseRect.setAttribute('fill', '#f7f3ef');
-        svg.appendChild(baseRect);
-
-        const dx = R * 1.5;
-        const dy = R * Math.sqrt(3);
-        const centers = [];
-        for (let col = -1; col < 22; col++) {
-            for (let row = -1; row < 14; row++) {
-                const x = col * dx + 132;
-                const y = row * dy + (col % 2 === 0 ? 78 : 78 + dy / 2);
-                if (inBlob(x, y)) centers.push({ x, y, id: centers.length });
+            flows = [];
+            for (let i = 0; i < 220; i++) {
+                const a = weightedPick();
+                const b = weightedPick();
+                if (a === b) continue;
+                const isOrange = Math.random() > 0.32;
+                const sign = Math.random() > 0.5 ? 1 : -1;
+                const curve = 0.15 + Math.random() * 0.22;
+                flows.push({
+                    ax: a.x, ay: a.y,
+                    bx: b.x, by: b.y,
+                    // quadratic control point — clamped to canvas bounds
+                    cx: Math.max(W * 0.02, Math.min(W * 0.98, (a.x + b.x) / 2 + sign * (a.y - b.y) * curve)),
+                    cy: Math.max(H * 0.02, Math.min(H * 0.98, (a.y + b.y) / 2 + sign * (b.x - a.x) * curve)),
+                    progress: Math.random(),
+                    speed: 0.0012 + Math.random() * 0.004,
+                    isOrange,
+                    width: isOrange ? (1.8 + Math.random() * 2.2) * DPR : (0.7 + Math.random() * 0.9) * DPR,
+                    opacity: isOrange ? 0.55 + Math.random() * 0.38 : 0.18 + Math.random() * 0.22,
+                    tailLen: 0.09 + Math.random() * 0.11,
+                });
             }
         }
 
-        const hexG = document.createElementNS(NS, 'g');
-        hexG.setAttribute('clip-path', 'url(#mob-clip)');
-        centers.forEach(c => {
-            const pts = Array.from({ length: 6 }, (_, i) => {
-                const a = (Math.PI / 3) * i;
-                return `${(c.x + R * Math.cos(a)).toFixed(1)},${(c.y + R * Math.sin(a)).toFixed(1)}`;
-            });
-            const poly = document.createElementNS(NS, 'polygon');
-            poly.setAttribute('points', pts.join(' '));
-            poly.setAttribute('fill', 'none');
-            poly.setAttribute('stroke', 'rgba(214, 107, 66, 0.18)');
-            poly.setAttribute('stroke-width', '1');
-            hexG.appendChild(poly);
-        });
-        svg.appendChild(hexG);
-
-        const outline = document.createElementNS(NS, 'path');
-        outline.setAttribute('d', clipPath.getAttribute('d'));
-        outline.setAttribute('fill', 'none');
-        outline.setAttribute('stroke', 'rgba(122, 114, 108, 0.5)');
-        outline.setAttribute('stroke-width', '1.8');
-        svg.appendChild(outline);
-
-        const edgeG = document.createElementNS(NS, 'g');
-        edgeG.setAttribute('clip-path', 'url(#mob-clip)');
-        const particleG = document.createElementNS(NS, 'g');
-        particleG.setAttribute('clip-path', 'url(#mob-clip)');
-        svg.appendChild(edgeG);
-        svg.appendChild(particleG);
-
-        const nodeG = document.createElementNS(NS, 'g');
-        nodeG.setAttribute('clip-path', 'url(#mob-clip)');
-        svg.appendChild(nodeG);
-
-        function makeSeededRandom(seed) {
-            let value = seed % 2147483647;
-            if (value <= 0) value += 2147483646;
-            return function rand() {
-                value = value * 16807 % 2147483647;
-                return (value - 1) / 2147483646;
+        function bezierPt(f, t) {
+            const mt = 1 - t;
+            return {
+                x: mt * mt * f.ax + 2 * mt * t * f.cx + t * t * f.bx,
+                y: mt * mt * f.ay + 2 * mt * t * f.cy + t * t * f.by,
             };
         }
 
-        const rand = makeSeededRandom(42857);
-        const edges = [];
-        const used = new Set();
+        function draw() {
+            // full clear — static tracks redrawn each frame so they're always visible
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, W, H);
 
-        function createLine(x1, y1, x2, y2) {
-            const line = document.createElementNS(NS, 'line');
-            line.setAttribute('x1', x1.toFixed(1));
-            line.setAttribute('y1', y1.toFixed(1));
-            line.setAttribute('x2', x2.toFixed(1));
-            line.setAttribute('y2', y2.toFixed(1));
-            line.setAttribute('stroke-linecap', 'round');
-            return line;
-        }
-
-        centers.forEach((node, index) => {
-            const sizeSeed = rand();
-            const radius = sizeSeed > 0.95 ? 3.1 : sizeSeed > 0.76 ? 2.05 : 1.05;
-            node.radius = radius;
-
-            const circle = document.createElementNS(NS, 'circle');
-            circle.setAttribute('cx', node.x.toFixed(1));
-            circle.setAttribute('cy', node.y.toFixed(1));
-            circle.setAttribute('r', String(radius));
-            circle.setAttribute('fill', radius > 2.6 ? '#7c7672' : '#55514f');
-            circle.setAttribute('opacity', radius > 2.6 ? '0.78' : radius > 1.7 ? '0.62' : '0.46');
-            nodeG.appendChild(circle);
-        });
-
-        const anchorNodes = centers
-            .filter((node) => node.radius >= 1.05)
-            .sort((left, right) => left.x - right.x);
-
-        for (let i = 0; i < 78 && anchorNodes.length > 1; i++) {
-            const a = anchorNodes[Math.floor(rand() * anchorNodes.length)];
-            const candidates = anchorNodes
-                .filter((b) => {
-                    if (a.id === b.id) return false;
-                    const dist = Math.hypot(a.x - b.x, a.y - b.y);
-                    return dist > dy * 0.85 && dist < dy * 3.6;
-                })
-                .sort((left, right) => Math.hypot(a.x - left.x, a.y - left.y) - Math.hypot(a.x - right.x, a.y - right.y))
-                .slice(0, 10);
-
-            if (!candidates.length) continue;
-            const b = candidates[Math.floor(rand() * candidates.length)];
-            const key = `${Math.min(a.id, b.id)}-${Math.max(a.id, b.id)}`;
-            if (used.has(key)) continue;
-            used.add(key);
-
-            const track = createLine(a.x, a.y, b.x, b.y);
-            track.setAttribute('stroke', 'rgba(233, 125, 77, 0.18)');
-            track.setAttribute('stroke-width', (0.7 + rand() * 0.65).toFixed(2));
-            track.setAttribute('opacity', (0.08 + rand() * 0.08).toFixed(3));
-            edgeG.appendChild(track);
-
-            const angle = Math.atan2(b.y - a.y, b.x - a.x);
-            const length = Math.hypot(b.x - a.x, b.y - a.y);
-            const comet = createLine(a.x, a.y, b.x, b.y);
-            comet.setAttribute('stroke', '#eb8b64');
-            comet.setAttribute('stroke-width', (1.2 + rand() * 1.2).toFixed(2));
-            comet.setAttribute('filter', 'url(#mob-soft-glow)');
-            comet.setAttribute('opacity', '0');
-            particleG.appendChild(comet);
-
-            const head = document.createElementNS(NS, 'circle');
-            head.setAttribute('r', (0.95 + rand() * 0.7).toFixed(2));
-            head.setAttribute('fill', '#d8744b');
-            head.setAttribute('opacity', '0');
-            particleG.appendChild(head);
-
-            edges.push({
-                x1: a.x,
-                y1: a.y,
-                x2: b.x,
-                y2: b.y,
-                angle,
-                duration: 900 + rand() * 2600,
-                offset: rand() * 3000,
-                comet,
-                head,
-                track,
-                length,
-                intensity: 0.42 + rand() * 0.52,
-                segmentLength: Math.max(8, Math.min(length * (0.18 + rand() * 0.16), 28))
+            // 1. static track lines (always visible on dark bg via white low-opacity)
+            ctx.lineCap = 'round';
+            flows.forEach(f => {
+                ctx.beginPath();
+                ctx.moveTo(f.ax, f.ay);
+                ctx.quadraticCurveTo(f.cx, f.cy, f.bx, f.by);
+                ctx.strokeStyle = f.isOrange ? 'rgba(255,210,180,0.10)' : 'rgba(180,210,255,0.09)';
+                ctx.lineWidth = f.width * 0.55;
+                ctx.globalAlpha = 1;
+                ctx.stroke();
             });
+
+            // 2. nodes
+            nodes.forEach(n => {
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+                ctx.fillStyle = 'rgba(220,212,200,1)';
+                ctx.globalAlpha = n.r > 5 * DPR ? 0.90 : n.r > 2 * DPR ? 0.68 : 0.42;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+
+            // 3. animated streaks — elongated segments following the curve
+            flows.forEach(f => {
+                f.progress += f.speed;
+                if (f.progress > 1) f.progress = 0;
+
+                const t = f.progress;
+                const t0 = Math.max(0, t - f.tailLen);
+
+                // draw streak as multiple short segments with increasing opacity (tail→head gradient)
+                const steps = 10;
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                const orangeRGB = '240,108,58';
+                const blueRGB  = '100,155,220';
+                const rgb = f.isOrange ? orangeRGB : blueRGB;
+                for (let i = 1; i <= steps; i++) {
+                    const alpha = i / steps;           // 0 at tail, 1 at head
+                    const st0 = t0 + (t - t0) * ((i - 1) / steps);
+                    const st1 = t0 + (t - t0) * (i / steps);
+                    const pt0 = bezierPt(f, st0);
+                    const pt1 = bezierPt(f, st1);
+                    ctx.beginPath();
+                    ctx.moveTo(pt0.x, pt0.y);
+                    ctx.lineTo(pt1.x, pt1.y);
+                    ctx.strokeStyle = `rgba(${rgb},${(alpha * f.opacity).toFixed(3)})`;
+                    ctx.lineWidth = f.width * (0.3 + 0.7 * alpha);
+                    ctx.stroke();
+                }
+
+                // bright head dot
+                const head = bezierPt(f, t);
+                ctx.beginPath();
+                ctx.arc(head.x, head.y, f.width * 0.9, 0, Math.PI * 2);
+                ctx.fillStyle = f.isOrange ? 'rgba(255,170,120,1)' : 'rgba(160,205,255,1)';
+                ctx.globalAlpha = Math.min(1, f.opacity * 1.25);
+                ctx.fill();
+                ctx.globalAlpha = 1;
+            });
+
+            requestAnimationFrame(draw);
         }
 
-        function updateEdge(edge, ts) {
-            const t = ((ts + edge.offset) % edge.duration) / edge.duration;
-            const progress = 0.08 + t * 0.84;
-            const headX = edge.x1 + (edge.x2 - edge.x1) * progress;
-            const headY = edge.y1 + (edge.y2 - edge.y1) * progress;
-            const tailProgress = Math.max(0, progress - edge.segmentLength / edge.length);
-            const tailX = edge.x1 + (edge.x2 - edge.x1) * tailProgress;
-            const tailY = edge.y1 + (edge.y2 - edge.y1) * tailProgress;
-            const envelope = Math.sin(Math.PI * t);
-
-            edge.comet.setAttribute('x1', tailX.toFixed(1));
-            edge.comet.setAttribute('y1', tailY.toFixed(1));
-            edge.comet.setAttribute('x2', headX.toFixed(1));
-            edge.comet.setAttribute('y2', headY.toFixed(1));
-            edge.comet.setAttribute('opacity', (0.16 + envelope * 0.5 * edge.intensity).toFixed(3));
-
-            edge.head.setAttribute('cx', headX.toFixed(1));
-            edge.head.setAttribute('cy', headY.toFixed(1));
-            edge.head.setAttribute('opacity', (0.35 + envelope * 0.4).toFixed(3));
-
-            edge.track.setAttribute('opacity', (0.05 + envelope * 0.12).toFixed(3));
-            edge.track.setAttribute('stroke-width', (0.65 + edge.intensity * 0.9).toFixed(2));
-        }
-
-        function tick(ts) {
-            edges.forEach((edge) => updateEdge(edge, ts));
-            requestAnimationFrame(tick);
-        }
-
-        requestAnimationFrame(tick);
+        const ro = new ResizeObserver(resize);
+        ro.observe(canvas);
+        resize();
+        draw();
     })();
     </script>
 </body>
