@@ -1,0 +1,1135 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MoRA | Human-Centric Geospatial Foundation Layer</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#083344',
+                            100: '#164e63',
+                            400: '#22d3ee', // Neon Cyan
+                            500: '#06b6d4',
+                            600: '#0891b2',
+                            900: '#164e63',
+                            950: '#083344',
+                        },
+                        accent: {
+                            500: '#ec4899', // Neon Pink/Magenta for contrast
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['"Helvetica Neue"', 'Helvetica', 'Arial', 'sans-serif'],
+                        mono: ['"SFMono-Regular"', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        body {
+            background-color: #000000;
+            color: #d1d5db; /* gray-300 */
+        }
+        
+        /* Map dark mode trick using filters */
+        .map-image-dark {
+            filter: invert(1) hue-rotate(180deg) brightness(0.6) contrast(1.2) grayscale(0.2);
+        }
+
+        .map-container {
+            mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
+            -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 75%, rgba(0,0,0,0) 100%);
+        }
+        
+        .hex-cell {
+            transition: fill 0.3s ease, stroke 0.3s ease, stroke-width 0.3s ease;
+        }
+
+        .hist-bar {
+            transition: height 0.4s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.3s ease;
+        }
+
+        .intro-panel {
+            background: linear-gradient(180deg, rgba(8, 8, 8, 0.92), rgba(4, 4, 4, 0.96));
+            border: 1px solid rgba(34, 211, 238, 0.16);
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.45);
+        }
+
+        .intro-grid-line {
+            border-color: rgba(34, 211, 238, 0.12);
+        }
+
+        .intro-hex-cell {
+            transition: fill 0.25s ease, stroke 0.25s ease, opacity 0.25s ease;
+        }
+
+        .intro-hex-cell.active {
+            filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.45));
+        }
+
+        .intro-bar {
+            transition: height 0.35s ease, background-color 0.3s ease, opacity 0.3s ease;
+        }
+
+        /* Animated gradient border for encoder */
+        .encoder-box {
+            position: relative;
+            background: #0a0a0a;
+            border-radius: 1rem;
+            border: 1px solid #1f2937;
+        }
+        .encoder-box::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: 1rem;
+            background: linear-gradient(45deg, #06b6d4, #ec4899, #06b6d4);
+            z-index: -1;
+            background-size: 200% 200%;
+            animation: gradient-shift 4s ease infinite;
+            opacity: 0.5;
+        }
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* --- 3D ISOMETRIC STYLES (DARK MODE) --- */
+        .iso-scene {
+            perspective: 1200px;
+            width: 100%;
+            height: 380px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .iso-wrapper {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            transform-style: preserve-3d;
+            transform: rotateX(60deg) rotateZ(-45deg);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .iso-wrapper:hover {
+            transform: rotateX(55deg) rotateZ(-35deg);
+        }
+        
+        .iso-layer {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+            transition: all 0.3s ease;
+        }
+
+        /* Bottom Layer: Continuous Hex Grid */
+        .iso-bottom {
+            transform: translateZ(-60px);
+            background-color: #0a0a0a; 
+            border: 1px solid #374151;
+            box-shadow: 
+                -1px 1px 0 #111827, -2px 2px 0 #111827, -3px 3px 0 #111827,
+                -4px 4px 0 #111827, -5px 5px 0 #111827, -6px 6px 0 #111827;
+            overflow: hidden;
+        }
+
+        /* Middle Layer: Mobility Graph with Nodes */
+        .iso-middle {
+            transform: translateZ(20px);
+            background-color: rgba(10, 10, 10, 0.7);
+            border: 1px solid #1f2937;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Top Modality Boxes */
+        .iso-top-box {
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            background-color: #0a0a0a;
+            border: 1px solid #374151;
+            transform-style: preserve-3d;
+            box-shadow: 
+                -1px 1px 0 #111827, -2px 2px 0 #111827, -3px 3px 0 #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .iso-top-box:hover {
+            box-shadow: 
+                -1px 1px 0 #111827, -2px 2px 0 #111827, 0 0 20px rgba(6, 182, 212, 0.4);
+            border-color: #22d3ee;
+        }
+
+        .box-1 { top: 10px; left: 10px; transform: translateZ(120px); }
+        .box-2 { top: 88px; left: 88px; transform: translateZ(120px); }
+        .box-3 { top: 166px; left: 166px; transform: translateZ(120px); }
+
+        /* Projection Beams */
+        .iso-beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 40px;
+            height: 100px;
+            background: linear-gradient(to bottom, rgba(34, 211, 238, 0.15), transparent);
+            transform-origin: top center;
+            transform: translate(-50%, 0) rotateX(-90deg) rotateY(-45deg);
+            pointer-events: none;
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #000; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #333; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555; 
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-brand-500 selection:text-white">
+
+    <!-- Navigation -->
+    <nav class="fixed top-0 w-full bg-black/80 backdrop-blur-md border-b border-zinc-900 z-50">
+        <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3 font-bold text-xl tracking-widest text-white uppercase">
+                <div class="w-6 h-6 border border-brand-400 flex items-center justify-center">
+                    <div class="w-2 h-2 bg-brand-400"></div>
+                </div>
+                MoRA
+            </div>
+            <div class="hidden md:flex space-x-8 text-xs font-mono tracking-widest text-zinc-400 uppercase">
+                <a href="#representation" class="hover:text-brand-400 transition-colors">Representation</a>
+                <a href="#deployment" class="hover:text-brand-400 transition-colors">Embeddings</a>
+                <a href="#scaling" class="hover:text-brand-400 transition-colors">Scaling</a>
+                <a href="#architecture" class="hover:text-brand-400 transition-colors">Architecture</a>
+            </div>
+            <a href="https://github.com/ylzhouchris/MoRA" target="_blank" rel="noreferrer" class="px-4 py-2 bg-zinc-900 text-white text-xs font-mono tracking-wider uppercase border border-zinc-800 hover:border-brand-400 hover:text-brand-400 transition-colors flex items-center gap-2">
+                <i data-lucide="github" class="w-4 h-4"></i> Source
+            </a>
+        </div>
+    </nav>
+
+    <!-- Opening Hero -->
+    <section class="pt-28 pb-16 px-6 max-w-7xl mx-auto relative">
+        <div class="absolute top-24 right-16 w-[520px] h-[520px] bg-brand-600/10 rounded-full blur-[140px] pointer-events-none"></div>
+
+        <div class="grid lg:grid-cols-[0.84fr_1.16fr] gap-10 items-center">
+            <div class="relative z-10">
+                <div class="inline-block mb-6 px-3 py-1 bg-brand-950/50 border border-brand-500/30 text-brand-400 text-xs font-mono tracking-[0.28em] uppercase">
+                    MoRA // Foundation Layer
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold tracking-tighter text-white mb-6 leading-[0.96]">
+                    Hexagonal
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand-400 to-accent-500">location representations</span>
+                    for human-scale geography.
+                </h1>
+                <p class="text-2xl md:text-3xl text-zinc-200 leading-tight font-light max-w-xl mb-8">
+                    How can we turn continuous land into a functional embedding space that downstream models can actually use?
+                </p>
+                <p class="text-base text-zinc-500 max-w-lg leading-relaxed font-light mb-10">
+                    MoRA partitions space into hexagonal cells and learns a dense vector for each cell from mobility, POIs, imagery, and demographic context. The visualization on the right sketches that first step: geography becoming a machine-readable structure.
+                </p>
+                <div class="flex flex-wrap gap-4 font-mono text-sm uppercase tracking-wider">
+                    <a href="https://github.com/ylzhouchris/MoRA" target="_blank" rel="noreferrer" class="px-6 py-3 bg-brand-500 text-black font-bold hover:bg-brand-400 transition-colors shadow-[0_0_20px_rgba(6,182,212,0.3)]">
+                        View Repository
+                    </a>
+                    <a href="#representation" class="px-6 py-3 bg-transparent text-white border border-zinc-700 hover:border-white transition-colors">
+                        Explore Representation
+                    </a>
+                </div>
+            </div>
+
+            <div class="intro-panel rounded-[30px] p-5 md:p-6 relative overflow-hidden">
+                <div class="flex items-center justify-between text-[11px] font-mono tracking-[0.28em] uppercase text-zinc-500 mb-4 px-1">
+                    <span>Nationwide Hexagonal Field</span>
+                    <span id="intro-hex-label" class="text-brand-400">Hex Cell B2</span>
+                </div>
+
+                <div class="grid xl:grid-cols-[1.12fr_0.88fr] gap-5 items-stretch">
+                    <div class="rounded-[24px] border border-zinc-800 bg-[#04070c] p-4">
+                        <div class="relative h-[460px] rounded-[20px] overflow-hidden border border-zinc-800 bg-black group">
+                            <img
+                                src="press_material_extracted/press_material/cover_black_02.jpg"
+                                alt="Mobility field visualization"
+                                class="absolute inset-0 w-full h-full object-cover opacity-80 transition-transform duration-[20s] group-hover:scale-[1.03]"
+                                onerror="this.src='city_map.png'; this.onerror=null;"
+                            />
+                            <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(34,211,238,0.06),rgba(0,0,0,0.55)_58%,rgba(0,0,0,0.9)_100%)]"></div>
+                            <svg id="intro-hex-svg" class="absolute inset-0 w-full h-full z-10"></svg>
+                            <div class="absolute left-4 bottom-4 z-20 text-[11px] font-mono tracking-[0.24em] uppercase text-zinc-400">
+                                Hover to inspect a hexagonal region
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="rounded-[24px] border border-zinc-800 bg-[#05070d] p-5 flex flex-col">
+                        <div class="rounded-[18px] border border-zinc-800 bg-[#07101a] p-4 mb-4">
+                            <div class="grid grid-cols-[72px_1fr] gap-4 items-start">
+                                <div class="rounded-[16px] border border-brand-500/30 bg-[#0a1823] p-3 flex items-center justify-center">
+                                    <div id="intro-hex-chip" class="w-11 h-11 rounded-[12px] border border-brand-400/40 shadow-[0_0_24px_rgba(34,211,238,0.16)]"></div>
+                                </div>
+                                <div>
+                                    <div class="text-[11px] font-mono tracking-[0.25em] uppercase text-zinc-500 mb-2">Functional Description</div>
+                                    <p id="intro-hex-copy" class="text-sm text-zinc-300 font-light leading-relaxed min-h-[96px]">
+                                        Commercial core with dense movement, strong POI activity, and broad functional overlap.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-4 mb-4">
+                            <div class="rounded-[18px] border border-zinc-800 bg-[#05070c] p-4">
+                                <div class="text-[11px] font-mono tracking-[0.25em] uppercase text-zinc-500 mb-3">Surface Signal</div>
+                                <div class="grid grid-cols-3 gap-2 mb-3">
+                                    <div class="rounded-lg bg-red-500/90 text-white text-xs font-mono px-2 py-2 text-center">R <span id="intro-r">0.81</span></div>
+                                    <div class="rounded-lg bg-green-500/90 text-white text-xs font-mono px-2 py-2 text-center">G <span id="intro-g">0.62</span></div>
+                                    <div class="rounded-lg bg-blue-500/90 text-white text-xs font-mono px-2 py-2 text-center">B <span id="intro-b">0.37</span></div>
+                                </div>
+                                <p class="text-xs text-zinc-500 font-mono uppercase tracking-[0.2em]">Visible signal</p>
+                            </div>
+                            <div class="rounded-[18px] border border-zinc-800 bg-[#05070c] p-4">
+                                <div class="text-[11px] font-mono tracking-[0.25em] uppercase text-zinc-500 mb-3">Vector Slice</div>
+                                <div id="intro-vector" class="font-mono text-xs text-brand-300 leading-relaxed break-all">
+                                    [0.81, -0.22, 0.45, 0.13, ...]
+                                </div>
+                                <p class="text-xs text-zinc-500 font-mono uppercase tracking-[0.2em] mt-3">Embedding</p>
+                            </div>
+                        </div>
+
+                        <div class="relative flex-1 rounded-[20px] border border-zinc-800 bg-[#05070c] p-4 overflow-hidden">
+                            <div class="absolute inset-x-4 top-4 bottom-4 flex flex-col justify-between pointer-events-none opacity-30">
+                                <div class="border-t intro-grid-line"></div>
+                                <div class="border-t intro-grid-line"></div>
+                                <div class="border-t intro-grid-line"></div>
+                                <div class="border-t intro-grid-line"></div>
+                            </div>
+                            <div class="text-[11px] font-mono tracking-[0.25em] uppercase text-zinc-500 mb-4 relative z-10">Embedding Distribution</div>
+                            <div id="intro-bars" class="relative z-10 h-36 flex items-end gap-[2px]"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Location Representation (Map & Embeddings) -->
+    <section class="py-24 bg-[#050505] border-t border-zinc-900">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <div class="mb-16 max-w-4xl">
+                <h2 class="text-xs font-mono text-brand-400 tracking-widest uppercase mb-3">01 // Location Representation</h2>
+                <h3 class="text-3xl md:text-4xl font-bold mb-4 tracking-tight text-white">
+                    Translating space into structure.
+                </h3>
+                <p class="text-zinc-400 text-lg leading-relaxed mb-4 font-light">
+                    While humans understand a location through descriptive language, machine learning models require structured numerical inputs. We need a way to translate the complex, multi-layered functional role of a region into a dense mathematical representation.
+                </p>
+                <p class="text-zinc-500 text-sm leading-relaxed font-mono">
+                    > MoRA partitions continuous land into hexagonal cells. <strong class="text-brand-400 font-normal">Hover any hexagon below</strong> to inspect the vector translation.
+                </p>
+            </div>
+
+            <div class="flex flex-col lg:flex-row gap-8 mb-24">
+                
+                <!-- Left: Interactive Map -->
+                <div class="w-full lg:w-1/2 flex flex-col gap-4">
+                    <div class="flex items-center justify-between text-xs font-mono text-zinc-500 uppercase tracking-wider px-1">
+                        <span class="flex items-center gap-2"><i data-lucide="map" class="w-4 h-4"></i> Partitioned Surface</span>
+                        <span class="flex items-center gap-2 text-brand-400 animate-pulse"><i data-lucide="mouse-pointer-click" class="w-4 h-4"></i> Inspect</span>
+                    </div>
+                    
+                    <div class="relative w-full h-96 bg-zinc-900 border border-zinc-800 overflow-hidden map-container group">
+                        <img 
+                            src="city_map.png" 
+                            alt="City Map" 
+                            class="absolute inset-0 w-full h-full object-cover map-image-dark transition-transform duration-[20s] group-hover:scale-105"
+                            onerror="this.src='https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1600&q=80'; this.onerror=null;"
+                        />
+                        <div class="absolute inset-0 bg-brand-900/20 mix-blend-overlay pointer-events-none"></div>
+                        <svg id="hex-svg" class="absolute inset-0 w-full h-full z-10"></svg>
+                    </div>
+
+                    <!-- Human Description -->
+                    <div class="bg-zinc-900/50 backdrop-blur-sm p-5 border border-zinc-800 flex items-center gap-6 h-32">
+                        <div class="flex-1 overflow-hidden">
+                            <h4 class="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-2">Human_Description</h4>
+                            <p id="human-desc-box" class="text-sm text-zinc-300 font-light line-clamp-3">
+                                Awaiting input... hover over the map to view functional description.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: MoRA Embedding -->
+                <div class="w-full lg:w-1/2 flex flex-col gap-4">
+                    <div class="flex items-center justify-between text-xs font-mono text-zinc-500 uppercase tracking-wider px-1">
+                        <span class="flex items-center gap-2"><i data-lucide="cpu" class="w-4 h-4"></i> Vector Space</span>
+                    </div>
+
+                    <div class="bg-[#0a0a0a] border border-zinc-800 flex flex-col flex-grow overflow-hidden relative h-96">
+                        <div class="px-6 py-5 border-b border-zinc-800 bg-black/50 backdrop-blur z-10">
+                            <div class="flex justify-between items-start mb-2">
+                                <h3 class="text-[10px] font-mono text-brand-400 uppercase tracking-widest">Selected_Hex</h3>
+                                <span class="text-zinc-500 text-[10px] font-mono" id="hex-id">ID: --</span>
+                            </div>
+                            <p class="text-white text-sm font-light min-h-[2.5rem] leading-relaxed" id="hex-desc">
+                                Awaiting input... hover over the map to view functional representation.
+                            </p>
+                            <div class="mt-3 font-mono text-xs text-brand-400/70 truncate" id="hex-vector">
+                                [0.00, 0.00, 0.00, 0.00, ...]
+                            </div>
+                        </div>
+                        
+                        <div class="p-6 relative flex-grow flex flex-col justify-end">
+                            <!-- Grid lines -->
+                            <div class="absolute inset-x-6 top-6 bottom-6 flex flex-col justify-between pointer-events-none opacity-10">
+                                <div class="border-t border-brand-400 w-full"></div>
+                                <div class="border-t border-brand-400 w-full"></div>
+                                <div class="border-t border-brand-400 w-full"></div>
+                                <div class="border-t border-brand-400 w-full"></div>
+                            </div>
+                            
+                            <div id="histogram-container" class="relative z-10 flex items-end justify-between w-full h-32 gap-[1px]">
+                                <!-- Bars injected by JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-zinc-900/50 backdrop-blur-sm p-5 border border-zinc-800 flex items-center gap-6 h-32">
+                        <div class="flex-1">
+                            <h4 class="text-[10px] font-mono text-zinc-500 uppercase tracking-widest mb-3">MoRA_Vector (128d)</h4>
+                            <div class="w-full h-8 bg-gradient-to-r from-brand-900 via-brand-500 to-accent-500 opacity-80"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- What's representation for? -->
+            <div class="max-w-5xl mx-auto pt-10 border-t border-zinc-900">
+                <div class="text-center mb-12 mt-10">
+                    <h3 class="text-2xl font-bold text-white mb-4">Downstream Applications</h3>
+                    <p class="text-zinc-400 text-sm font-light">Dense vectors can be seamlessly fed into machine learning models for predictive tasks.</p>
+                </div>
+
+                <div class="flex flex-col gap-6">
+                    
+                    <!-- Classification Workflow -->
+                    <div class="bg-[#0a0a0a] p-6 border border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-zinc-600 transition-colors">
+                        <div class="w-full md:w-1/4 text-center md:text-left">
+                            <h4 class="text-brand-400 font-mono text-sm uppercase tracking-wider mb-2">Classification</h4>
+                            <p class="text-xs text-zinc-500 font-light">Predicting categorical labels for regions (e.g., functional zones).</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 md:gap-8 flex-1 justify-center">
+                            <div class="flex flex-col items-center">
+                                <svg id="hex-class-in" class="w-20 h-20"></svg>
+                                <span class="text-[10px] text-zinc-500 font-mono mt-2 uppercase">Input</span>
+                            </div>
+                            
+                            <div class="flex flex-col items-center text-zinc-600">
+                                <i data-lucide="arrow-right" class="w-5 h-5 hidden md:block"></i>
+                                <i data-lucide="arrow-down" class="w-5 h-5 md:hidden"></i>
+                            </div>
+
+                            <div class="flex flex-col items-center">
+                                <svg id="hex-class-out" class="w-20 h-20"></svg>
+                                <span class="text-[10px] text-zinc-500 font-mono mt-2 uppercase">Output</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-1/4 flex flex-col gap-2 text-[10px] font-mono text-zinc-400 bg-black p-4 border border-zinc-800">
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 bg-brand-500"></div> Residential</div>
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 bg-accent-500"></div> Commercial</div>
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 bg-green-400"></div> Parks</div>
+                            <div class="flex items-center gap-2"><div class="w-2 h-2 bg-yellow-400"></div> Industrial</div>
+                        </div>
+                    </div>
+
+                    <!-- Regression Workflow -->
+                    <div class="bg-[#0a0a0a] p-6 border border-zinc-800 flex flex-col md:flex-row items-center justify-between gap-6 hover:border-zinc-600 transition-colors">
+                        <div class="w-full md:w-1/4 text-center md:text-left">
+                            <h4 class="text-brand-400 font-mono text-sm uppercase tracking-wider mb-2">Regression</h4>
+                            <p class="text-xs text-zinc-500 font-light">Predicting continuous numerical values (e.g., Crime Rates).</p>
+                        </div>
+                        
+                        <div class="flex items-center gap-4 md:gap-8 flex-1 justify-center">
+                            <div class="flex flex-col items-center">
+                                <svg id="hex-reg-in" class="w-20 h-20"></svg>
+                                <span class="text-[10px] text-zinc-500 font-mono mt-2 uppercase">Input</span>
+                            </div>
+                            
+                            <div class="flex flex-col items-center text-zinc-600">
+                                <i data-lucide="arrow-right" class="w-5 h-5 hidden md:block"></i>
+                                <i data-lucide="arrow-down" class="w-5 h-5 md:hidden"></i>
+                            </div>
+
+                            <div class="flex flex-col items-center">
+                                <svg id="hex-reg-out" class="w-20 h-20"></svg>
+                                <span class="text-[10px] text-zinc-500 font-mono mt-2 uppercase">Output</span>
+                            </div>
+                        </div>
+
+                        <div class="w-full md:w-1/4 flex flex-col gap-2 text-[10px] font-mono text-zinc-400 bg-black p-4 border border-zinc-800 justify-center">
+                            <div class="flex justify-between mb-1">
+                                <span>Low</span>
+                                <span>High</span>
+                            </div>
+                            <div class="w-full h-2 bg-gradient-to-r from-brand-900 via-brand-500 to-accent-500"></div>
+                            <div class="text-center mt-1 text-zinc-500">Predicted Value</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Architecture Section -->
+    <section id="architecture" class="py-24 bg-black border-t border-zinc-900 overflow-hidden">
+        <div class="max-w-7xl mx-auto px-6">
+            
+            <div class="text-center mb-16 max-w-4xl mx-auto">
+                <h2 class="text-xs font-mono text-brand-400 tracking-widest uppercase mb-3">02 // Architecture</h2>
+                <h2 class="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">Multi-modal Alignment</h2>
+                <p class="text-lg text-zinc-400 font-light leading-relaxed">
+                    MoRA employs a novel architecture to construct its embeddings. By anchoring diverse data sources to a unified spatial graph, we ensure all physical and social modalities are strictly interpreted through the lens of fundamental human dynamics.
+                </p>
+            </div>
+
+            <!-- 3-Column Layout -->
+            <div class="flex flex-col lg:flex-row gap-6 items-center justify-between">
+                
+                <!-- 1. Left: Interactive 3D Diagram -->
+                <div class="w-full lg:w-5/12 flex flex-col items-center">
+                    
+                    <div class="iso-scene mb-4">
+                        <div class="iso-wrapper">
+                            
+                            <!-- Layer 1: Continuous Hex Grid (Bottom) -->
+                            <div class="iso-layer iso-bottom" onmouseenter="updateLayerInfo('hex')" onmouseleave="resetLayerInfo()">
+                                <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+                                    <defs>
+                                        <pattern id="hex-pattern" width="34.64" height="60" patternUnits="userSpaceOnUse" patternTransform="scale(1.2)">
+                                            <path d="M17.32 0 L34.64 10 L34.64 30 L17.32 40 L0 30 L0 10 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1"/>
+                                            <path d="M17.32 60 L34.64 70 L34.64 90 L17.32 100 L0 90 L0 70 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1"/>
+                                            <path d="M34.64 30 L51.96 40 L51.96 60 L34.64 70 L17.32 60 L17.32 40 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1"/>
+                                            <path d="M0 30 L17.32 40 L17.32 60 L0 70 L-17.32 60 L-17.32 40 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1"/>
+                                        </pattern>
+                                    </defs>
+                                    <rect width="100%" height="100%" fill="url(#hex-pattern)" />
+                                </svg>
+                            </div>
+
+                            <!-- Layer 2: Mobility Graph -->
+                            <div class="iso-layer iso-middle flex items-center justify-center overflow-hidden" onmouseenter="updateLayerInfo('graph')" onmouseleave="resetLayerInfo()">
+                                <svg class="w-full h-full" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+                                    <line x1="40" y1="50" x2="100" y2="30" stroke="#374151" stroke-width="1"/>
+                                    <line x1="100" y1="30" x2="160" y2="70" stroke="#374151" stroke-width="1"/>
+                                    <line x1="40" y1="50" x2="60" y2="120" stroke="#374151" stroke-width="1"/>
+                                    <line x1="100" y1="30" x2="110" y2="100" stroke="#374151" stroke-width="1"/>
+                                    <line x1="160" y1="70" x2="110" y2="100" stroke="#374151" stroke-width="1"/>
+                                    <line x1="60" y1="120" x2="110" y2="100" stroke="#22d3ee" stroke-width="2" style="filter: drop-shadow(0 0 4px #22d3ee);"/> 
+                                    <line x1="60" y1="120" x2="80" y2="170" stroke="#374151" stroke-width="1"/>
+                                    <line x1="110" y1="100" x2="150" y2="150" stroke="#374151" stroke-width="1"/>
+                                    <line x1="80" y1="170" x2="150" y2="150" stroke="#374151" stroke-width="1"/>
+                                    
+                                    <circle cx="40" cy="50" r="4" fill="#6b7280"/>
+                                    <circle cx="100" cy="30" r="5" fill="#6b7280"/>
+                                    <circle cx="160" cy="70" r="4" fill="#6b7280"/>
+                                    <circle cx="60" cy="120" r="6" fill="#22d3ee" style="filter: drop-shadow(0 0 6px #22d3ee);"/> 
+                                    <circle cx="110" cy="100" r="7" fill="#22d3ee" style="filter: drop-shadow(0 0 6px #22d3ee);"/> 
+                                    <circle cx="80" cy="170" r="4" fill="#6b7280"/>
+                                    <circle cx="150" cy="150" r="5" fill="#6b7280"/>
+                                </svg>
+                            </div>
+
+                            <!-- Layer 3: Modalities -->
+                            <div class="iso-top-box box-1" onmouseenter="updateLayerInfo('poi')" onmouseleave="resetLayerInfo()">
+                                <div class="iso-beam"></div>
+                                <div class="w-full h-full flex flex-col items-center justify-center p-1 relative z-10">
+                                    <i data-lucide="map-pin" class="w-5 h-5 text-accent-500 mb-1"></i>
+                                    <div class="w-6 h-0.5 bg-zinc-700 mb-1"></div>
+                                    <div class="w-4 h-0.5 bg-zinc-700"></div>
+                                </div>
+                            </div>
+
+                            <div class="iso-top-box box-2" onmouseenter="updateLayerInfo('imagery')" onmouseleave="resetLayerInfo()">
+                                <div class="iso-beam"></div>
+                                <div class="w-full h-full flex items-center justify-center relative z-10 overflow-hidden bg-[#111]">
+                                    <svg class="w-full h-full" viewBox="0 0 100 100">
+                                        <path d="M0,20 Q30,40 50,10 T100,30 L100,100 L0,100 Z" fill="#1f2937"/>
+                                        <path d="M0,50 Q40,70 60,40 T100,60 L100,100 L0,100 Z" fill="#374151"/>
+                                        <line x1="20" y1="0" x2="40" y2="100" stroke="#4b5563" stroke-width="1"/>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <div class="iso-top-box box-3" onmouseenter="updateLayerInfo('demo')" onmouseleave="resetLayerInfo()">
+                                <div class="iso-beam"></div>
+                                <div class="w-full h-full flex flex-col relative z-10 p-1">
+                                    <div class="flex-1 border border-zinc-800 grid grid-cols-3 grid-rows-3 gap-px bg-zinc-800">
+                                        <div class="bg-black"></div><div class="bg-black"></div><div class="bg-black"></div>
+                                        <div class="bg-black"></div><div class="bg-brand-500"></div><div class="bg-black"></div>
+                                        <div class="bg-black"></div><div class="bg-black"></div><div class="bg-black"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Info Box -->
+                    <div class="w-full bg-[#0a0a0a] border border-zinc-800 p-5 min-h-28 transition-all duration-300" id="layer-info-box">
+                        <div class="flex items-center gap-2 mb-2">
+                            <i data-lucide="layers" class="w-4 h-4 text-brand-400" id="layer-icon"></i>
+                            <h4 class="font-mono text-white text-sm uppercase tracking-wider" id="layer-title">Multi-modal Inputs</h4>
+                        </div>
+                        <p class="text-zinc-400 text-xs font-light leading-relaxed" id="layer-desc">
+                            Hover over the 3D layers above to explore the raw modalities MoRA processes.
+                        </p>
+                    </div>
+
+                </div>
+
+                <!-- 2. Middle: Encoder -->
+                <div class="w-full lg:w-2/12 flex flex-col lg:flex-row items-center justify-center gap-4 py-8 lg:py-0">
+                    <div class="hidden lg:flex flex-col items-center text-zinc-700">
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </div>
+                    
+                    <div class="encoder-box w-full p-6 text-center">
+                        <div class="w-10 h-10 bg-black border border-zinc-800 flex items-center justify-center mx-auto mb-3">
+                            <i data-lucide="cpu" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <h3 class="text-sm font-mono text-white mb-2 uppercase tracking-wider">Encoder</h3>
+                        <p class="text-[10px] text-zinc-500 font-light leading-relaxed">
+                            Contrastive alignment onto the mobility graph.
+                        </p>
+                    </div>
+
+                    <div class="hidden lg:flex flex-col items-center text-zinc-700">
+                        <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                    </div>
+                </div>
+
+                <!-- 3. Right: Output Representations -->
+                <div class="w-full lg:w-5/12 flex flex-col items-center">
+                    <div class="bg-[#0a0a0a] p-6 w-full text-center relative overflow-hidden border border-zinc-800 h-96 flex flex-col justify-center">
+                        <div class="relative z-10">
+                            <div class="flex justify-center mb-4">
+                                <div class="w-12 h-12 bg-black border border-zinc-800 flex items-center justify-center">
+                                    <i data-lucide="database" class="w-5 h-5 text-brand-400"></i>
+                                </div>
+                            </div>
+                            <h3 class="text-lg font-bold text-white mb-1">Dense Representations</h3>
+                            <p class="text-xs text-brand-400 mb-8 font-mono">128-dimensional vector</p>
+                            
+                            <!-- Visual representation of a dense vector -->
+                            <div class="grid grid-cols-8 gap-1 w-full px-6">
+                                <!-- Hardcoded neon colors -->
+                                <div class="h-2 bg-brand-500 opacity-90"></div>
+                                <div class="h-2 bg-accent-500 opacity-60"></div>
+                                <div class="h-2 bg-brand-400 opacity-80"></div>
+                                <div class="h-2 bg-zinc-700 opacity-40"></div>
+                                <div class="h-2 bg-white opacity-100"></div>
+                                <div class="h-2 bg-brand-600 opacity-70"></div>
+                                <div class="h-2 bg-zinc-600 opacity-50"></div>
+                                <div class="h-2 bg-brand-400 opacity-90"></div>
+                                
+                                <div class="h-2 bg-zinc-800 opacity-30"></div>
+                                <div class="h-2 bg-brand-500 opacity-80"></div>
+                                <div class="h-2 bg-accent-500 opacity-90"></div>
+                                <div class="h-2 bg-zinc-700 opacity-50"></div>
+                                <div class="h-2 bg-brand-400 opacity-70"></div>
+                                <div class="h-2 bg-white opacity-100"></div>
+                                <div class="h-2 bg-zinc-600 opacity-40"></div>
+                                <div class="h-2 bg-brand-600 opacity-80"></div>
+
+                                <div class="h-2 bg-brand-400 opacity-70"></div>
+                                <div class="h-2 bg-zinc-700 opacity-60"></div>
+                                <div class="h-2 bg-brand-500 opacity-90"></div>
+                                <div class="h-2 bg-brand-400 opacity-80"></div>
+                                <div class="h-2 bg-accent-500 opacity-50"></div>
+                                <div class="h-2 bg-brand-600 opacity-90"></div>
+                                <div class="h-2 bg-zinc-800 opacity-40"></div>
+                                <div class="h-2 bg-white opacity-100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+     <!-- Code & Deployment Section -->
+    <section class="py-20 bg-[#050505] border-t border-zinc-900">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            
+            <div>
+                <h2 class="text-xs font-mono text-brand-400 tracking-widest uppercase mb-3">03 // Deployment</h2>
+                <h2 class="text-3xl font-bold text-white mb-6">Deploy instantly with MoRAD.</h2>
+                <p class="text-zinc-400 mb-8 font-light leading-relaxed">
+                    Complex multimodal inference is hard to ship. The distilled version of MoRA maps raw longitude and latitude directly into the shared embedding space, making the foundation much easier to use in production settings.
+                </p>
+                
+                <ul class="space-y-6">
+                    <li class="flex gap-4">
+                        <div class="mt-1 text-brand-400"><i data-lucide="shield" class="w-5 h-5"></i></div>
+                        <div>
+                            <h4 class="font-mono text-sm text-white uppercase tracking-wider">Privacy Preserving</h4>
+                            <p class="text-xs text-zinc-500 mt-1 font-light">No need to process raw mobility or demographic data at inference time.</p>
+                        </div>
+                    </li>
+                    <li class="flex gap-4">
+                        <div class="mt-1 text-brand-400"><i data-lucide="zap" class="w-5 h-5"></i></div>
+                        <div>
+                            <h4 class="font-mono text-sm text-white uppercase tracking-wider">Fast Inference</h4>
+                            <p class="text-xs text-zinc-500 mt-1 font-light">A lightweight surrogate network handles coordinate-to-embedding translation.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="bg-black border border-zinc-800 overflow-hidden">
+                <div class="flex items-center px-4 py-2 bg-zinc-900 border-b border-zinc-800">
+                    <div class="text-[10px] text-zinc-500 font-mono">mora_quickstart.py</div>
+                </div>
+                <div class="p-6 overflow-x-auto">
+<pre class="code-block text-xs text-zinc-300 leading-loose font-mono">
+<span class="text-accent-500">import</span> mora
+
+<span class="text-zinc-600"># Load the distilled inference model</span>
+model = mora.load_model(<span class="text-brand-400">'morad-128d-national'</span>)
+
+<span class="text-zinc-600"># Coordinate-in, representation-out</span>
+lat, lon = <span class="text-purple-400">31.2304</span>, <span class="text-purple-400">121.4737</span>
+embedding = model.encode(lat, lon)
+
+<span class="text-blue-400">print</span>(embedding.shape)
+<span class="text-zinc-500">> (128,)</span>
+
+<span class="text-blue-400">print</span>(embedding[:<span class="text-purple-400">5</span>])
+<span class="text-zinc-500">> [-0.042, 0.891, 0.112, -0.334, 0.567]</span>
+</pre>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-black border-t border-zinc-900 py-12">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3 font-bold text-lg tracking-widest text-white uppercase">
+                <div class="w-5 h-5 border border-brand-400 flex items-center justify-center">
+                    <div class="w-1.5 h-1.5 bg-brand-400"></div>
+                </div>
+                MoRA
+            </div>
+            <p class="text-xs text-zinc-500 font-mono uppercase tracking-wider">Geospatial Foundation Layer</p>
+            <div class="flex space-x-6 text-xs font-mono text-zinc-500 uppercase tracking-wider">
+                <a href="#" class="hover:text-white transition-colors">GitHub</a>
+                <a href="#" class="hover:text-white transition-colors">Paper</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        lucide.createIcons();
+
+        // 3D Diagram Interactivity
+        const layerData = {
+            'poi': {
+                title: 'POI_Textual',
+                desc: 'Extracts semantic meaning from Points of Interest using language models, capturing functional purpose.',
+                color: 'text-accent-500',
+                border: 'border-accent-500/50',
+                icon: 'map-pin'
+            },
+            'imagery': {
+                title: 'Satellite_Visual',
+                desc: 'Processes high-resolution overhead imagery to understand the physical structure and built environment.',
+                color: 'text-white',
+                border: 'border-zinc-500',
+                icon: 'image'
+            },
+            'demo': {
+                title: 'Demo_Tabular',
+                desc: 'Incorporates structured census and population data to ground the physical space in social reality.',
+                color: 'text-brand-500',
+                border: 'border-brand-500/50',
+                icon: 'table'
+            },
+            'graph': {
+                title: 'Mobility_Graph',
+                desc: 'The core alignment mechanism. All modalities are projected onto this network based on human movement.',
+                color: 'text-brand-400',
+                border: 'border-brand-400/50',
+                icon: 'network'
+            },
+            'hex': {
+                title: 'Hex_Projection',
+                desc: 'The final continuous space is discretized into standard H3 hexagonal cells for dense vectors.',
+                color: 'text-zinc-400',
+                border: 'border-zinc-600',
+                icon: 'hexagon'
+            },
+            'default': {
+                title: 'Multi-modal Inputs',
+                desc: 'Hover over the 3D layers above to explore the raw modalities MoRA processes.',
+                color: 'text-brand-400',
+                border: 'border-zinc-800',
+                icon: 'layers'
+            }
+        };
+
+        function updateLayerInfo(layerKey) {
+            const data = layerData[layerKey];
+            const box = document.getElementById('layer-info-box');
+            const icon = document.getElementById('layer-icon');
+            const title = document.getElementById('layer-title');
+            const desc = document.getElementById('layer-desc');
+
+            box.className = `w-full bg-[#0a0a0a] border p-5 min-h-28 transition-all duration-300 ${data.border}`;
+            
+            icon.setAttribute('data-lucide', data.icon);
+            icon.className = `w-4 h-4 ${data.color}`;
+            lucide.createIcons(); 
+            
+            title.innerText = data.title;
+            desc.innerText = data.desc;
+        }
+
+        function resetLayerInfo() {
+            updateLayerInfo('default');
+        }
+
+        // Interactive Map Data
+        const regionData = [
+            { id: "B2", desc: "Commercial core with dense movement, strong POI activity, and broad functional overlap.", vec: "[0.81, -0.22, 0.45, 0.13, ...]", rgb: [0.81, 0.62, 0.37], bars: [0.88, 0.82, 0.76, 0.68, 0.59, 0.48, 0.39, 0.31, 0.24, 0.19, 0.42, 0.53, 0.61, 0.73, 0.66, 0.47] },
+            { id: "C4", desc: "High-density residential apartment complex with predictable morning and evening mobility.", vec: "[-0.14, 0.77, -0.31, 0.05, ...]", rgb: [0.41, 0.69, 0.58], bars: [0.52, 0.58, 0.62, 0.73, 0.79, 0.68, 0.44, 0.32, 0.21, 0.18, 0.27, 0.41, 0.49, 0.55, 0.48, 0.33] },
+            { id: "A1", desc: "Major street intersection facilitating high-volume vehicular transfers.", vec: "[0.92, 0.11, 0.88, -0.42, ...]", rgb: [0.52, 0.57, 0.68], bars: [0.91, 0.84, 0.77, 0.63, 0.49, 0.37, 0.29, 0.22, 0.18, 0.15, 0.31, 0.46, 0.58, 0.71, 0.65, 0.54] },
+            { id: "D3", desc: "Mixed-use block featuring ground-floor cafes and upper-level offices.", vec: "[0.45, 0.33, 0.12, 0.67, ...]", rgb: [0.67, 0.54, 0.43], bars: [0.43, 0.52, 0.61, 0.74, 0.69, 0.55, 0.38, 0.27, 0.19, 0.16, 0.25, 0.36, 0.47, 0.64, 0.71, 0.58] },
+            { id: "E5", desc: "Neighborhood pocket park acting as a local social anchor.", vec: "[-0.55, -0.12, 0.04, 0.89, ...]", rgb: [0.35, 0.63, 0.44], bars: [0.26, 0.33, 0.49, 0.57, 0.63, 0.59, 0.47, 0.34, 0.22, 0.17, 0.19, 0.25, 0.31, 0.44, 0.52, 0.39] }
+        ];
+
+        const numDimensions = 128;
+        const histogramContainer = document.getElementById('histogram-container');
+        const bars = [];
+        const introBarsContainer = document.getElementById('intro-bars');
+
+        for (let i = 0; i < numDimensions; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'hist-bar flex-1 bg-zinc-800';
+            bar.style.height = '5%'; 
+            histogramContainer.appendChild(bar);
+            bars.push(bar);
+        }
+
+        function updateHistogram() {
+            bars.forEach((bar) => {
+                const value = Math.random() * 90 + 10;
+                bar.style.height = `${value}%`;
+                
+                if (value > 80) {
+                    bar.style.backgroundColor = '#22d3ee'; // Cyan
+                } else if (value > 60) {
+                    bar.style.backgroundColor = '#ec4899'; // Magenta
+                } else if (value > 30) {
+                    bar.style.backgroundColor = '#0891b2'; // Dark Cyan
+                } else {
+                    bar.style.backgroundColor = '#1f2937'; // Gray
+                }
+            });
+        }
+
+        function renderIntroBars(values) {
+            if (!introBarsContainer) return;
+            introBarsContainer.innerHTML = '';
+
+            values.forEach((value, index) => {
+                const bar = document.createElement('div');
+                bar.className = 'intro-bar flex-1';
+                bar.style.height = `${Math.max(14, value * 120)}px`;
+
+                if (value > 0.72) {
+                    bar.style.backgroundColor = '#22d3ee';
+                } else if (value > 0.52) {
+                    bar.style.backgroundColor = '#ec4899';
+                } else if (value > 0.3) {
+                    bar.style.backgroundColor = '#0891b2';
+                } else {
+                    bar.style.backgroundColor = '#1f2937';
+                }
+
+                bar.style.opacity = `${0.75 + ((index % 4) * 0.06)}`;
+                introBarsContainer.appendChild(bar);
+            });
+        }
+
+        function updateIntroPanel(data) {
+            const label = document.getElementById('intro-hex-label');
+            const copy = document.getElementById('intro-hex-copy');
+            const vector = document.getElementById('intro-vector');
+            const chip = document.getElementById('intro-hex-chip');
+            const r = document.getElementById('intro-r');
+            const g = document.getElementById('intro-g');
+            const b = document.getElementById('intro-b');
+
+            if (!label || !copy || !vector || !chip || !r || !g || !b) return;
+
+            label.innerText = `Hex Cell ${data.id}`;
+            copy.innerText = data.desc;
+            vector.innerText = data.vec;
+            r.innerText = data.rgb[0].toFixed(2);
+            g.innerText = data.rgb[1].toFixed(2);
+            b.innerText = data.rgb[2].toFixed(2);
+            chip.style.background = `linear-gradient(180deg, rgba(${Math.round(data.rgb[0] * 255)}, ${Math.round(data.rgb[1] * 255)}, ${Math.round(data.rgb[2] * 255)}, 0.95), rgba(34, 211, 238, 0.12))`;
+
+            renderIntroBars(data.bars);
+        }
+
+        function drawOpeningHexGrid() {
+            const svg = document.getElementById('intro-hex-svg');
+            if (!svg) return;
+
+            svg.innerHTML = '';
+
+            const width = svg.clientWidth || 760;
+            const height = svg.clientHeight || 360;
+            const size = 24;
+            const hexWidth = Math.sqrt(3) * size;
+            const hexHeight = 2 * size;
+            const xOffset = hexWidth;
+            const yOffset = hexHeight * 0.75;
+
+            const cols = Math.ceil(width / xOffset) + 1;
+            const rows = Math.ceil(height / yOffset) + 1;
+
+            for (let row = -1; row < rows; row++) {
+                for (let col = -1; col < cols; col++) {
+                    let x = col * xOffset;
+                    if (row % 2 !== 0) {
+                        x += xOffset / 2;
+                    }
+                    let y = row * yOffset;
+
+                    const points = [];
+                    for (let i = 0; i < 6; i++) {
+                        const angleDeg = 60 * i - 30;
+                        const angleRad = Math.PI / 180 * angleDeg;
+                        points.push(`${x + size * Math.cos(angleRad)},${y + size * Math.sin(angleRad)}`);
+                    }
+
+                    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', points.join(' '));
+                    polygon.setAttribute('class', 'intro-hex-cell fill-transparent stroke-brand-500/20 stroke-[1] cursor-pointer');
+
+                    const data = regionData[Math.floor(Math.random() * regionData.length)];
+
+                    polygon.addEventListener('mouseenter', () => {
+                        updateIntroPanel(data);
+                        polygon.classList.add('active');
+                        polygon.setAttribute('fill', 'rgba(34, 211, 238, 0.18)');
+                        polygon.setAttribute('stroke', '#22d3ee');
+                        polygon.setAttribute('stroke-width', '1.5');
+                    });
+
+                    polygon.addEventListener('mouseleave', () => {
+                        polygon.classList.remove('active');
+                        polygon.setAttribute('fill', 'transparent');
+                        polygon.setAttribute('stroke', 'rgba(34, 211, 238, 0.18)');
+                        polygon.setAttribute('stroke-width', '1');
+                    });
+
+                    svg.appendChild(polygon);
+                }
+            }
+
+            updateIntroPanel(regionData[0]);
+        }
+
+        function drawHexGrid() {
+            const svg = document.getElementById('hex-svg');
+            svg.innerHTML = ''; 
+            
+            const width = svg.clientWidth || 800;
+            const height = svg.clientHeight || 450;
+            
+            const size = 26; 
+            const hexWidth = Math.sqrt(3) * size;
+            const hexHeight = 2 * size;
+            const xOffset = hexWidth;
+            const yOffset = hexHeight * 0.75;
+
+            const cols = Math.ceil(width / xOffset) + 1;
+            const rows = Math.ceil(height / yOffset) + 1;
+
+            for (let row = -1; row < rows; row++) {
+                for (let col = -1; col < cols; col++) {
+                    let x = col * xOffset;
+                    if (row % 2 !== 0) {
+                        x += xOffset / 2;
+                    }
+                    let y = row * yOffset;
+                    
+                    let points = [];
+                    for (let i = 0; i < 6; i++) {
+                        let angle_deg = 60 * i - 30;
+                        let angle_rad = Math.PI / 180 * angle_deg;
+                        let px = x + size * Math.cos(angle_rad);
+                        let py = y + size * Math.sin(angle_rad);
+                        points.push(`${px},${py}`);
+                    }
+                    
+                    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', points.join(' '));
+                    // Dark mode hex styling
+                    polygon.setAttribute('class', 'hex-cell fill-transparent stroke-brand-500/20 stroke-[1] hover:fill-brand-500/20 hover:stroke-brand-400 hover:stroke-[1.5] cursor-pointer');
+                    
+                    const data = regionData[Math.floor(Math.random() * regionData.length)];
+                    
+                    polygon.addEventListener('mouseenter', () => {
+                        document.getElementById('hex-id').innerText = `ID: ${data.id}`;
+                        document.getElementById('hex-desc').innerText = data.desc;
+                        document.getElementById('hex-vector').innerText = data.vec;
+                        document.getElementById('human-desc-box').innerText = `> ${data.desc}`;
+                        document.getElementById('human-desc-box').classList.add('text-white');
+                        updateHistogram();
+                    });
+
+                    svg.appendChild(polygon);
+                }
+            }
+        }
+
+        function drawMiniHexGrid(containerId, type) {
+            const svg = document.getElementById(containerId);
+            if (!svg) return;
+            svg.innerHTML = '';
+            
+            const size = 10;
+            const hexWidth = Math.sqrt(3) * size;
+            const hexHeight = 2 * size;
+            const xOffset = hexWidth;
+            const yOffset = hexHeight * 0.75;
+            
+            const unknownIndices = [1, 4, 7];
+            
+            // Neon colors for dark mode
+            const classColors = ['#06b6d4', '#ec4899', '#4ade80', '#facc15', '#06b6d4', '#ec4899', '#4ade80', '#06b6d4', '#facc15'];
+            const heatColors = ['#06b6d4', '#0ea5e9', '#8b5cf6', '#d946ef', '#ec4899', '#06b6d4', '#0ea5e9', '#8b5cf6', '#d946ef'];
+            
+            let index = 0;
+            for (let row = 0; row < 3; row++) {
+                for (let col = 0; col < 3; col++) {
+                    let x = col * xOffset + 16;
+                    if (row % 2 !== 0) x += xOffset / 2;
+                    let y = row * yOffset + 16;
+                    
+                    let points = [];
+                    for (let i = 0; i < 6; i++) {
+                        let angle_deg = 60 * i - 30;
+                        let angle_rad = Math.PI / 180 * angle_deg;
+                        points.push(`${x + size * Math.cos(angle_rad)},${y + size * Math.sin(angle_rad)}`);
+                    }
+                    
+                    let polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+                    polygon.setAttribute('points', points.join(' '));
+                    
+                    let fill = '#111827'; 
+                    let stroke = '#374151';
+                    let showQuestionMark = false;
+                    
+                    if (type === 'class-in') {
+                        if (unknownIndices.includes(index)) {
+                            fill = '#000000';
+                            stroke = '#374151';
+                            showQuestionMark = true;
+                        } else {
+                            fill = classColors[index % classColors.length];
+                            stroke = '#000000';
+                        }
+                    } else if (type === 'class-out') {
+                        fill = classColors[index % classColors.length];
+                        stroke = '#000000';
+                    } else if (type === 'reg-in') {
+                        if (unknownIndices.includes(index)) {
+                            fill = '#000000';
+                            stroke = '#374151';
+                            showQuestionMark = true;
+                        } else {
+                            fill = heatColors[index % heatColors.length];
+                            stroke = '#000000';
+                        }
+                    } else if (type === 'reg-out') {
+                        fill = heatColors[index % heatColors.length];
+                        stroke = '#000000';
+                    }
+                    
+                    polygon.setAttribute('fill', fill);
+                    polygon.setAttribute('stroke', stroke);
+                    polygon.setAttribute('stroke-width', '1');
+                    svg.appendChild(polygon);
+                    
+                    if (showQuestionMark) {
+                        let text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+                        text.setAttribute('x', x);
+                        text.setAttribute('y', y + 3); 
+                        text.setAttribute('text-anchor', 'middle');
+                        text.setAttribute('fill', '#4b5563');
+                        text.setAttribute('font-size', '8px');
+                        text.setAttribute('font-family', 'monospace');
+                        text.textContent = '?';
+                        svg.appendChild(text);
+                    }
+                    
+                    index++;
+                }
+            }
+        }
+
+        function init() {
+            drawOpeningHexGrid();
+            drawHexGrid();
+            drawMiniHexGrid('hex-class-in', 'class-in');
+            drawMiniHexGrid('hex-class-out', 'class-out');
+            drawMiniHexGrid('hex-reg-in', 'reg-in');
+            drawMiniHexGrid('hex-reg-out', 'reg-out');
+        }
+
+        window.addEventListener('DOMContentLoaded', init);
+        window.addEventListener('resize', () => {
+            clearTimeout(window.resizeTimer);
+            window.resizeTimer = setTimeout(init, 200);
+        });
+    </script>
+</body>
+</html>

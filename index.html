@@ -130,6 +130,67 @@
             text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
         }
 
+        .hero-badge {
+            margin-top: 18px;
+            display: inline-flex;
+            align-items: center;
+            padding: 8px 14px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 214, 102, 0.55);
+            background: linear-gradient(135deg, rgba(255, 209, 102, 0.26), rgba(224, 90, 43, 0.22));
+            color: #fff5db;
+            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+            font-size: 0.86rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            box-shadow: 0 16px 34px rgba(224, 90, 43, 0.22);
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-links {
+            margin-top: 18px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .hero-link {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 112px;
+            padding: 10px 16px;
+            border-radius: 999px;
+            border: 1px solid rgba(255, 196, 92, 0.45);
+            background: linear-gradient(135deg, rgba(255, 191, 36, 0.24), rgba(224, 90, 43, 0.20));
+            color: #fff8e7;
+            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            line-height: 1;
+            text-decoration: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 14px 30px rgba(224, 90, 43, 0.18);
+            transition: transform 160ms ease, border-color 160ms ease, background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .hero-link-arrow {
+            margin-left: 8px;
+            font-size: 1rem;
+            line-height: 1;
+            opacity: 0.92;
+        }
+
+        .hero-link:hover {
+            transform: translateY(-1px);
+            border-color: rgba(255, 220, 140, 0.72);
+            background: linear-gradient(135deg, rgba(255, 205, 72, 0.34), rgba(224, 90, 43, 0.28));
+            color: #ffffff;
+            box-shadow: 0 18px 36px rgba(224, 90, 43, 0.26);
+        }
+
         .map-shell {
             position: absolute;
             inset: 0;
@@ -236,15 +297,17 @@
         }
 
         @keyframes hero-drift {
-            0%   { transform: scale(1.06) translate(0%,     0%);    }
-            28%  { transform: scale(1.10) translate(-2.2%,  0.7%);  }
-            55%  { transform: scale(1.07) translate( 1.1%,  0.4%);  }
-            100% { transform: scale(1.08) translate(-1.4%,  -0.5%); }
+            0%   { transform: scale(1.07) translate3d(0%,     0%,    0); }
+            24%  { transform: scale(1.13) translate3d(-3.0%, -1.3%, 0); }
+            50%  { transform: scale(1.09) translate3d( 1.5%,  1.0%, 0); }
+            76%  { transform: scale(1.145) translate3d(-3.5%,  1.8%, 0); }
+            100% { transform: scale(1.105) translate3d(-2.0%, -1.0%, 0); }
         }
 
         @keyframes hero-drift-mobile {
-            0%   { transform: scale(1.08) translate(0%, 0%); }
-            100% { transform: scale(1.10) translate(-1%, 0.4%); }
+            0%   { transform: scale(1.09) translate3d(0%, 0%, 0); }
+            50%  { transform: scale(1.13) translate3d(-1.6%, -1.0%, 0); }
+            100% { transform: scale(1.115) translate3d(-1.8%, 0.9%, 0); }
         }
 
         @media (max-width: 768px) {
@@ -272,19 +335,32 @@
         .scroll-bridge {
             position: relative;
             z-index: 1;
-            margin-top: -14vh;
-            height: 24vh;
-            min-height: 180px;
+            margin-top: -12vh;
+            height: 30vh;
+            min-height: 220px;
             background:
                 linear-gradient(180deg, rgba(5, 5, 5, 0.02) 0%, rgba(5, 5, 5, 0.42) 42%, rgba(5, 5, 5, 0.9) 82%, var(--bg) 100%);
         }
 
-        /* ── Two-paradigm section ── */
+        /* --- Two-paradigm section --- */
         .representation {
             position: relative;
             z-index: 2;
             background: var(--bg);
-            padding: 10vh 4.8vw 10vh;
+            padding: 13vh 4.8vw 13vh;
+            --earth-opacity: 0;
+            --earth-scale: 0.985;
+            --earth-y: 18px;
+            --mora-opacity: 0;
+            --mora-scale: 0.985;
+            --mora-y: 18px;
+            --mora-focus: 0;
+            --mora-border-color: rgba(255, 255, 255, 0.08);
+            --mora-left-width: 1px;
+            --mora-fill-alpha: 0;
+            --mora-glow-alpha: 0;
+            --claim-opacity: 0;
+            --claim-y: 18px;
         }
 
         .representation-inner {
@@ -325,18 +401,51 @@
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 24px;
+            perspective: 1200px;
         }
 
         .paradigm-card {
+            position: relative;
             padding: 28px 28px 24px;
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
             background: rgba(255, 255, 255, 0.03);
             box-shadow: 0 18px 36px rgba(0, 0, 0, 0.2);
+            opacity: var(--earth-opacity);
+            transform: translateY(var(--earth-y)) scale(var(--earth-scale));
+            will-change: transform, opacity, box-shadow, border-color, background;
+            transition: border-color 0.18s ease, background 0.18s ease, box-shadow 0.18s ease;
+        }
+
+        .paradigm-card > * {
+            position: relative;
+            z-index: 1;
         }
 
         .paradigm-card.card-mora {
-            border-left: 3px solid #e05a2b;
+            border-left-width: var(--mora-left-width);
+            opacity: var(--mora-opacity);
+            transform: translateY(var(--mora-y)) scale(var(--mora-scale));
+            border-color: var(--mora-border-color);
+            background:
+                linear-gradient(135deg, rgba(224, 90, 43, var(--mora-fill-alpha)), rgba(255, 255, 255, 0.025)),
+                rgba(255, 255, 255, 0.03);
+            box-shadow:
+                0 18px 36px rgba(0, 0, 0, 0.2),
+                0 28px 70px rgba(224, 90, 43, var(--mora-glow-alpha));
+        }
+
+        .card-mora::before {
+            content: "";
+            position: absolute;
+            inset: -1px;
+            border-radius: inherit;
+            pointer-events: none;
+            opacity: 0;
+            background:
+                radial-gradient(circle at 20% 15%, rgba(224, 90, 43, 0.28), transparent 34%),
+                linear-gradient(135deg, rgba(224, 90, 43, 0.18), rgba(245, 158, 11, 0.04));
+            opacity: var(--mora-focus);
         }
 
         .paradigm-card-tag {
@@ -379,6 +488,49 @@
 
         .card-earth .paradigm-chip { background: rgba(8, 145, 178, 0.16); color: #67e8f9; }
         .card-mora  .paradigm-chip { background: rgba(224, 90, 43, 0.16); color: #fdba74; }
+
+        .paradigm-note {
+            margin: 28px 0 0;
+            padding: 0;
+            border: 0;
+            border-radius: 0;
+            background: transparent;
+            color: rgba(226, 232, 240, 0.84);
+            font-family: "IBM Plex Sans", sans-serif;
+            font-size: clamp(0.98rem, 1.25vw, 1.1rem);
+            line-height: 1.68;
+            opacity: var(--claim-opacity);
+            transform: translateY(var(--claim-y));
+            box-shadow: none;
+            overflow: visible;
+            will-change: opacity, transform;
+        }
+
+        .paradigm-note-inner {
+            position: relative;
+            max-width: 780px;
+            padding: 20px 0 0;
+            border-radius: 0;
+            background:
+                radial-gradient(circle at 82% 50%, rgba(224, 90, 43, 0.08), transparent 34%);
+        }
+
+        .paradigm-note strong {
+            color: #f8fafc;
+            font-weight: 600;
+        }
+
+        .paradigm-note-copy {
+            position: relative;
+            z-index: 1;
+            margin: 0;
+        }
+
+        .movement-highlight {
+            color: #fdba74;
+            font-weight: 700;
+            text-shadow: 0 0 18px rgba(224, 90, 43, 0.45);
+        }
 
         @media (max-width: 720px) {
             .paradigm-cards { grid-template-columns: 1fr; }
@@ -453,10 +605,10 @@
             font-weight: 300;
         }
 
-        /* ── Mobility section ── */
+        /* --- Mobility section --- */
         .mobility-section {
             background: var(--bg);
-            padding: 9vh 4.8vw 7vh;
+            padding: 12vh 4.8vw 11vh;
         }
 
         .mobility-inner {
@@ -489,18 +641,685 @@
 
         .mobility-viz-wrap {
             position: relative;
-            display: flex;
-            flex-direction: column;
+            padding: 34px 0 0;
+        }
+
+        .pf-panel {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: clamp(18px, 2.5vw, 30px);
+            border: 1px solid rgba(90, 145, 210, 0.28);
+            border-radius: 22px;
+            background:
+                radial-gradient(circle at 72% 72%, rgba(90, 145, 210, 0.08), transparent 36%),
+                radial-gradient(circle at 24% 24%, rgba(60, 110, 180, 0.06), transparent 30%),
+                rgba(255, 255, 255, 0.016);
+            box-shadow: 0 24px 64px rgba(0, 0, 0, 0.22);
+        }
+
+        .pf-row {
+            margin-bottom: 10px;
+        }
+
+        .pf-row-label {
+            font-family: "IBM Plex Sans", sans-serif;
+            font-size: clamp(0.92rem, 1.15vw, 1.05rem);
+            font-weight: 700;
+            color: #f8fafc;
+            margin-bottom: 10px;
+        }
+
+        .pf-cols {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr auto 1fr;
             align-items: center;
-            padding: 22px 0 0;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            gap: clamp(6px, 1.2vw, 16px);
+        }
+
+        .pf-cell {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-width: 0;
+        }
+
+        .pf-token-pair {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: clamp(4px, 0.8vw, 10px);
+        }
+
+        .pf-plus {
+            color: rgba(140, 180, 230, 0.7);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: clamp(1.1rem, 1.6vw, 1.6rem);
+            flex-shrink: 0;
+        }
+
+        .pf-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .pf-gc-svg { width: clamp(56px, 7vw, 86px); display: block; overflow: visible; }
+        .pf-mob-svg { width: clamp(90px, 13vw, 148px); display: block; overflow: visible; }
+        .pf-city-svg { width: clamp(90px, 13vw, 148px); display: block; overflow: visible; }
+
+        .pf-divider {
+            border: none;
+            border-top: 1.5px dashed rgba(90, 145, 210, 0.45);
+            margin: 14px 0;
+        }
+
+        .llm-word-cloud,
+        .llm-sentence-card,
+        .semantic-space {
+            width: min(100%, 220px);
+            min-height: 118px;
+            border: 1px solid rgba(96, 165, 250, 0.18);
+            border-radius: 18px;
+            background:
+                radial-gradient(circle at 50% 48%, rgba(96, 165, 250, 0.16), transparent 58%),
+                rgba(255, 255, 255, 0.024);
+        }
+
+        .llm-word-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 12px;
+        }
+
+        .llm-word-cloud span,
+        .llm-sentence-card span {
+            padding: 4px 7px;
+            border-radius: 999px;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.62rem;
+            color: rgba(226, 232, 240, 0.76);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            white-space: nowrap;
+        }
+
+        .llm-sentence-card {
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 13px 12px;
+        }
+
+        .llm-sentence-card .focus-word {
+            color: #bfdbfe;
+            background: rgba(96, 165, 250, 0.18);
+            border-color: rgba(96, 165, 250, 0.32);
+        }
+
+        .semantic-space {
+            display: block;
+            overflow: visible;
+        }
+
+        .insight-model-panel {
+            position: relative;
+            max-width: 980px;
+            margin: 0 auto;
+            padding: clamp(22px, 3vw, 34px);
+            border: 1px solid rgba(203, 213, 225, 0.2);
+            border-radius: 30px;
+            background:
+                radial-gradient(circle at 76% 74%, rgba(224, 90, 43, 0.12), transparent 28%),
+                radial-gradient(circle at 22% 22%, rgba(96, 165, 250, 0.09), transparent 24%),
+                rgba(255, 255, 255, 0.018);
+            box-shadow: 0 26px 70px rgba(0, 0, 0, 0.22);
+            overflow: hidden;
+        }
+
+        .insight-model-panel::before {
+            content: "";
+            position: absolute;
+            left: clamp(22px, 3vw, 34px);
+            right: clamp(22px, 3vw, 34px);
+            top: 50%;
+            border-top: 1px dashed rgba(96, 165, 250, 0.55);
+        }
+
+        .insight-lane {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 1.1fr auto 1.1fr auto 1.45fr;
+            gap: clamp(12px, 1.8vw, 24px);
+            align-items: center;
+            min-height: 172px;
+        }
+
+        .insight-lane + .insight-lane {
+            margin-top: 28px;
+        }
+
+        .insight-lane-title {
+            position: absolute;
+            left: 0;
+            top: 0;
+            font-family: "IBM Plex Sans", sans-serif;
+            font-size: clamp(0.94rem, 1.2vw, 1.1rem);
+            font-weight: 700;
+            letter-spacing: 0.02em;
+            color: #f8fafc;
+        }
+
+        .insight-unit {
+            position: relative;
+            display: grid;
+            place-items: center;
+            min-height: 132px;
+            padding-top: 28px;
+            text-align: center;
+        }
+
+        .insight-arrow,
+        .insight-plus {
+            color: rgba(203, 213, 225, 0.62);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: clamp(1.4rem, 2vw, 2rem);
+            transform: translateY(14px);
+        }
+
+        .insight-plus {
+            color: rgba(203, 213, 225, 0.78);
+            font-size: clamp(1.6rem, 2vw, 2.2rem);
+        }
+
+        .insight-label {
+            margin-top: 12px;
+            color: rgba(226, 232, 240, 0.82);
+            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+            font-size: 0.98rem;
+            letter-spacing: 0.02em;
+        }
+
+        .token-pair,
+        .grid-pair {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .word-token {
+            position: relative;
+            min-width: 66px;
+            padding: 10px 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(96, 165, 250, 0.24);
+            background: rgba(96, 165, 250, 0.08);
+            color: rgba(226, 232, 240, 0.9);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.84rem;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.16);
+        }
+
+        .word-token::before {
+            content: "";
+            position: absolute;
+            inset: -5px;
+            border-radius: inherit;
+            border: 1px dashed rgba(96, 165, 250, 0.18);
+        }
+
+        .context-stack,
+        .meaning-stack {
+            width: min(100%, 260px);
+            display: grid;
+            gap: 9px;
+        }
+
+        .mini-tree {
+            position: relative;
+            width: 54px;
+            height: 42px;
+        }
+
+        .mini-tree::before {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 8px;
+            width: 1px;
+            height: 18px;
+            background: rgba(203, 213, 225, 0.44);
+        }
+
+        .mini-tree span {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: rgba(203, 213, 225, 0.72);
+            box-shadow: 0 0 12px rgba(96, 165, 250, 0.24);
+        }
+
+        .mini-tree span:nth-child(1) { left: 24px; top: 0; }
+        .mini-tree span:nth-child(2) { left: 6px; top: 30px; }
+        .mini-tree span:nth-child(3) { right: 6px; top: 30px; }
+
+        .mini-tree i {
+            position: absolute;
+            left: 15px;
+            right: 15px;
+            top: 23px;
+            height: 1px;
+            background: rgba(203, 213, 225, 0.36);
+        }
+
+        .grid-token {
+            width: 70px;
+            height: 64px;
+            position: relative;
+            display: block;
+        }
+
+        .grid-token::before {
+            content: "";
+            position: absolute;
+            inset: 4px 7px;
+            background:
+                radial-gradient(circle at 50% 50%, rgba(224, 90, 43, 0.72) 0 10px, transparent 11px),
+                radial-gradient(circle at 29% 32%, rgba(96, 165, 250, 0.34) 0 10px, transparent 11px),
+                radial-gradient(circle at 71% 32%, rgba(96, 165, 250, 0.34) 0 10px, transparent 11px),
+                radial-gradient(circle at 29% 68%, rgba(96, 165, 250, 0.34) 0 10px, transparent 11px),
+                radial-gradient(circle at 71% 68%, rgba(96, 165, 250, 0.34) 0 10px, transparent 11px),
+                rgba(96, 165, 250, 0.05);
+            clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+            border: 1px solid rgba(96, 165, 250, 0.28);
+            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.16);
+        }
+
+        .token-plus {
+            color: rgba(203, 213, 225, 0.7);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 1.25rem;
+        }
+
+        .context-cloud,
+        .meaning-cloud {
+            position: relative;
+            width: min(100%, 210px);
+            height: 102px;
+            border-radius: 28px;
+            background:
+                radial-gradient(circle at 52% 48%, rgba(96, 165, 250, 0.22), transparent 34%),
+                rgba(255, 255, 255, 0.024);
+            border: 1px solid rgba(96, 165, 250, 0.18);
+            overflow: hidden;
+        }
+
+        .context-cloud span,
+        .meaning-cloud span {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.58rem;
+            color: rgba(203, 213, 225, 0.62);
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+        }
+
+        .context-sentence {
+            width: 100%;
+            min-height: 48px;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            justify-content: center;
+            gap: 5px;
+            padding: 9px 10px;
+            border-radius: 16px;
+            border: 1px solid rgba(96, 165, 250, 0.18);
+            background:
+                radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.18), transparent 58%),
+                rgba(255, 255, 255, 0.024);
+        }
+
+        .context-sentence span,
+        .movement-sentence-row span {
+            padding: 4px 7px;
+            border-radius: 999px;
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.62rem;
+            color: rgba(226, 232, 240, 0.74);
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .context-sentence .focus-word {
+            color: #bfdbfe;
+            background: rgba(96, 165, 250, 0.18);
+            border-color: rgba(96, 165, 250, 0.32);
+        }
+
+        .meaning-vector {
+            width: 100%;
+            min-height: 48px;
+            display: grid;
+            align-content: center;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(96, 165, 250, 0.18);
+            background:
+                radial-gradient(circle at 50% 48%, rgba(96, 165, 250, 0.18), transparent 56%),
+                rgba(255, 255, 255, 0.024);
+        }
+
+        .meaning-vector span {
+            padding: 7px 8px;
+            border-radius: 12px;
+            color: rgba(226, 232, 240, 0.78);
+            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+            font-size: 0.76rem;
+            text-align: center;
+            background: rgba(96, 165, 250, 0.09);
+            border: 1px solid rgba(96, 165, 250, 0.15);
+        }
+
+        .meaning-vector strong,
+        .functional-meaning strong {
+            color: #f8fafc;
+            font-family: "IBM Plex Sans", sans-serif;
+            font-size: 0.82rem;
+        }
+
+        .meaning-vector small,
+        .functional-meaning small {
+            color: rgba(203, 213, 225, 0.52);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.58rem;
+            letter-spacing: 0.04em;
+        }
+
+        .movement-sentence {
+            width: min(100%, 250px);
+            display: grid;
+            gap: 10px;
+            justify-items: center;
+        }
+
+        .movement-sentence-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .movement-sentence-row span {
+            color: rgba(253, 186, 116, 0.82);
+            background: rgba(224, 90, 43, 0.1);
+            border-color: rgba(224, 90, 43, 0.18);
+        }
+
+        .movement-sentence-row .focus-cell {
+            color: #fed7aa;
+            background: rgba(224, 90, 43, 0.22);
+            border-color: rgba(224, 90, 43, 0.36);
+        }
+
+        .movement-sentence-row .sentence-arrow {
+            color: rgba(253, 186, 116, 0.55);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.78rem;
+        }
+
+        .mobility-grid-scene {
+            position: relative;
+            width: min(100%, 270px);
+            height: 134px;
+            border-radius: 22px;
+            border: 1px solid rgba(253, 186, 116, 0.16);
+            background:
+                radial-gradient(circle at 52% 48%, rgba(224, 90, 43, 0.14), transparent 56%),
+                rgba(255, 255, 255, 0.022);
+            overflow: hidden;
+        }
+
+        .mobility-grid-scene::before {
+            content: "";
+            position: absolute;
+            inset: 13px 18px;
+            opacity: 0.74;
+            background:
+                linear-gradient(30deg, transparent 31%, rgba(148, 163, 184, 0.16) 32% 33%, transparent 34%),
+                linear-gradient(150deg, transparent 31%, rgba(148, 163, 184, 0.16) 32% 33%, transparent 34%);
+            background-size: 42px 36px;
+        }
+
+        .mobility-hex {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: 42px;
+            height: 37px;
+            transform: translate(-50%, -50%);
+            clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+            background: rgba(96, 165, 250, 0.12);
+            border: 1px solid rgba(148, 163, 184, 0.18);
+        }
+
+        .mobility-hex.hot {
+            background: rgba(224, 90, 43, 0.22);
+            box-shadow: 0 0 18px rgba(224, 90, 43, 0.18);
+        }
+
+        .mobility-path {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: var(--w);
+            height: 3px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, rgba(224, 90, 43, 0.85), transparent);
+            transform: rotate(var(--r));
+            transform-origin: left center;
+            box-shadow: 0 0 14px rgba(224, 90, 43, 0.35);
+            animation: mobility-path-pulse var(--speed) ease-in-out infinite alternate;
+        }
+
+        .walker {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: 12px;
+            height: 16px;
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 0 10px rgba(253, 186, 116, 0.35));
+            animation: walker-bob 1.8s ease-in-out infinite alternate;
+        }
+
+        .walker::before {
+            content: "";
+            position: absolute;
+            left: 3px;
+            top: 0;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #fed7aa;
+        }
+
+        .walker::after {
+            content: "";
+            position: absolute;
+            left: 2px;
+            top: 7px;
+            width: 8px;
+            height: 8px;
+            border-radius: 6px 6px 2px 2px;
+            background: rgba(224, 90, 43, 0.9);
+        }
+
+        @keyframes mobility-path-pulse {
+            from { opacity: 0.42; transform: rotate(var(--r)) scaleX(0.84); }
+            to { opacity: 1; transform: rotate(var(--r)) scaleX(1.04); }
+        }
+
+        @keyframes walker-bob {
+            from { translate: 0 -2px; }
+            to { translate: 0 3px; }
+        }
+
+        /* --- hex token pair (left column) --- */
+        .hex-token-pair {
+            width: min(100%, 160px);
+            display: block;
+            overflow: visible;
+        }
+        .htk {
+            fill: rgba(96,165,250,0.07);
+            stroke: rgba(96,165,250,0.42);
+            stroke-width: 1.3;
+        }
+        .htk-lbl {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 8px;
+            fill: rgba(203,213,225,0.45);
+            text-anchor: middle;
+        }
+        .htk-plus {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 14px;
+            fill: rgba(203,213,225,0.6);
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        /* --- mobility scene (center column) --- */
+        .mob-scene-svg {
+            width: min(100%, 200px);
+            display: block;
+            overflow: visible;
+        }
+        /* neutral hex */
+        .mh  { fill: rgba(96,165,250,0.05); stroke: rgba(148,163,184,0.28); stroke-width: 1.1; }
+        /* visited hex */
+        .mhv { fill: rgba(224,90,43,0.10);  stroke: rgba(253,186,116,0.52); stroke-width: 1.3; }
+        /* destination hex */
+        .mhd { fill: rgba(224,90,43,0.22);  stroke: rgba(253,186,116,0.85); stroke-width: 1.6;
+                filter: drop-shadow(0 0 5px rgba(253,186,116,0.3)); }
+
+        /* trajectory lines */
+        .mtr {
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 5 3.5;
+            animation: mtrFlow 1.6s linear infinite;
+        }
+        .mtr-a { stroke: rgba(253,186,116,0.92); stroke-width: 1.8; }
+        .mtr-b { stroke: rgba(253,186,116,0.58); stroke-width: 1.5; animation-delay: 0.4s; }
+        .mtr-c { stroke: rgba(253,186,116,0.38); stroke-width: 1.3; animation-delay: 0.8s; }
+        @keyframes mtrFlow { to { stroke-dashoffset: -17; } }
+        @media (prefers-reduced-motion: reduce) { .mtr { animation: none; } }
+
+        /* walker figures */
+        .mw { animation: mwBob 1.7s ease-in-out infinite alternate; }
+        .mw-b { animation-delay: 0.5s; }
+        .mw-c { animation-delay: 1.0s; }
+        @keyframes mwBob {
+            from { transform: translate(0, -1.5px); }
+            to   { transform: translate(0,  1.5px); }
+        }
+
+        /* destination convergence pulse */
+        .mconv {
+            fill: rgba(224,90,43,0.15);
+            stroke: rgba(253,186,116,0.6);
+            stroke-width: 1;
+            animation: mconvPulse 2s ease-in-out infinite alternate;
+        }
+        @keyframes mconvPulse {
+            from { r: 8;  opacity: 0.7; }
+            to   { r: 12; opacity: 1.0; }
+        }
+
+        .mob-scene-lbl {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 8.5px;
+            fill: rgba(253,186,116,0.55);
+            text-anchor: middle;
+        }
+
+                .functional-meaning {
+            position: relative;
+            width: 100%;
+            min-height: 50px;
+            display: grid;
+            align-content: center;
+            padding: 10px 12px;
+            border-radius: 16px;
+            border: 1px solid rgba(253, 186, 116, 0.2);
+            background:
+                radial-gradient(circle at 50% 48%, rgba(224, 90, 43, 0.18), transparent 56%),
+                rgba(255, 255, 255, 0.024);
+        }
+
+        .functional-meaning span {
+            color: rgba(255, 237, 213, 0.82);
+            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+            font-size: 0.76rem;
+            text-align: left;
         }
 
         .mobility-svg {
             width: 100%;
-            max-width: 900px;
+            max-width: 260px;
             display: block;
             border-radius: 12px;
+        }
+
+        @media (max-width: 860px) {
+            .pf-cols {
+                grid-template-columns: 1fr;
+                gap: 10px;
+            }
+
+            .pf-arrow svg {
+                transform: rotate(90deg);
+            }
+
+            .insight-model-panel::before {
+                display: none;
+            }
+
+            .insight-lane {
+                grid-template-columns: 1fr;
+                gap: 8px;
+                min-height: auto;
+                padding: 28px 0 18px;
+            }
+
+            .insight-lane + .insight-lane {
+                margin-top: 10px;
+                border-top: 1px dashed rgba(96, 165, 250, 0.35);
+            }
+
+            .insight-arrow {
+                transform: none;
+                rotate: 90deg;
+            }
+
+            .insight-unit {
+                min-height: 112px;
+                padding-top: 18px;
+            }
         }
 
         .mobility-scroll-hint {
@@ -527,53 +1346,554 @@
             50%       { translate: -50% 6px; }
         }
 
-        /* ── Ensure architecture/results/choice stay dark like hero ── */
+        /* --- Ensure architecture/results/choice stay dark like hero --- */
         .architecture-section,
         .results-section {
             background: var(--bg);
         }
 
+        /* --- outer section: tall enough for 3 scroll stages --- */
         .architecture-section {
-            padding: 10vh 4.8vw 8vh;
+            min-height: 390vh;
+            padding: 0;
         }
 
+        /* --- sticky viewport --- */
         .architecture-inner {
-            max-width: 1100px;
-            margin: 0 auto;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: minmax(360px, 38%) 1fr;
+            isolation: isolate;
         }
 
-        .architecture-header {
-            max-width: 760px;
-            margin: 0 0 64px;
-            text-align: left;
+        .architecture-inner::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 12% 16%, rgba(224,90,43,0.12), transparent 32%),
+                radial-gradient(circle at 86% 70%, rgba(96,165,250,0.09), transparent 36%),
+                linear-gradient(180deg, rgba(255,255,255,0.018), transparent 44%);
+        }
+
+        /* --- LEFT: text column --- */
+        .architecture-text {
+            position: relative;
+            z-index: 4;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: clamp(40px,6vh,80px) clamp(24px,4.8vw,60px);
+            background:
+                linear-gradient(90deg, rgba(5,5,5,0.96), rgba(5,5,5,0.84) 74%, rgba(5,5,5,0));
+            border-right: 1px solid rgba(255,255,255,0.055);
         }
 
         .architecture-section .paradigm-kicker {
             color: #e05a2b;
+            margin-bottom: 14px;
         }
 
         .architecture-section .paradigm-title {
-            max-width: 760px;
-            margin-bottom: 20px;
+            max-width: 460px;
+            font-size: clamp(2.1rem,3.6vw,3.55rem);
+            margin-bottom: 18px;
+            line-height: 0.98;
+            letter-spacing: -0.045em;
         }
 
         .architecture-section .paradigm-subtitle {
-            max-width: 760px;
-            color: rgba(203, 213, 225, 0.76);
-            font-size: clamp(1rem, 1.45vw, 1.18rem);
-            line-height: 1.66;
+            color: rgba(203,213,225,0.72);
+            font-size: clamp(0.94rem,1.2vw,1.08rem);
+            line-height: 1.7;
             margin-bottom: 0;
+            max-width: 440px;
         }
 
-        .architecture-grid {
-            display: grid;
-            grid-template-columns: minmax(320px, 1.3fr) minmax(240px, 1fr);
-            gap: 40px;
-            align-items: start;
+        /* step list: stacked, crossfade on stage change */
+        .arch-steps {
+            margin-top: clamp(28px,4vh,52px);
+            position: relative;
+            min-height: 238px;
         }
 
-        .architecture-panel {
+        .arch-step {
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            opacity: 0;
+            transform: translateY(16px);
+            pointer-events: none;
+            padding: 22px 24px 24px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.075);
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.018)),
+                rgba(5,5,5,0.46);
+            box-shadow: 0 18px 46px rgba(0,0,0,0.18);
+            transition: opacity 480ms cubic-bezier(.4,0,.2,1),
+                        transform 480ms cubic-bezier(.34,1.2,.64,1);
+        }
+
+        .architecture-section.flow-stage-0 .arch-step.s0,
+        .architecture-section.flow-stage-1 .arch-step.s1,
+        .architecture-section.flow-stage-2 .arch-step.s2 {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .arch-step-num {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            color: rgba(224,90,43,0.85);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .arch-step-num::before {
+            content: "";
+            display: block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #e05a2b;
+            box-shadow: 0 0 10px rgba(224,90,43,0.7);
+            flex-shrink: 0;
+        }
+
+        .arch-step-title {
+            margin: 0 0 12px;
+            font-family: "Cormorant Garamond", serif;
+            font-size: clamp(1.65rem,2.5vw,2.55rem);
+            line-height: 0.98;
+            letter-spacing: -0.035em;
+            color: #f8fafc;
+        }
+
+        .arch-step-copy {
+            margin: 0;
+            font-family: "IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;
+            font-size: clamp(0.86rem,1.1vw,1rem);
+            line-height: 1.6;
+            color: rgba(203,213,225,0.72);
+            max-width: 390px;
+        }
+
+        /* stage progress bars at bottom of text column */
+        .arch-progress {
+            display: flex;
+            gap: 8px;
+            margin-top: clamp(24px,3.2vh,42px);
+            max-width: 390px;
+        }
+
+        .arch-progress span {
+            flex: 1;
+            height: 4px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.075);
+            overflow: hidden;
+        }
+
+        .arch-progress span::after {
+            content: "";
+            display: block;
             width: 100%;
+            height: 100%;
+            transform: scaleX(0.04);
+            transform-origin: left;
+            background: linear-gradient(90deg, #e05a2b, #fdba74);
+            transition: transform 650ms cubic-bezier(.4,0,.2,1), opacity 500ms ease;
+            opacity: 0.28;
+        }
+
+        .architecture-section.flow-stage-0 .arch-progress span:nth-child(1)::after,
+        .architecture-section.flow-stage-1 .arch-progress span:nth-child(2)::after,
+        .architecture-section.flow-stage-2 .arch-progress span:nth-child(3)::after {
+            transform: scaleX(1);
+            opacity: 1;
+        }
+
+        /* --- RIGHT: canvas column --- */
+        .arch-canvas-col {
+            position: relative;
+            overflow: hidden;
+            background:
+                radial-gradient(circle at 44% 51%, rgba(224,90,43,0.11) 0%, transparent 52%),
+                radial-gradient(circle at 74% 35%, rgba(96,165,250,0.08) 0%, transparent 44%),
+                linear-gradient(135deg, rgba(255,255,255,0.018), transparent 46%);
+        }
+
+        .arch-canvas-col::before {
+            content: "";
+            position: absolute;
+            inset: 8vh 5vw;
+            border-radius: 34px;
+            border: 1px solid rgba(255,255,255,0.07);
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.045), rgba(255,255,255,0.012)),
+                rgba(5,5,5,0.18);
+            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 30px 80px rgba(0,0,0,0.2);
+        }
+
+        .arch-canvas-col::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            opacity: 0.18;
+            background-image:
+                linear-gradient(rgba(255,255,255,0.045) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.045) 1px, transparent 1px);
+            background-size: 44px 44px;
+            mask-image: radial-gradient(circle at 56% 50%, black, transparent 72%);
+        }
+
+        /* each stage panel: fills full canvas, crossfades */
+        .arch-stage-panel {
+            position: absolute;
+            inset: 8vh 5vw;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 600ms cubic-bezier(.4,0,.2,1);
+            pointer-events: none;
+        }
+
+        .architecture-section.flow-stage-0 .arch-stage-panel.sp0,
+        .architecture-section.flow-stage-1 .arch-stage-panel.sp1,
+        .architecture-section.flow-stage-2 .arch-stage-panel.sp2 {
+            opacity: 1;
+        }
+
+        /* --- STAGE 0: H3 grid SVG --- */
+        .arch-svg-stage {
+            width: min(92%, 640px);
+            filter: drop-shadow(0 30px 50px rgba(0,0,0,0.26));
+        }
+
+        .arch-hex-grid path {
+            fill: rgba(255,255,255,0.02);
+            stroke: rgba(203,213,225,0.24);
+            stroke-width: 1;
+        }
+
+        .arch-hex-selected {
+            fill: rgba(224,90,43,0.18);
+            stroke: #fdba74;
+            stroke-width: 2.3;
+            filter: drop-shadow(0 0 11px rgba(253,186,116,0.52));
+        }
+
+        .arch-hex-label {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 11px;
+            fill: rgba(253,186,116,0.9);
+            text-anchor: middle;
+            dominant-baseline: central;
+        }
+
+        .arch-land-shape {
+            fill: rgba(51,65,85,0.42);
+            stroke: rgba(226,232,240,0.2);
+            stroke-width: 1.5;
+        }
+
+        .arch-flow-line {
+            fill: none;
+            stroke-width: 2.4;
+            stroke-linecap: round;
+            stroke-dasharray: 9 8;
+            animation: arch-flow-dash 7s linear infinite;
+        }
+
+        @keyframes arch-flow-dash {
+            to { stroke-dashoffset: -68; }
+        }
+
+        /* --- STAGE 1: modality pills orbiting a hex --- */
+        .arch-modality-wrap {
+            position: relative;
+            width: min(440px, 82%);
+            aspect-ratio: 1;
+        }
+
+        .arch-modality-wrap::before,
+        .arch-modality-wrap::after {
+            content: "";
+            position: absolute;
+            inset: 14%;
+            border-radius: 50%;
+            border: 1px dashed rgba(255,255,255,0.12);
+        }
+
+        .arch-modality-wrap::after {
+            inset: 29%;
+            border-color: rgba(224,90,43,0.18);
+        }
+
+        .arch-mod-center {
+            position: absolute;
+            inset: 50%;
+            transform: translate(-50%,-50%);
+            width: 92px; height: 92px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            filter: drop-shadow(0 0 30px rgba(224,90,43,0.22));
+        }
+
+        .arch-mod-center::before {
+            content: "";
+            position: absolute;
+            inset: -18px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(224,90,43,0.14), transparent 68%);
+        }
+
+        .arch-mod-center svg { width: 92px; height: 92px; }
+
+        .arch-mod-pill {
+            position: absolute;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 9px 15px;
+            border-radius: 999px;
+            font-family: "IBM Plex Sans Condensed","IBM Plex Sans",sans-serif;
+            font-size: 0.86rem;
+            font-weight: 500;
+            background: rgba(5,5,5,0.78);
+            border: 1px solid rgba(255,255,255,0.12);
+            box-shadow: 0 14px 38px rgba(0,0,0,0.22);
+            backdrop-filter: blur(12px);
+            white-space: nowrap;
+            transform: translate(-50%,-50%);
+            /* orbit entrance */
+            opacity: 0;
+            scale: 0.85;
+            transition: opacity 500ms ease, scale 500ms cubic-bezier(.34,1.4,.64,1);
+        }
+
+        .arch-mod-pill .dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: currentColor;
+            flex-shrink: 0;
+        }
+
+        /* positions (% from top-left of wrapper) */
+        .arch-mod-pill.imagery  { top: 12%; left: 50%;  color: #60a5fa; transition-delay: 0ms;   }
+        .arch-mod-pill.poi      { top: 50%; left: 92%;  color: #fdba74; transition-delay: 80ms;  }
+        .arch-mod-pill.demo     { top: 88%; left: 50%;  color: #a78bfa; transition-delay: 160ms; }
+        .arch-mod-pill.mobility { top: 50%; left: 8%;   color: #fb923c; transition-delay: 240ms; }
+
+        /* connector lines from pill to center */
+        .arch-mod-line {
+            position: absolute;
+            top: 50%; left: 50%;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, currentColor);
+            transform-origin: left center;
+            opacity: 0;
+            transition: opacity 500ms ease;
+        }
+
+        .architecture-section.flow-stage-1 .arch-mod-pill,
+        .architecture-section.flow-stage-2 .arch-mod-pill {
+            opacity: 1;
+            scale: 1;
+        }
+
+        .architecture-section.flow-stage-1 .arch-mod-line,
+        .architecture-section.flow-stage-2 .arch-mod-line {
+            opacity: 0.3;
+        }
+
+        /* --- STAGE 2: contrastive alignment --- */
+        .arch-align-wrap {
+            position: relative;
+            width: min(520px, 88%);
+            aspect-ratio: 1;
+        }
+
+        /* backbone circle */
+        .arch-backbone {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%,-50%);
+            width: 174px; height: 174px;
+            border-radius: 50%;
+            border: 1.5px solid rgba(253,186,116,0.6);
+            background:
+                radial-gradient(circle, rgba(224,90,43,0.18), transparent 62%),
+                rgba(5,5,5,0.82);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            text-align: center;
+            z-index: 2;
+            box-shadow: 0 0 0 rgba(224,90,43,0.3);
+            transition: box-shadow 800ms ease;
+        }
+
+        .architecture-section.flow-stage-2 .arch-backbone {
+            box-shadow: 0 0 60px rgba(224,90,43,0.35);
+        }
+
+        .arch-backbone::before {
+            content: "";
+            position: absolute;
+            inset: 14px;
+            border-radius: 50%;
+            border: 1px dashed rgba(255,255,255,0.12);
+        }
+
+        .arch-backbone::after {
+            content: "";
+            position: absolute;
+            inset: -22px;
+            border-radius: 50%;
+            border: 1px solid rgba(253,186,116,0.09);
+        }
+
+        .arch-backbone-title {
+            font-family: "IBM Plex Sans",sans-serif;
+            font-size: 0.94rem;
+            font-weight: 700;
+            color: #f8fafc;
+            letter-spacing: -0.01em;
+            margin: 0 0 3px;
+            line-height: 1.1;
+        }
+
+        .arch-backbone-stat {
+            font-family: "IBM Plex Mono",monospace;
+            font-size: 0.62rem;
+            color: #fdba74;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        /* modality source dots orbiting outward */
+        .arch-align-dot {
+            position: absolute;
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            background: var(--c);
+            box-shadow: 0 0 18px var(--c);
+            top: var(--ty);
+            left: var(--tx);
+            transform: translate(-50%,-50%);
+            transition: top 900ms cubic-bezier(.34,1.05,.64,1),
+                        left 900ms cubic-bezier(.34,1.05,.64,1),
+                        opacity 600ms ease;
+            opacity: 0;
+        }
+
+        .architecture-section.flow-stage-2 .arch-align-dot {
+            top: 50%; left: 50%;
+            opacity: 1;
+        }
+
+        /* label on each dot */
+        .arch-align-dot::after {
+            content: attr(data-label);
+            position: absolute;
+            top: -22px; left: 50%;
+            transform: translateX(-50%);
+            font-family: "IBM Plex Mono",monospace;
+            font-size: 10px;
+            color: var(--c);
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 500ms ease 300ms;
+        }
+
+        .architecture-section.flow-stage-2 .arch-align-dot::after {
+            opacity: 1;
+        }
+
+        /* connector line from dot origin to center */
+        .arch-align-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--lc), rgba(255,255,255,0.12));
+            top: var(--ly);
+            left: 50%;
+            width: var(--lw);
+            transform: rotate(var(--lr)) translateY(-50%);
+            transform-origin: left center;
+            opacity: 0;
+            transition: opacity 700ms ease;
+            filter: blur(0.1px);
+        }
+
+        .architecture-section.flow-stage-2 .arch-align-line {
+            opacity: 0.5;
+        }
+
+        /* embedding output strip */
+        .arch-emb-strip {
+            position: absolute;
+            bottom: 8px; left: 50%;
+            transform: translateX(-50%);
+            width: 78%;
+            height: 10px;
+            border-radius: 999px;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 700ms ease 400ms;
+            display: flex;
+            box-shadow: 0 0 28px rgba(224,90,43,0.12);
+        }
+
+        .architecture-section.flow-stage-2 .arch-emb-strip {
+            opacity: 1;
+        }
+
+        .arch-emb-strip span {
+            flex: 1;
+            height: 100%;
+        }
+
+        .arch-emb-label {
+            position: absolute;
+            bottom: 26px; left: 50%;
+            transform: translateX(-50%);
+            font-family: "IBM Plex Mono",monospace;
+            font-size: 9px;
+            color: rgba(203,213,225,0.4);
+            letter-spacing: 0.06em;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 700ms ease 400ms;
+        }
+
+        .architecture-section.flow-stage-2 .arch-emb-label {
+            opacity: 1;
+        }
+
+        @media (max-width: 900px) {
+            .architecture-inner {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                height: auto;
+            }
+            .architecture-section { min-height: auto; }
+            .architecture-text {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+                padding: 40px 20px 32px;
+            }
+            .arch-steps { min-height: 160px; }
+            .arch-canvas-col { min-height: 380px; }
+            .arch-stage-panel { position: relative; inset: auto; opacity: 1; }
         }
 
         .architecture-diagram {
@@ -749,18 +2069,6 @@
             padding: 0 1px;
         }
 
-        .arch-dense-reps {
-            margin-top: 28px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255,255,255,0.06);
-            display: flex;
-            align-items: flex-start;
-            gap: 28px;
-        }
-        .arch-dense-reps .representation-output-icon {
-            margin-bottom: 8px;
-        }
-
         .architecture-info-header {
             display: flex;
             align-items: center;
@@ -857,70 +2165,1137 @@
             font-weight: 300;
         }
 
-        .representation-output {
-            min-height: 382px;
-            padding: 32px 28px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            border: 1px solid rgba(39, 39, 42, 1);
-            background: rgba(10, 10, 10, 0.92);
-            overflow: hidden;
-        }
-
-        .representation-output-icon {
-            width: 46px;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 18px;
-            border-radius: 12px;
-            background: #000000;
-            border: 1px solid rgba(39, 39, 42, 1);
-            color: rgba(34, 211, 238, 0.95);
-        }
-
-        .representation-output-title {
-            margin: 0 0 6px;
-            color: #ffffff;
-            font-family: "IBM Plex Sans", sans-serif;
-            font-size: 1.3rem;
-            font-weight: 700;
-            letter-spacing: -0.03em;
-        }
-
-        .representation-output-subtitle {
-            margin: 0 0 28px;
-            color: rgba(34, 211, 238, 0.92);
-            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.86rem;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            font-weight: 500;
-        }
-
-        .representation-output-grid {
-            width: 100%;
-            display: grid;
-            grid-template-columns: repeat(8, minmax(0, 1fr));
-            gap: 6px;
-            padding: 0 12px;
-        }
-
-        .representation-output-cell {
-            height: 9px;
-            border-radius: 999px;
-        }
-
         .architecture-icon-accent {
             color: rgba(244, 114, 182, 0.9);
         }
 
+        /* Layered architecture v2: continuous land -> H3 -> mobility -> modalities */
+        .architecture-section {
+            min-height: 460vh;
+            padding: 0;
+            background: var(--bg);
+            --arch-h3-opacity: 0;
+            --arch-h3-z: 46px;
+            --arch-mob-opacity: 0;
+            --arch-mob-z: 92px;
+            --arch-mod-opacity: 0;
+            --arch-proj-opacity: 0;
+            --arch-mod-y: 24px;
+            --arch-mod-scale: 0.96;
+            --arch-stack-transform: translate(-50%, -50%) rotateX(58deg) rotateZ(-42deg);
+            --arch-h3-svg-y: 10px;
+            --arch-mob-svg-y: 18px;
+            --arch-step-0: 1;
+            --arch-step-1: 0;
+            --arch-step-2: 0;
+            --arch-step-3: 0;
+        }
+
+        .architecture-section > .architecture-inner:not(.arch-layer-inner) {
+            display: none;
+        }
+
+        .architecture-section.arch-layer-stage-0 .arch-layer-detail.s0,
+        .architecture-section.arch-layer-stage-1 .arch-layer-detail.s1,
+        .architecture-section.arch-layer-stage-2 .arch-layer-detail.s2,
+        .architecture-section.arch-layer-stage-3 .arch-layer-detail.s3 {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        .architecture-section.arch-layer-stage-0 .arch-layer-progress span:nth-child(1)::after,
+        .architecture-section.arch-layer-stage-1 .arch-layer-progress span:nth-child(2)::after,
+        .architecture-section.arch-layer-stage-2 .arch-layer-progress span:nth-child(3)::after,
+        .architecture-section.arch-layer-stage-3 .arch-layer-progress span:nth-child(4)::after {
+            transform: scaleX(1);
+            opacity: 1;
+        }
+
+        .architecture-inner.arch-layer-inner {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: grid;
+            grid-template-columns: minmax(360px, 36%) 1fr;
+            overflow: hidden;
+            isolation: isolate;
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .architecture-inner.arch-layer-inner::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+            background:
+                radial-gradient(circle at 18% 18%, rgba(224, 90, 43, 0.12), transparent 30%),
+                radial-gradient(circle at 82% 62%, rgba(96, 165, 250, 0.09), transparent 34%),
+                linear-gradient(180deg, rgba(255,255,255,0.016), transparent 44%);
+        }
+
+        .arch-layer-copy {
+            position: relative;
+            z-index: 5;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+            padding: clamp(40px, 6vh, 78px) 0;
+            padding-right: clamp(24px, 4.8vw, 58px);
+            background: linear-gradient(90deg, rgba(5,5,5,0.96), rgba(5,5,5,0.82) 74%, rgba(5,5,5,0));
+            border-right: 1px solid rgba(255,255,255,0.055);
+        }
+
+        .arch-layer-detail-stack {
+            position: relative;
+            width: min(760px, 86%);
+            min-height: 146px;
+            margin: 6px auto 0;
+        }
+
+        .arch-layer-detail {
+            position: absolute;
+            inset: 0;
+            padding: 0 6px;
+            border: 0;
+            background: transparent;
+            box-shadow: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 220ms linear, transform 220ms linear;
+            pointer-events: none;
+            text-align: center;
+        }
+
+        .arch-layer-detail .arch-layer-num {
+            margin-bottom: 10px;
+        }
+
+        .arch-layer-detail p:last-child {
+            margin: 0;
+            max-width: 60ch;
+            margin-inline: auto;
+            color: rgba(203,213,225,0.76);
+            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+            font-size: clamp(0.9rem, 0.98vw, 0.98rem);
+            line-height: 1.58;
+        }
+
+        .arch-layer-num {
+            margin: 0 0 10px;
+            color: rgba(147,197,253,0.88);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+        }
+
+        .arch-layer-progress {
+            display: flex;
+            gap: 8px;
+            width: min(760px, 86%);
+            margin: 0 auto;
+        }
+
+        .arch-layer-progress span {
+            flex: 1;
+            height: 3px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.075);
+            overflow: hidden;
+        }
+
+        .arch-layer-progress span::after {
+            content: "";
+            display: block;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(0.04);
+            transform-origin: left;
+            background: linear-gradient(90deg, #e05a2b, #fdba74);
+            opacity: 0.28;
+            transition: transform 650ms cubic-bezier(.4,0,.2,1), opacity 500ms ease;
+        }
+
+        .arch-layer-canvas {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            gap: 18px;
+            padding: clamp(36px, 5vh, 54px) 0 clamp(28px, 4vh, 40px);
+            background: transparent;
+        }
+
+        .arch-layer-canvas > .arch-layer-steps-wrap {
+            position: relative;
+            top: auto;
+            left: auto;
+            width: min(980px, 94%);
+            transform: none;
+            z-index: 5;
+            pointer-events: auto;
+        }
+
+        .arch-layer-canvas::before {
+            display: none;
+        }
+
+        .arch-layer-figure {
+            position: relative;
+            z-index: 1;
+            width: min(760px, 86%);
+            height: min(680px, 84vh);
+            min-height: 540px;
+            margin-top: 0;
+        }
+
+        .arch-layer-figure::before {
+            display: none;
+        }
+
+        .arch-iso-model {
+            position: absolute;
+            left: 50%;
+            top: 55%;
+            width: min(660px, 92%);
+            transform: translate(-50%, -50%);
+            filter: drop-shadow(0 34px 62px rgba(0,0,0,0.34));
+            overflow: visible;
+            display: none;
+        }
+
+        .arch-paper-model {
+            display: none;
+        }
+
+        .arch-iso-scene {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .arch-iso-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .arch-iso-wrapper {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            transform-style: preserve-3d;
+            transform: rotateX(60deg) rotateZ(-45deg);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .arch-layer-figure:hover .arch-iso-wrapper {
+            transform: rotateX(55deg) rotateZ(-35deg);
+        }
+
+        .arch-iso-layer {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+            transition: opacity 420ms ease, transform 520ms cubic-bezier(.34,1.05,.64,1), box-shadow 240ms ease;
+        }
+
+        .arch-iso-bottom {
+            transform: translateZ(-56px);
+            background:
+                radial-gradient(circle at 22% 26%, rgba(255,255,255,0.08) 0 2px, transparent 2.5px),
+                radial-gradient(circle at 74% 34%, rgba(255,255,255,0.06) 0 2.2px, transparent 2.8px),
+                radial-gradient(circle at 56% 72%, rgba(255,255,255,0.05) 0 2px, transparent 2.6px),
+                linear-gradient(135deg, rgba(12,18,18,0.96), rgba(28,42,39,0.98));
+            border: 1px solid #374151;
+            box-shadow:
+                -1px 1px 0 #111827,
+                -2px 2px 0 #111827,
+                -3px 3px 0 #111827,
+                -4px 4px 0 #111827,
+                -5px 5px 0 #111827,
+                -6px 6px 0 #111827;
+            overflow: hidden;
+        }
+
+        .arch-iso-bottom::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(102deg, transparent 0 16%, rgba(208,214,223,0.16) 16.8% 18.1%, transparent 18.8% 43%, rgba(208,214,223,0.14) 43.8% 45%, transparent 45.8% 100%),
+                linear-gradient(14deg, transparent 0 24%, rgba(214,220,228,0.12) 24.7% 25.7%, transparent 26.4% 57%, rgba(214,220,228,0.14) 57.7% 58.9%, transparent 59.6% 100%),
+                linear-gradient(0deg, transparent 0 30%, rgba(72,98,89,0.78) 30% 32%, transparent 32% 61%, rgba(72,98,89,0.7) 61% 62.4%, transparent 62.4% 100%),
+                linear-gradient(90deg, transparent 0 22%, rgba(86,114,102,0.66) 22% 23.2%, transparent 23.2% 46%, rgba(86,114,102,0.62) 46% 47.2%, transparent 47.2% 74%, rgba(86,114,102,0.58) 74% 75.2%, transparent 75.2% 100%);
+            opacity: 1;
+            mix-blend-mode: screen;
+        }
+
+        .arch-iso-bottom::after {
+            content: "";
+            position: absolute;
+            inset: 8% 7%;
+            background:
+                linear-gradient(90deg, rgba(226,232,240,0.16) 0 1px, transparent 1px 22px),
+                linear-gradient(0deg, rgba(226,232,240,0.1) 0 1px, transparent 1px 18px),
+                linear-gradient(135deg, rgba(15,23,23,0.18), rgba(15,23,23,0));
+            background-size: 22px 100%, 100% 18px, 100% 100%;
+            opacity: 0.18;
+            clip-path: polygon(7% 17%, 28% 7%, 46% 14%, 63% 8%, 82% 18%, 94% 36%, 88% 55%, 72% 66%, 76% 84%, 56% 92%, 35% 84%, 19% 91%, 7% 76%, 12% 54%, 4% 34%);
+        }
+
+        .arch-iso-h3 {
+            inset: 0;
+            transform: translateZ(-56px);
+            background: transparent;
+            border: 1px solid rgba(148,163,184,0.16);
+            box-shadow: none;
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .arch-iso-h3::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                linear-gradient(135deg, rgba(10,10,10,0.16), rgba(10,10,10,0.04)),
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='41.568' height='72' viewBox='0 0 41.568 72'%3E%3Cg fill='none' stroke='%23cbd5e1' stroke-opacity='.46' stroke-width='1'%3E%3Cpath d='M20.784 0 L41.568 12 L41.568 36 L20.784 48 L0 36 L0 12 Z'/%3E%3Cpath d='M20.784 24 L41.568 36 L41.568 60 L20.784 72 L0 60 L0 36 Z'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 100% 100%, 41.568px 72px;
+            background-position: 0 0, 0 0;
+            opacity: 1;
+            mix-blend-mode: screen;
+        }
+
+        .arch-iso-h3::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 27% 34%, rgba(253,186,116,0.24) 0 9px, transparent 10px),
+                radial-gradient(circle at 58% 52%, rgba(253,186,116,0.18) 0 9px, transparent 10px),
+                radial-gradient(circle at 72% 26%, rgba(253,186,116,0.15) 0 8px, transparent 9px);
+            opacity: 0.72;
+        }
+
+        .arch-iso-graph {
+            inset: 0;
+            transform: translateZ(20px);
+            background-color: rgba(10, 10, 10, 0.7);
+            border: 1px solid #1f2937;
+            backdrop-filter: blur(4px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            opacity: 0;
+            overflow: hidden;
+        }
+
+        .arch-iso-graph svg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            transform: none;
+            opacity: 1;
+        }
+
+        .arch-iso-modality {
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            background-color: #0a0a0a;
+            border: 1px solid #374151;
+            box-shadow:
+                -1px 1px 0 #111827,
+                -2px 2px 0 #111827,
+                -3px 3px 0 #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform-style: preserve-3d;
+            cursor: default;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease, opacity 420ms ease;
+        }
+
+        .arch-iso-modality::before {
+            display: none;
+        }
+
+        .arch-iso-modality.poi {
+            top: 10px;
+            left: 10px;
+            transform: translateZ(132px);
+        }
+
+        .arch-iso-modality.imagery {
+            top: 88px;
+            left: 88px;
+            transform: translateZ(132px);
+        }
+
+        .arch-iso-modality.demo {
+            top: 166px;
+            left: 166px;
+            transform: translateZ(132px);
+        }
+
+        .arch-iso-modality-art {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arch-iso-modality-art svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .arch-iso-beam {
+            position: absolute;
+            width: 40px;
+            height: 122px;
+            background: linear-gradient(to bottom, rgba(34, 211, 238, 0.15), transparent);
+            clip-path: polygon(18% 0%, 82% 0%, 100% 100%, 0% 100%);
+            clip-path: polygon(20% 0%, 80% 0%, 100% 100%, 0% 100%);
+            filter: none;
+            opacity: 0;
+            transform-origin: top center;
+        }
+
+        .arch-iso-beam.poi {
+            top: 50%;
+            left: 42px;
+            transform: translateZ(44px) rotateX(-90deg) rotateY(-45deg);
+        }
+
+        .arch-iso-beam.imagery {
+            top: 50%;
+            left: 120px;
+            transform: translateZ(44px) rotateX(-90deg) rotateY(-45deg);
+        }
+
+        .arch-iso-beam.demo {
+            top: 50%;
+            left: 198px;
+            transform: translateZ(44px) rotateX(-90deg) rotateY(-45deg);
+        }
+
+        .paper-h3-layer {
+            opacity: var(--arch-h3-opacity);
+            transform: translateY(var(--arch-h3-svg-y));
+        }
+
+        .paper-mobility-layer {
+            opacity: var(--arch-mob-opacity);
+            transform: translateY(var(--arch-mob-svg-y));
+        }
+
+        .paper-land-layer {
+            opacity: 1;
+        }
+
+        .paper-modality-layer {
+            opacity: var(--arch-mod-opacity);
+            transform: translateY(var(--arch-mod-y));
+        }
+
+        .paper-label {
+            fill: rgba(15,23,42,0.94);
+            font-family: "IBM Plex Sans", sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-anchor: middle;
+        }
+
+        .paper-sub-label {
+            fill: rgba(15,23,42,0.76);
+            font-family: "IBM Plex Sans", sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-anchor: middle;
+        }
+
+        .paper-panel-top {
+            fill: url(#paperPanelGrad);
+            stroke: rgba(115,133,146,0.36);
+            stroke-width: 0.75;
+            filter: url(#paperSoftShadow);
+        }
+
+        .paper-panel-side {
+            fill: rgba(149,171,183,0.54);
+            stroke: rgba(96,113,125,0.2);
+            stroke-width: 0.72;
+        }
+
+        .paper-panel-frame {
+            fill: none;
+            stroke: rgba(255,255,255,0.74);
+            stroke-width: 0.7;
+            opacity: 0.68;
+        }
+
+        .paper-panel-detail {
+            stroke: rgba(92,108,120,0.34);
+            stroke-width: 0.95;
+            fill: none;
+            stroke-linecap: round;
+        }
+
+        .paper-panel-detail.light {
+            stroke: rgba(255,255,255,0.4);
+            stroke-width: 0.9;
+        }
+
+        .paper-projection {
+            fill: url(#paperBeamGrad);
+            stroke: rgba(148,163,184,0.12);
+            stroke-width: 0.5;
+        }
+
+        .paper-graph-plane {
+            fill: rgba(249,251,251,0.96);
+            stroke: rgba(123,140,150,0.34);
+            stroke-width: 0.9;
+            filter: url(#paperSoftShadow);
+        }
+
+        .paper-graph-plane-side {
+            fill: rgba(210,221,226,0.8);
+            stroke: rgba(123,140,150,0.22);
+            stroke-width: 0.8;
+        }
+
+        .paper-graph-edge {
+            stroke: rgba(120,138,149,0.64);
+            stroke-width: 0.9;
+            fill: none;
+        }
+
+        .paper-graph-edge.flow {
+            stroke: rgba(124,144,156,0.86);
+            stroke-width: 1.15;
+            stroke-linecap: round;
+            stroke-dasharray: 4 4;
+            animation: archIsoFlow 2.4s linear infinite;
+            filter: drop-shadow(0 0 3px rgba(160,176,188,0.22));
+        }
+
+        .paper-graph-node {
+            fill: rgba(133,151,162,0.92);
+            stroke: rgba(255,255,255,0.88);
+            stroke-width: 0.6;
+        }
+
+        .paper-graph-node.hot {
+            fill: rgba(150,167,177,0.96);
+            stroke: rgba(255,255,255,0.9);
+            filter: drop-shadow(0 0 4px rgba(167,186,196,0.22));
+        }
+
+        .paper-base-top {
+            fill: url(#paperBaseGrad);
+            stroke: rgba(83,103,111,0.34);
+            stroke-width: 1;
+            filter: url(#paperSoftShadow);
+        }
+
+        .paper-base-side {
+            fill: rgba(103,127,132,0.84);
+            stroke: rgba(76,94,102,0.28);
+            stroke-width: 1;
+        }
+
+        .paper-base-gridline {
+            stroke: rgba(255,255,255,0.18);
+            stroke-width: 0.8;
+            fill: none;
+        }
+
+        .paper-base-shadow {
+            fill: rgba(15,23,42,0.12);
+        }
+
+        .paper-hex {
+            fill: rgba(120,145,139,0.3);
+            stroke: rgba(79,101,99,0.32);
+            stroke-width: 0.62;
+        }
+
+        .paper-hex.hot {
+            fill: rgba(147,170,162,0.38);
+            stroke: rgba(97,118,116,0.34);
+        }
+
+        .paper-land-road {
+            fill: none;
+            stroke: rgba(48,63,70,0.16);
+            stroke-width: 1.8;
+            stroke-linecap: round;
+        }
+
+        .paper-land-water {
+            fill: rgba(114,147,156,0.18);
+            stroke: rgba(30,41,59,0.12);
+            stroke-width: 0.8;
+        }
+
+        .paper-land-block {
+            fill: rgba(58,74,82,0.08);
+            stroke: rgba(30,41,59,0.1);
+            stroke-width: 0.65;
+        }
+
+        .paper-h3-sheet {
+            fill: rgba(246,249,250,0.98);
+            stroke: rgba(123,140,150,0.26);
+            stroke-width: 0.88;
+            filter: url(#paperSoftShadow);
+        }
+
+        .paper-h3-sheet-side {
+            fill: rgba(212,223,227,0.78);
+            stroke: rgba(123,140,150,0.14);
+            stroke-width: 0.75;
+        }
+
+        .paper-platform-glow {
+            fill: rgba(255,255,255,0.42);
+            filter: blur(10px);
+        }
+
+        .paper-floor-guide {
+            stroke: rgba(148,163,184,0.12);
+            stroke-width: 0.75;
+            stroke-dasharray: 3 5;
+        }
+
+        .paper-node-halo {
+            fill: rgba(184,201,210,0.16);
+            filter: blur(7px);
+        }
+
+        .paper-panel-gloss {
+            fill: url(#paperGlassGrad);
+            opacity: 0.54;
+        }
+
+        .architecture-section.arch-layer-stage-0 .arch-iso-bottom {
+            opacity: 1;
+        }
+
+        .architecture-section.arch-layer-stage-1 .arch-iso-bottom,
+        .architecture-section.arch-layer-stage-2 .arch-iso-bottom,
+        .architecture-section.arch-layer-stage-3 .arch-iso-bottom {
+            opacity: 1;
+        }
+
+        .architecture-section.arch-layer-stage-1 .arch-iso-h3,
+        .architecture-section.arch-layer-stage-2 .arch-iso-h3,
+        .architecture-section.arch-layer-stage-3 .arch-iso-h3 {
+            opacity: 1;
+            transform: translateZ(-56px);
+        }
+
+        .architecture-section.arch-layer-stage-2 .arch-iso-graph,
+        .architecture-section.arch-layer-stage-3 .arch-iso-graph {
+            opacity: 1;
+            transform: translateZ(20px);
+        }
+
+        .architecture-section.arch-layer-stage-3 .arch-iso-modality,
+        .architecture-section.arch-layer-stage-3 .arch-iso-beam {
+            opacity: 1;
+        }
+
+        .arch-iso-base,
+        .arch-iso-land {
+            opacity: 1;
+        }
+
+        .arch-iso-h3 {
+            opacity: var(--arch-h3-opacity);
+            transform: translateY(var(--arch-h3-svg-y));
+            transition: none;
+        }
+
+        .arch-iso-mobility {
+            opacity: var(--arch-mob-opacity);
+            transform: translateY(var(--arch-mob-svg-y));
+            transition: none;
+        }
+
+        .arch-iso-side {
+            fill: rgba(40,58,58,0.8);
+            stroke: rgba(148,163,184,0.16);
+            stroke-width: 1.2;
+        }
+
+        .arch-iso-top {
+            fill: rgba(32,48,48,0.92);
+            stroke: rgba(148,163,184,0.22);
+            stroke-width: 1.4;
+        }
+
+        .arch-land-parcel {
+            fill: rgba(37,57,52,0.92);
+            stroke: rgba(226,232,240,0.18);
+            stroke-width: 1.2;
+        }
+
+        .arch-land-road {
+            fill: none;
+            stroke: rgba(226,232,240,0.22);
+            stroke-width: 3;
+            stroke-linecap: round;
+        }
+
+        .arch-land-water {
+            fill: rgba(96,165,250,0.16);
+            stroke: rgba(96,165,250,0.2);
+            stroke-width: 1;
+        }
+
+        .arch-land-building {
+            fill: rgba(226,232,240,0.16);
+            stroke: rgba(226,232,240,0.16);
+            stroke-width: 0.8;
+        }
+
+        .arch-iso-h3 polygon {
+            fill: rgba(96,165,250,0.06);
+            stroke: rgba(203,213,225,0.34);
+            stroke-width: 1.15;
+        }
+
+        .arch-iso-h3 polygon.hot {
+            fill: rgba(224,90,43,0.16);
+            stroke: rgba(253,186,116,0.72);
+        }
+
+        .arch-mob-plane {
+            fill: rgba(226,232,240,0.035);
+            stroke: rgba(226,232,240,0.2);
+            stroke-width: 1.2;
+        }
+
+        .arch-mob-edge {
+            fill: none;
+            stroke: rgba(148,163,184,0.34);
+            stroke-width: 1.1;
+        }
+
+        .arch-mob-edge.flow {
+            stroke: rgba(224,90,43,0.72);
+            stroke-width: 2.1;
+            stroke-linecap: round;
+            stroke-dasharray: 8 7;
+            animation: archIsoFlow 2.6s linear infinite;
+            filter: drop-shadow(0 0 5px rgba(224,90,43,0.35));
+        }
+
+        .arch-mob-node-svg {
+            fill: rgba(232,229,221,0.78);
+            stroke: rgba(5,5,5,0.38);
+            stroke-width: 1;
+        }
+
+        .arch-mob-node-svg.hot {
+            fill: rgba(253,186,116,0.95);
+            filter: drop-shadow(0 0 7px rgba(224,90,43,0.45));
+        }
+
+        @keyframes archIsoFlow {
+            to { stroke-dashoffset: -42; }
+        }
+
+        .arch-stack {
+            position: absolute;
+            left: 50%;
+            top: 54%;
+            width: min(520px, 78%);
+            height: 360px;
+            transform: var(--arch-stack-transform);
+            transform-style: preserve-3d;
+            transition: none;
+            display: none;
+        }
+
+        .arch-land-layer,
+        .arch-h3-layer,
+        .arch-mobility-layer {
+            position: absolute;
+            inset: 0;
+            border-radius: 20px;
+            transform-style: preserve-3d;
+        }
+
+        .arch-land-layer {
+            background:
+                radial-gradient(circle at 24% 28%, rgba(96,165,250,0.22), transparent 10%),
+                radial-gradient(circle at 68% 38%, rgba(34,197,94,0.18), transparent 14%),
+                linear-gradient(135deg, rgba(38,54,50,0.88), rgba(21,31,33,0.94));
+            border: 1px solid rgba(148,163,184,0.18);
+            box-shadow: 0 34px 70px rgba(0,0,0,0.38);
+        }
+
+        .arch-land-layer::before {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border-radius: 18px;
+            opacity: 0.56;
+            background:
+                linear-gradient(28deg, transparent 44%, rgba(226,232,240,0.18) 45% 47%, transparent 48%),
+                linear-gradient(118deg, transparent 42%, rgba(226,232,240,0.12) 43% 45%, transparent 46%),
+                radial-gradient(circle at 20% 62%, rgba(253,186,116,0.16), transparent 8%),
+                radial-gradient(circle at 72% 24%, rgba(96,165,250,0.16), transparent 8%);
+        }
+
+        .arch-h3-layer {
+            transform: translateZ(46px);
+            opacity: 0;
+            transition: opacity 650ms ease, transform 650ms cubic-bezier(.34,1.05,.64,1);
+        }
+
+        .arch-h3-grid {
+            position: absolute;
+            inset: 20px 28px;
+            opacity: 0.95;
+            background:
+                linear-gradient(30deg, transparent 31%, rgba(203,213,225,0.24) 32% 33%, transparent 34%),
+                linear-gradient(150deg, transparent 31%, rgba(203,213,225,0.24) 32% 33%, transparent 34%);
+            background-size: 52px 45px;
+            clip-path: polygon(8% 14%, 92% 4%, 98% 78%, 54% 98%, 4% 76%);
+        }
+
+        .arch-h3-token {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: 52px;
+            height: 45px;
+            transform: translate(-50%, -50%);
+            clip-path: polygon(25% 0, 75% 0, 100% 50%, 75% 100%, 25% 100%, 0 50%);
+            background: rgba(96,165,250,0.13);
+            border: 1px solid rgba(148,163,184,0.2);
+        }
+
+        .arch-h3-token.hot {
+            background: rgba(224,90,43,0.22);
+            box-shadow: 0 0 22px rgba(224,90,43,0.22);
+        }
+
+        .architecture-section.arch-layer-stage-1 .arch-h3-layer,
+        .architecture-section.arch-layer-stage-2 .arch-h3-layer,
+        .architecture-section.arch-layer-stage-3 .arch-h3-layer {
+            opacity: 1;
+            transform: translateZ(74px);
+        }
+
+        .arch-mobility-layer {
+            transform: translateZ(108px);
+            opacity: 0;
+            transition: opacity 650ms ease, transform 650ms cubic-bezier(.34,1.05,.64,1);
+        }
+
+        .architecture-section.arch-layer-stage-2 .arch-mobility-layer,
+        .architecture-section.arch-layer-stage-3 .arch-mobility-layer {
+            opacity: 1;
+            transform: translateZ(120px);
+        }
+
+        .arch-mob-node {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: var(--s);
+            height: var(--s);
+            border-radius: 50%;
+            background: rgba(232,229,221,0.74);
+            box-shadow: 0 0 18px rgba(253,186,116,0.18);
+            transform: translate(-50%, -50%);
+        }
+
+        .arch-mob-flow {
+            position: absolute;
+            left: var(--x);
+            top: var(--y);
+            width: var(--w);
+            height: 3px;
+            border-radius: 999px;
+            background: linear-gradient(90deg, transparent, rgba(224,90,43,0.92), transparent);
+            transform: rotate(var(--r));
+            transform-origin: left center;
+            box-shadow: 0 0 18px rgba(224,90,43,0.35);
+            animation: archLayerFlow var(--speed) ease-in-out infinite alternate;
+        }
+
+        @keyframes archLayerFlow {
+            from { opacity: 0.38; transform: rotate(var(--r)) scaleX(0.78); }
+            to { opacity: 1; transform: rotate(var(--r)) scaleX(1.08); }
+        }
+
+        .arch-modality-panel {
+            position: absolute;
+            z-index: 4;
+            width: 150px;
+            min-height: 92px;
+            padding: 13px 14px;
+            border-radius: 18px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background:
+                linear-gradient(135deg, rgba(255,255,255,0.075), rgba(255,255,255,0.02)),
+                rgba(5,5,5,0.72);
+            box-shadow: 0 24px 54px rgba(0,0,0,0.26);
+            backdrop-filter: blur(14px);
+            opacity: 0;
+            transform: translateY(22px) scale(0.96);
+            transition: opacity 580ms ease, transform 580ms cubic-bezier(.34,1.2,.64,1);
+        }
+
+        .arch-projection {
+            position: absolute;
+            z-index: 3;
+            left: var(--x);
+            top: var(--y);
+            width: 1px;
+            height: var(--h);
+            background: linear-gradient(180deg, rgba(253,186,116,0.48), rgba(253,186,116,0.04));
+            opacity: var(--arch-proj-opacity);
+            transform: rotate(var(--r));
+            transform-origin: top;
+            pointer-events: none;
+            filter: drop-shadow(0 0 10px rgba(224,90,43,0.18));
+        }
+
+        .architecture-section.arch-layer-stage-3 .arch-modality-panel {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .arch-modality-panel.poi { left: 10%; top: 9%; color: #fdba74; transition-delay: 0ms; }
+        .arch-modality-panel.imagery { left: 39%; top: 3%; color: #60a5fa; transition-delay: 90ms; }
+        .arch-modality-panel.demo { right: 9%; top: 9%; color: #a78bfa; transition-delay: 180ms; }
+        .arch-modality-panel.mob { display: none; }
+
+        .arch-modality-panel strong {
+            display: block;
+            margin-bottom: 6px;
+            color: #f8fafc;
+            font-size: 0.88rem;
+            font-family: "IBM Plex Sans", sans-serif;
+        }
+
+        .arch-modality-panel span {
+            color: rgba(203,213,225,0.62);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .arch-modality-panel::after {
+            content: "";
+            position: absolute;
+            left: 50%;
+            top: 100%;
+            width: 1px;
+            height: var(--h, 115px);
+            background: linear-gradient(180deg, currentColor, transparent);
+            opacity: 0.45;
+            transform: rotate(var(--r, 0deg));
+            transform-origin: top;
+        }
+
+        .arch-layer-caption {
+            position: absolute;
+            left: 50%;
+            bottom: 7vh;
+            z-index: 5;
+            transform: translateX(-50%);
+            color: rgba(203,213,225,0.5);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.68rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .arch-layer-tag {
+            position: absolute;
+            z-index: 5;
+            padding: 5px 9px;
+            border-radius: 999px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(5,5,5,0.66);
+            color: rgba(226,232,240,0.78);
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.62rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            backdrop-filter: blur(10px);
+        }
+
+        .arch-layer-tag.land {
+            left: 25%;
+            bottom: 26%;
+        }
+
+        .arch-layer-tag.h3 {
+            left: 39%;
+            bottom: 39%;
+            color: #bfdbfe;
+            opacity: var(--arch-h3-opacity);
+        }
+
+        .arch-layer-tag.mobility {
+            left: 55%;
+            bottom: 54%;
+            color: #fdba74;
+            opacity: var(--arch-mob-opacity);
+        }
+
+        .arch-layer-figure .arch-projection,
+        .arch-layer-figure .arch-layer-tag,
+        .arch-layer-figure .arch-layer-caption {
+            display: none;
+        }
+
+        @media (max-width: 900px) {
+            .architecture-inner.arch-layer-inner {
+                position: relative;
+                height: auto;
+                min-height: 100vh;
+                grid-template-columns: 1fr;
+            }
+
+            .architecture-section { min-height: auto; }
+
+            .arch-layer-copy {
+                border-right: none;
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+                padding: 40px 20px 32px;
+            }
+
+            .arch-layer-detail-stack {
+                width: min(720px, calc(100% - 32px));
+                min-height: 188px;
+                margin-top: 2px;
+            }
+
+            .arch-layer-canvas > .arch-layer-steps-wrap {
+                position: relative;
+                top: auto;
+                left: auto;
+                width: min(720px, calc(100% - 32px));
+                transform: none;
+                margin: 28px auto 0;
+                pointer-events: auto;
+            }
+
+            .arch-layer-progress {
+                width: 100%;
+            }
+
+            .arch-layer-canvas {
+                min-height: 640px;
+            }
+
+            .arch-layer-figure {
+                width: 94%;
+                min-height: 560px;
+                margin-top: 28px;
+            }
+
+            .arch-modality-panel {
+                width: 132px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .architecture-section .arch-h3-layer {
+            opacity: var(--arch-h3-opacity) !important;
+            transform: translateZ(var(--arch-h3-z)) !important;
+            transition: none !important;
+        }
+
+        .architecture-section .arch-mobility-layer {
+            opacity: var(--arch-mob-opacity) !important;
+            transform: translateZ(var(--arch-mob-z)) !important;
+            transition: none !important;
+        }
+
+        .architecture-section .arch-modality-panel {
+            opacity: var(--arch-mod-opacity) !important;
+            transform: translateY(var(--arch-mod-y)) scale(var(--arch-mod-scale)) !important;
+            transition: none !important;
+            display: none !important;
+        }
+
+        /* CSS 3D arch scene overrides */
+        .arch-iso-scene {
+            perspective: 1200px;
+            overflow: visible;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .arch-iso-wrapper {
+            position: relative;
+            width: 240px;
+            height: 240px;
+            transform-style: preserve-3d;
+            transform: rotateX(58deg) rotateZ(-44deg);
+            transition: transform 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .arch-layer-figure:hover .arch-iso-wrapper {
+            transform: rotateX(52deg) rotateZ(-34deg);
+        }
+
+        /* Map image inside bottom layer */
+        .arch-map-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.5;
+            filter: brightness(0.55) saturate(0.35) hue-rotate(185deg);
+            mix-blend-mode: screen;
+            z-index: 0;
+        }
+
+        /* Override bottom layer background to show map image */
+        .arch-iso-bottom {
+            background: rgba(8, 14, 18, 0.94) !important;
+        }
+
+        .arch-iso-bottom::before,
+        .arch-iso-bottom::after {
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Make graph layer translucent enough to show structure */
+        .arch-iso-graph {
+            background-color: rgba(8, 12, 16, 0.72) !important;
+        }
+
         .results-section {
-            padding: 10vh 4.8vw 10vh;
+            padding: 13vh 4.8vw 13vh;
         }
 
         .results-inner {
@@ -953,30 +3328,30 @@
 
         .results-content {
             display: grid;
-            gap: 26px;
+            gap: 22px;
         }
 
         .results-metrics {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-            margin-bottom: 26px;
+            gap: 12px;
+            margin-bottom: 18px;
         }
 
         .results-metric {
-            min-height: 96px;
-            padding: 18px 20px;
-            border-radius: 14px;
+            min-height: 82px;
+            padding: 14px 16px;
+            border-radius: 12px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 18px 36px rgba(0, 0, 0, 0.18);
+            box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
         }
 
         .results-metric-value {
-            margin: 0 0 6px;
+            margin: 0 0 4px;
             color: #f8fafc;
             font-family: "Cormorant Garamond", serif;
-            font-size: clamp(2rem, 3vw, 2.5rem);
+            font-size: clamp(1.7rem, 2.4vw, 2.15rem);
             line-height: 1;
             font-weight: 700;
         }
@@ -989,21 +3364,22 @@
         .results-metric-label {
             color: rgba(203, 213, 225, 0.76);
             font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.88rem;
+            font-size: 0.8rem;
             letter-spacing: 0.06em;
         }
 
         .results-visual {
             display: grid;
-            grid-template-columns: minmax(0, 1.1fr) minmax(220px, 0.52fr);
-            gap: 24px;
+            grid-template-columns: minmax(0, 1fr) minmax(200px, 0.48fr);
+            gap: 18px;
             align-items: center;
         }
 
         .results-radar-wrap {
             position: relative;
-            min-height: 480px;
-            padding: 52px 8px 8px;
+            max-width: 560px;
+            min-height: 420px;
+            padding: 46px 0 0;
         }
 
         .results-radar-hint {
@@ -1011,12 +3387,12 @@
             left: 50%;
             top: 0;
             translate: -50% 0;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 999px;
             background: rgba(224, 90, 43, 0.14);
             color: #fdba74;
             font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             letter-spacing: 0.04em;
             white-space: nowrap;
         }
@@ -1030,14 +3406,14 @@
         .results-radar-label {
             fill: rgba(248, 250, 252, 0.92);
             font-family: "Cormorant Garamond", serif;
-            font-size: 17px;
+            font-size: 15px;
             letter-spacing: 0.02em;
         }
 
         .results-radar-tick {
             fill: rgba(148, 163, 184, 0.78);
             font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .results-tooltip {
@@ -1113,49 +3489,49 @@
 
         .results-summary-bars {
             display: grid;
-            gap: 18px;
+            gap: 14px;
             align-content: start;
         }
 
         .results-summary-row {
             display: grid;
-            gap: 8px;
+            gap: 6px;
         }
 
         .results-summary-head {
             display: grid;
-            grid-template-columns: 14px minmax(0, 1fr) auto;
-            column-gap: 10px;
+            grid-template-columns: 12px minmax(0, 1fr) auto;
+            column-gap: 8px;
             align-items: start;
             font-family: "IBM Plex Sans", sans-serif;
         }
 
         .results-summary-swatch {
-            width: 14px;
-            height: 14px;
+            width: 12px;
+            height: 12px;
             border-radius: 3px;
-            margin-top: 6px;
+            margin-top: 5px;
         }
 
         .results-summary-name {
-            font-size: 0.98rem;
+            font-size: 0.9rem;
             font-weight: 600;
             color: #f8fafc;
         }
 
         .results-summary-stat {
-            font-size: 0.9rem;
+            font-size: 0.82rem;
             color: rgba(148, 163, 184, 0.94);
             white-space: nowrap;
         }
 
         .results-summary-track {
             position: relative;
-            height: 10px;
+            height: 8px;
             border-radius: 999px;
             background: rgba(255, 255, 255, 0.08);
             overflow: hidden;
-            margin-left: 24px;
+            margin-left: 20px;
         }
 
         .results-summary-fill {
@@ -1444,10 +3820,6 @@
                 transform: rotate(90deg);
             }
 
-            .representation-output {
-                min-height: 320px;
-            }
-
             .results-chart {
                 grid-template-columns: 40px minmax(0, 1fr);
             }
@@ -1625,6 +3997,7 @@
                     <p class="subtitle">
                        MoRA encodes locations across the entirety of China into compact 128-dimensional representations capturing their socio-economic and functional DNA by anchoring satellite imagery, 100M+ POIs, and demographics to a billion-edge mobility graph.
                     </p>
+                    <div class="hero-badge">ICLR 2026</div>
                 </div>
             </section>
 
@@ -1655,21 +4028,30 @@
         <section class="representation" id="representation" aria-labelledby="paradigm-title">
             <div class="representation-inner">
                 <p class="paradigm-kicker">01 — The question</p>
-                <h2 id="paradigm-title" class="paradigm-title">Two paradigms for understanding place</h2>
-                <p class="paradigm-subtitle">Geospatial AI has split into two philosophical camps. Each answers a different question about what defines a location.</p>
+                <h2 id="paradigm-title" class="paradigm-title">Two paradigms for representing locations</h2>
+                <p class="paradigm-subtitle">There have gradually emerged two main paradigms in geospatial representation learning: one grounds locations in their physical attributes, while the other represents them through patterns of human activity that
+unfold within them.</p>
 
                 <div class="paradigm-cards">
                     <div class="paradigm-card card-earth">
                         <p class="paradigm-card-tag">Earth Observation</p>
                         <h3 class="paradigm-card-title">What does this place look like?</h3>
-                        <p class="paradigm-card-body">Satellites, radar, LiDAR. These build a digital twin of the planet's surface — land cover, terrain, built environment. Powerful for monitoring, but they capture physical state, not human function.</p>
+                        <p class="paradigm-card-body">Satellites, radar, LiDAR. These build a digital twin of the planet's surface — land cover, terrain, built environment. Powerful for monitoring, capturing the physical state of locations.</p>
                         <span class="paradigm-chip">Physical state</span>
                     </div>
                     <div class="paradigm-card card-mora">
-                        <p class="paradigm-card-tag">Human-Centric — MoRA</p>
+                        <p class="paradigm-card-tag">Human-Centric</p>
                         <h3 class="paradigm-card-title">What do people do here?</h3>
-                        <p class="paradigm-card-body">Mobility, demographics, points of interest. A train station and an adjacent park share near-identical pixels, but radically different human dynamics. Function emerges from movement.</p>
+                        <p class="paradigm-card-body">Mobility, demographics, points of interest. A train station and an adjacent park share near-identical pixels, but radically different human dynamics.</p>
                         <span class="paradigm-chip">Functional meaning</span>
+                    </div>
+                </div>
+
+                <div class="paradigm-note">
+                    <div class="paradigm-note-inner">
+                        <p class="paradigm-note-copy">
+                            <strong>MoRA's claim is fundamentally human-centric.</strong> MoRA posits that a location's latent meaning lies less in its intrinsic attributes and more in its functional relationships with other places, as revealed by <span class="movement-highlight">human movement</span>.
+                        </p>
                     </div>
                 </div>
             </div>
@@ -1678,173 +4060,218 @@
         <section class="mobility-section" id="mobility" aria-labelledby="mobility-title">
             <div class="mobility-inner">
                 <div class="mobility-header">
-                    <p class="paradigm-kicker">02 — Core insight</p>
+                    <p class="paradigm-kicker">02 — MoRA's core insight</p>
                     <h2 id="mobility-title" class="paradigm-title">Mobility as the syntax of space</h2>
-                    <p class="paradigm-subtitle">Geographic space is tokenized into H3 hexagonal cells. Human movement between cells forms sentences. The mobility graph — 200K nodes, 1.2 billion edges — becomes the structural backbone through which all other modalities are interpreted.</p>
+                    <p class="paradigm-subtitle">MoRA borrows its theoretical logic from LLMs: meaning emerges from how discrete tokens co-occur in context. H3 grid cells become spatial tokens, and human mobility sequences provide the context that reveals each region's latent functional meaning.</p>
                 </div>
                 <div class="mobility-viz-wrap">
-                    <canvas id="mobility-svg" class="mobility-svg" aria-hidden="true"></canvas>
+                    <div class="pf-panel" aria-label="Analogy between large language models and MoRA spatial intelligence">
+                        <div class="pf-row">
+                            <div class="pf-row-label">Large Language Models (LLMs)</div>
+                            <div class="pf-cols">
+                                <div class="pf-cell">
+                                    <div class="llm-word-cloud" aria-label="Many word tokens">
+                                        <span>student</span>
+                                        <span>reads</span>
+                                        <span>map</span>
+                                        <span>train</span>
+                                        <span>market</span>
+                                        <span>morning</span>
+                                        <span>bright</span>
+                                        <span>question</span>
+                                        <span>city</span>
+                                        <span>answer</span>
+                                        <span>walks</span>
+                                        <span>home</span>
+                                    </div>
+                                </div>
+                                <div class="pf-arrow">
+                                    <svg viewBox="0 0 44 20" width="44" height="20"><path d="M2,10 L34,10 M28,4 L38,10 L28,16" fill="none" stroke="rgba(90,145,210,0.65)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4,14 L30,14 M26,10 L34,14 L26,18" fill="none" stroke="rgba(90,145,210,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="pf-cell">
+                                    <div class="llm-sentence-card" aria-label="Words linked into sentence context">
+                                        <span>The</span>
+                                        <span class="focus-word">student</span>
+                                        <span>reads</span>
+                                        <span>a</span>
+                                        <span class="focus-word">map</span>
+                                        <span>before</span>
+                                        <span>taking</span>
+                                        <span>the</span>
+                                        <span class="focus-word">train</span>
+                                        <span>home</span>
+                                    </div>
+                                </div>
+                                <div class="pf-arrow">
+                                    <svg viewBox="0 0 44 20" width="44" height="20"><path d="M2,10 L34,10 M28,4 L38,10 L28,16" fill="none" stroke="rgba(90,145,210,0.65)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4,14 L30,14 M26,10 L34,14 L26,18" fill="none" stroke="rgba(90,145,210,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+                                <div class="pf-cell">
+                                    <svg class="semantic-space" viewBox="0 0 220 118" aria-label="Semantic meaning represented as vector-space distribution">
+                                        <ellipse cx="110" cy="58" rx="78" ry="42" fill="rgba(90,145,210,0.08)" stroke="rgba(90,145,210,0.3)" stroke-width="1.2"/>
+                                        <line x1="28" y1="94" x2="196" y2="94" stroke="rgba(140,180,230,0.22)" stroke-width="1"/>
+                                        <line x1="36" y1="102" x2="36" y2="18" stroke="rgba(140,180,230,0.18)" stroke-width="1"/>
+                                        <circle cx="75" cy="45" r="3.2" fill="rgba(90,145,210,0.78)"/>
+                                        <circle cx="92" cy="54" r="2.4" fill="rgba(90,145,210,0.58)"/>
+                                        <circle cx="104" cy="40" r="2.8" fill="rgba(90,145,210,0.68)"/>
+                                        <circle cx="128" cy="65" r="3.4" fill="rgba(125,190,240,0.82)"/>
+                                        <circle cx="145" cy="57" r="2.6" fill="rgba(125,190,240,0.64)"/>
+                                        <circle cx="156" cy="76" r="2.3" fill="rgba(125,190,240,0.56)"/>
+                                        <circle cx="112" cy="56" r="8.5" fill="rgba(224,90,43,0.22)" stroke="rgba(224,90,43,0.62)" stroke-width="1.2"/>
+                                        <path d="M75 45 C91 44 101 49 112 56 C124 63 135 64 156 76" fill="none" stroke="rgba(224,90,43,0.52)" stroke-width="1.4" stroke-dasharray="4 3"/>
+                                        <text x="110" y="113" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="rgba(80,130,200,0.72)">[Semantic Meaning]</text>
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pf-divider"></div>
+
+                        <div class="pf-row">
+                            <div class="pf-row-label">Spatial Intelligence Model</div>
+                            <div class="pf-cols">
+
+                                <!-- col 1: grid cell + grid cell -->
+                                <div class="pf-cell">
+                                    <div class="pf-token-pair">
+                                        <svg class="pf-gc-svg" viewBox="0 0 88 100" aria-hidden="true"><polygon points="56.0,44.0 50.0,54.4 38.0,54.4 32.0,44.0 38.0,33.6 50.0,33.6" fill="rgba(28,60,120,0.90)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="74.0,54.4 68.0,64.8 56.0,64.8 50.0,54.4 56.0,44.0 68.0,44.0" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="56.0,64.8 50.0,75.2 38.0,75.2 32.0,64.8 38.0,54.4 50.0,54.4" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="38.0,54.4 32.0,64.8 20.0,64.8 14.0,54.4 20.0,44.0 32.0,44.0" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="38.0,33.6 32.0,44.0 20.0,44.0 14.0,33.6 20.0,23.2 32.0,23.2" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="56.0,23.2 50.0,33.6 38.0,33.6 32.0,23.2 38.0,12.8 50.0,12.8" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="74.0,33.6 68.0,44.0 56.0,44.0 50.0,33.6 56.0,23.2 68.0,23.2" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="88.0,44.0 66.0,82.1 22.0,82.1 0.0,44.0 22.0,5.9 66.0,5.9" fill="none" stroke="rgba(90,145,210,0.55)" stroke-width="1.8"/><text x="44" y="98" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="rgba(80,130,200,0.68)">[Grid cell]</text></svg>
+                                        <span class="pf-plus">+</span>
+                                        <svg class="pf-gc-svg" viewBox="0 0 88 100" aria-hidden="true"><polygon points="56.0,44.0 50.0,54.4 38.0,54.4 32.0,44.0 38.0,33.6 50.0,33.6" fill="rgba(28,60,120,0.90)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="74.0,54.4 68.0,64.8 56.0,64.8 50.0,54.4 56.0,44.0 68.0,44.0" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="56.0,64.8 50.0,75.2 38.0,75.2 32.0,64.8 38.0,54.4 50.0,54.4" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="38.0,54.4 32.0,64.8 20.0,64.8 14.0,54.4 20.0,44.0 32.0,44.0" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="38.0,33.6 32.0,44.0 20.0,44.0 14.0,33.6 20.0,23.2 32.0,23.2" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="56.0,23.2 50.0,33.6 38.0,33.6 32.0,23.2 38.0,12.8 50.0,12.8" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="74.0,33.6 68.0,44.0 56.0,44.0 50.0,33.6 56.0,23.2 68.0,23.2" fill="rgba(70,120,188,0.72)" stroke="rgba(255,255,255,0.20)" stroke-width="1.1"/><polygon points="88.0,44.0 66.0,82.1 22.0,82.1 0.0,44.0 22.0,5.9 66.0,5.9" fill="none" stroke="rgba(90,145,210,0.55)" stroke-width="1.8"/><text x="44" y="98" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9.5" fill="rgba(80,130,200,0.68)">[Grid cell]</text></svg>
+                                    </div>
+                                </div>
+
+                                <div class="pf-arrow">
+                                    <svg viewBox="0 0 44 20" width="44" height="20"><path d="M2,10 L34,10 M28,4 L38,10 L28,16" fill="none" stroke="rgba(90,145,210,0.65)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4,14 L30,14 M26,10 L34,14 L26,18" fill="none" stroke="rgba(90,145,210,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+
+                                <!-- col 2: mobility cluster -->
+                                <div class="pf-cell">
+                                    <svg class="pf-mob-svg" viewBox="0 0 128 130" aria-hidden="true"><polygon points="30.3,64.5 19.0,71.0 7.7,64.5 7.7,51.5 19.0,45.0 30.3,51.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="41.5,84.0 30.3,90.5 19.0,84.0 19.0,71.0 30.3,64.5 41.5,71.0" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="52.8,103.5 41.5,110.0 30.3,103.5 30.3,90.5 41.5,84.0 52.8,90.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="41.5,45.0 30.3,51.5 19.0,45.0 19.0,32.0 30.3,25.5 41.5,32.0" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="52.8,64.5 41.5,71.0 30.3,64.5 30.3,51.5 41.5,45.0 52.8,51.5" fill="rgba(140,180,225,0.24)" stroke="rgba(75,140,210,0.40)" stroke-width="1.2"/><polygon points="64.0,84.0 52.8,90.5 41.5,84.0 41.5,71.0 52.8,64.5 64.0,71.0" fill="rgba(140,180,225,0.24)" stroke="rgba(75,140,210,0.40)" stroke-width="1.2"/><polygon points="75.3,103.5 64.0,110.0 52.8,103.5 52.8,90.5 64.0,84.0 75.3,90.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="52.8,25.5 41.5,32.0 30.3,25.5 30.3,12.5 41.5,6.0 52.8,12.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="64.0,45.0 52.8,51.5 41.5,45.0 41.5,32.0 52.8,25.5 64.0,32.0" fill="rgba(140,180,225,0.24)" stroke="rgba(75,140,210,0.40)" stroke-width="1.2"/><polygon points="75.3,64.5 64.0,71.0 52.8,64.5 52.8,51.5 64.0,45.0 75.3,51.5" fill="rgba(140,180,225,0.42)" stroke="rgba(75,140,210,0.65)" stroke-width="1.2"/><polygon points="86.5,84.0 75.3,90.5 64.0,84.0 64.0,71.0 75.3,64.5 86.5,71.0" fill="rgba(140,180,225,0.24)" stroke="rgba(75,140,210,0.40)" stroke-width="1.2"/><polygon points="97.8,103.5 86.5,110.0 75.3,103.5 75.3,90.5 86.5,84.0 97.8,90.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="75.3,25.5 64.0,32.0 52.8,25.5 52.8,12.5 64.0,6.0 75.3,12.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="86.5,45.0 75.3,51.5 64.0,45.0 64.0,32.0 75.3,25.5 86.5,32.0" fill="rgba(140,180,225,0.24)" stroke="rgba(75,140,210,0.40)" stroke-width="1.2"/><polygon points="97.8,64.5 86.5,71.0 75.3,64.5 75.3,51.5 86.5,45.0 97.8,51.5" fill="rgba(140,180,225,0.24)" stroke="rgba(75,140,210,0.40)" stroke-width="1.2"/><polygon points="109.1,84.0 97.8,90.5 86.5,84.0 86.5,71.0 97.8,64.5 109.1,71.0" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="97.8,25.5 86.5,32.0 75.3,25.5 75.3,12.5 86.5,6.0 97.8,12.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="109.1,45.0 97.8,51.5 86.5,45.0 86.5,32.0 97.8,25.5 109.1,32.0" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><polygon points="120.3,64.5 109.1,71.0 97.8,64.5 97.8,51.5 109.1,45.0 120.3,51.5" fill="rgba(140,180,225,0.11)" stroke="rgba(75,140,210,0.20)" stroke-width="1.2"/><defs><marker id="mp0" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0.5 L4,2.5 L0,4.5" fill="none" stroke="rgba(28,60,120,0.88)" stroke-width="1" stroke-linecap="round"/></marker><marker id="mp1" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0.5 L4,2.5 L0,4.5" fill="none" stroke="rgba(28,60,120,0.62)" stroke-width="1" stroke-linecap="round"/></marker><marker id="mp2" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0.5 L4,2.5 L0,4.5" fill="none" stroke="rgba(28,60,120,0.46)" stroke-width="1" stroke-linecap="round"/></marker><marker id="mp3" markerWidth="5" markerHeight="5" refX="4" refY="2.5" orient="auto"><path d="M0,0.5 L4,2.5 L0,4.5" fill="none" stroke="rgba(28,60,120,0.32)" stroke-width="1" stroke-linecap="round"/></marker></defs><path d="M19.0,58.0 C16.7,48.1 20.5,41.4 30.3,38.5 C40.0,35.6 43.9,28.9 41.5,19.0 C48.9,12.0 56.6,12.0 64.0,19.0 C71.7,31.5 83.2,38.1 97.8,38.5 C107.6,41.4 111.4,48.1 109.1,58.0" fill="none" stroke="rgba(28,60,120,0.88)" stroke-width="2.0" stroke-linecap="round" marker-end="url(#mp0)"/><path d="M64.0,97.0 C61.7,87.1 65.5,80.4 75.3,77.5 C85.1,74.6 88.9,67.9 86.5,58.0 C76.8,55.1 72.9,48.4 75.3,38.5 C85.1,35.6 88.9,28.9 86.5,19.0" fill="none" stroke="rgba(28,60,120,0.62)" stroke-width="1.6" stroke-linecap="round" marker-end="url(#mp1)"/><path d="M86.5,97.0 C71.9,96.6 60.4,90.0 52.8,77.5 C62.6,74.6 66.4,67.9 64.0,58.0 C61.7,48.1 65.5,41.4 75.3,38.5 C85.1,35.6 88.9,28.9 86.5,19.0" fill="none" stroke="rgba(28,60,120,0.46)" stroke-width="1.4" stroke-linecap="round" marker-end="url(#mp2)"/><path d="M19.0,58.0 C26.4,51.0 34.1,51.0 41.5,58.0 C48.9,65.0 56.6,65.0 64.0,58.0 C71.5,51.0 79.1,51.0 86.5,58.0 C94.0,65.0 101.6,65.0 109.1,58.0" fill="none" stroke="rgba(28,60,120,0.32)" stroke-width="1.2" stroke-linecap="round" marker-end="url(#mp3)"/><circle cx="19.0" cy="52.5" r="3.2" fill="rgba(28,60,120,0.92)"/><line x1="19.0" y1="55.7" x2="16.0" y2="62.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="19.0" y1="55.7" x2="22.0" y2="62.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="16.0" y1="53.5" x2="19.0" y2="56.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><line x1="22.0" y1="53.5" x2="19.0" y2="56.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><circle cx="86.5" cy="13.5" r="3.2" fill="rgba(28,60,120,0.92)"/><line x1="86.5" y1="16.7" x2="83.5" y2="23.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="86.5" y1="16.7" x2="89.5" y2="23.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="83.5" y1="14.5" x2="86.5" y2="17.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><line x1="89.5" y1="14.5" x2="86.5" y2="17.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><circle cx="64.0" cy="91.5" r="3.2" fill="rgba(28,60,120,0.92)"/><line x1="64.0" y1="94.7" x2="61.0" y2="101.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="64.0" y1="94.7" x2="67.0" y2="101.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="61.0" y1="92.5" x2="64.0" y2="95.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><line x1="67.0" y1="92.5" x2="64.0" y2="95.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><circle cx="109.1" cy="52.5" r="3.2" fill="rgba(28,60,120,0.92)"/><line x1="109.1" y1="55.7" x2="106.1" y2="62.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="109.1" y1="55.7" x2="112.1" y2="62.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.7" stroke-linecap="round"/><line x1="106.1" y1="53.5" x2="109.1" y2="56.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><line x1="112.1" y1="53.5" x2="109.1" y2="56.0" stroke="rgba(28,60,120,0.92)" stroke-width="1.3" stroke-linecap="round"/><text x="64" y="127" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(75,130,200,0.65)">[Mobility sequence]</text></svg>
+                                </div>
+
+                                <div class="pf-arrow">
+                                    <svg viewBox="0 0 44 20" width="44" height="20"><path d="M2,10 L34,10 M28,4 L38,10 L28,16" fill="none" stroke="rgba(90,145,210,0.65)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4,14 L30,14 M26,10 L34,14 L26,18" fill="none" stroke="rgba(90,145,210,0.35)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                </div>
+
+                                <!-- col 3: city functional meaning -->
+                                <div class="pf-cell">
+                                    <svg class="pf-city-svg" viewBox="0 0 150 134" aria-hidden="true"><line x1="75" y1="55" x2="34" y2="74" stroke="rgba(120,200,255,0.28)" stroke-width="1.4" stroke-dasharray="3 2"/><line x1="34" y1="74" x2="116" y2="74" stroke="rgba(120,200,255,0.28)" stroke-width="1.4" stroke-dasharray="3 2"/><line x1="116" y1="74" x2="75" y2="88" stroke="rgba(120,200,255,0.28)" stroke-width="1.4" stroke-dasharray="3 2"/><line x1="75" y1="55" x2="75" y2="88" stroke="rgba(120,200,255,0.28)" stroke-width="1.4" stroke-dasharray="3 2"/><circle cx="75" cy="70" r="30" fill="none" stroke="rgba(120,200,255,0.18)" stroke-width="10"/><polygon points="91.0,55.0 83.0,68.9 67.0,68.9 59.0,55.0 67.0,41.1 83.0,41.1" fill="rgba(240,160,40,0.80)" stroke="rgba(255,200,80,0.65)" stroke-width="0.9" opacity="0.92"/><polygon points="115.0,68.9 107.0,82.7 91.0,82.7 83.0,68.9 91.0,55.0 107.0,55.0" fill="rgba(240,160,40,0.80)" stroke="rgba(255,200,80,0.65)" stroke-width="0.9" opacity="0.62"/><polygon points="91.0,82.7 83.0,96.6 67.0,96.6 59.0,82.7 67.0,68.9 83.0,68.9" fill="rgba(240,160,40,0.80)" stroke="rgba(255,200,80,0.65)" stroke-width="0.9" opacity="0.62"/><polygon points="67.0,68.9 59.0,82.7 43.0,82.7 35.0,68.9 43.0,55.0 59.0,55.0" fill="rgba(240,160,40,0.80)" stroke="rgba(255,200,80,0.65)" stroke-width="0.9" opacity="0.62"/><polygon points="67.0,41.1 59.0,55.0 43.0,55.0 35.0,41.1 43.0,27.3 59.0,27.3" fill="rgba(240,160,40,0.80)" stroke="rgba(255,200,80,0.65)" stroke-width="0.9" opacity="0.62"/><polygon points="91.0,27.3 83.0,41.1 67.0,41.1 59.0,27.3 67.0,13.4 83.0,13.4" fill="rgba(240,160,40,0.80)" stroke="rgba(255,200,80,0.65)" stroke-width="0.9" opacity="0.62"/><polygon points="115.0,41.1 107.0,55.0 91.0,55.0 83.0,41.1 91.0,27.3 107.0,27.3" fill="rgba(240,160,40,0.80)" stroke="rgba(255,200,80,0.65)" stroke-width="0.9" opacity="0.62"/><circle cx="75" cy="55" r="6" fill="rgba(255,255,255,0.18)"/><polygon points="46.0,74.0 40.0,84.4 28.0,84.4 22.0,74.0 28.0,63.6 40.0,63.6" fill="rgba(50,160,90,0.75)" stroke="rgba(90,200,130,0.60)" stroke-width="0.9" opacity="0.92"/><polygon points="64.0,84.4 58.0,94.8 46.0,94.8 40.0,84.4 46.0,74.0 58.0,74.0" fill="rgba(50,160,90,0.75)" stroke="rgba(90,200,130,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="46.0,94.8 40.0,105.2 28.0,105.2 22.0,94.8 28.0,84.4 40.0,84.4" fill="rgba(50,160,90,0.75)" stroke="rgba(90,200,130,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="28.0,84.4 22.0,94.8 10.0,94.8 4.0,84.4 10.0,74.0 22.0,74.0" fill="rgba(50,160,90,0.75)" stroke="rgba(90,200,130,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="28.0,63.6 22.0,74.0 10.0,74.0 4.0,63.6 10.0,53.2 22.0,53.2" fill="rgba(50,160,90,0.75)" stroke="rgba(90,200,130,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="46.0,53.2 40.0,63.6 28.0,63.6 22.0,53.2 28.0,42.8 40.0,42.8" fill="rgba(50,160,90,0.75)" stroke="rgba(90,200,130,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="64.0,63.6 58.0,74.0 46.0,74.0 40.0,63.6 46.0,53.2 58.0,53.2" fill="rgba(50,160,90,0.75)" stroke="rgba(90,200,130,0.60)" stroke-width="0.9" opacity="0.62"/><circle cx="34" cy="74" r="5" fill="rgba(255,255,255,0.18)"/><polygon points="128.0,74.0 122.0,84.4 110.0,84.4 104.0,74.0 110.0,63.6 122.0,63.6" fill="rgba(70,120,220,0.75)" stroke="rgba(110,160,240,0.60)" stroke-width="0.9" opacity="0.92"/><polygon points="146.0,84.4 140.0,94.8 128.0,94.8 122.0,84.4 128.0,74.0 140.0,74.0" fill="rgba(70,120,220,0.75)" stroke="rgba(110,160,240,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="128.0,94.8 122.0,105.2 110.0,105.2 104.0,94.8 110.0,84.4 122.0,84.4" fill="rgba(70,120,220,0.75)" stroke="rgba(110,160,240,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="110.0,84.4 104.0,94.8 92.0,94.8 86.0,84.4 92.0,74.0 104.0,74.0" fill="rgba(70,120,220,0.75)" stroke="rgba(110,160,240,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="110.0,63.6 104.0,74.0 92.0,74.0 86.0,63.6 92.0,53.2 104.0,53.2" fill="rgba(70,120,220,0.75)" stroke="rgba(110,160,240,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="128.0,53.2 122.0,63.6 110.0,63.6 104.0,53.2 110.0,42.8 122.0,42.8" fill="rgba(70,120,220,0.75)" stroke="rgba(110,160,240,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="146.0,63.6 140.0,74.0 128.0,74.0 122.0,63.6 128.0,53.2 140.0,53.2" fill="rgba(70,120,220,0.75)" stroke="rgba(110,160,240,0.60)" stroke-width="0.9" opacity="0.62"/><circle cx="116" cy="74" r="5" fill="rgba(255,255,255,0.18)"/><polygon points="86.0,88.0 80.5,97.5 69.5,97.5 64.0,88.0 69.5,78.5 80.5,78.5" fill="rgba(200,70,70,0.70)" stroke="rgba(240,110,110,0.60)" stroke-width="0.9" opacity="0.92"/><polygon points="102.5,97.5 97.0,107.1 86.0,107.1 80.5,97.5 86.0,88.0 97.0,88.0" fill="rgba(200,70,70,0.70)" stroke="rgba(240,110,110,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="86.0,107.1 80.5,116.6 69.5,116.6 64.0,107.1 69.5,97.5 80.5,97.5" fill="rgba(200,70,70,0.70)" stroke="rgba(240,110,110,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="69.5,97.5 64.0,107.1 53.0,107.1 47.5,97.5 53.0,88.0 64.0,88.0" fill="rgba(200,70,70,0.70)" stroke="rgba(240,110,110,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="69.5,78.5 64.0,88.0 53.0,88.0 47.5,78.5 53.0,68.9 64.0,68.9" fill="rgba(200,70,70,0.70)" stroke="rgba(240,110,110,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="86.0,68.9 80.5,78.5 69.5,78.5 64.0,68.9 69.5,59.4 80.5,59.4" fill="rgba(200,70,70,0.70)" stroke="rgba(240,110,110,0.60)" stroke-width="0.9" opacity="0.62"/><polygon points="102.5,78.5 97.0,88.0 86.0,88.0 80.5,78.5 86.0,68.9 97.0,68.9" fill="rgba(200,70,70,0.70)" stroke="rgba(240,110,110,0.60)" stroke-width="0.9" opacity="0.62"/><circle cx="75" cy="88" r="4" fill="rgba(255,255,255,0.18)"/><text x="75" y="130" text-anchor="middle" font-family="IBM Plex Mono,monospace" font-size="9" fill="rgba(80,130,200,0.68)">[Latent Functional Meaning]</text></svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section class="architecture-section" id="model" aria-labelledby="architecture-title">
-            <div class="architecture-inner">
-                <div class="architecture-header">
+        <section class="architecture-section arch-layer-stage-0" id="model" aria-labelledby="architecture-title-layer">
+            <div class="architecture-inner arch-layer-inner">
+                <div class="arch-layer-copy">
                     <p class="paradigm-kicker">03 — Model architecture</p>
-                    <h2 class="paradigm-title" id="architecture-title">Mobility as Backbone for Multi-modal Alignment</h2>
+                    <h2 class="paradigm-title" id="architecture-title-layer">Human mobility as the structural backbone</h2>
                     <p class="paradigm-subtitle">
-                        MoRA constructs location embeddings by aligning diverse signals onto a shared mobility backbone. Physical observations, social structure, and semantic context are all interpreted through the same human movement graph before being fused into one reusable representation.
+                        By using a human mobility graph as the central backbone for multimodal alignment, MoRA makes POI text, satellite imagery, and demographic signals readable through the lens of fundamental human dynamics.
                     </p>
                 </div>
 
-                <div class="architecture-grid">
-                    <div class="architecture-panel architecture-diagram">
-
-                        <!-- Layer info: now at top -->
-                        <div class="architecture-info" id="layer-info-box">
-                            <div class="architecture-info-header">
-                                <i data-lucide="layers" class="architecture-info-icon" id="layer-icon" style="width:16px;height:16px;"></i>
-                                <h4 class="architecture-info-title" id="layer-title">Multi-modal Inputs</h4>
-                            </div>
-                            <p class="architecture-info-desc" id="layer-desc">
-                                Hover each layer from bottom to top to explore how MoRA stacks its input signals.
-                            </p>
+                <div class="arch-layer-canvas" aria-hidden="true">
+                    <div class="arch-layer-steps-wrap">
+                        <div class="arch-layer-progress" aria-hidden="true">
+                            <span></span><span></span><span></span><span></span>
                         </div>
+                    </div>
 
-                        <!-- Ordered hover hint -->
-                        <div class="arch-hover-hint" aria-label="Hover order hint">
-                            <span class="arch-hover-hint-label">Hover ↓ → ↑</span>
-                            <div class="arch-hover-steps">
-                                <span class="arch-step" onmouseenter="updateLayerInfo('hex')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">1</span>H3 Grid</span>
-                                <span class="arch-step-sep">→</span>
-                                <span class="arch-step" onmouseenter="updateLayerInfo('graph')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">2</span>Mobility</span>
-                                <span class="arch-step-sep">→</span>
-                                <span class="arch-step" onmouseenter="updateLayerInfo('poi')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">3</span>POI</span>
-                                <span class="arch-step-sep">→</span>
-                                <span class="arch-step" onmouseenter="updateLayerInfo('imagery')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">4</span>Imagery</span>
-                                <span class="arch-step-sep">→</span>
-                                <span class="arch-step" onmouseenter="updateLayerInfo('demo')" onmouseleave="resetLayerInfo()"><span class="arch-step-num">5</span>Demographics</span>
+                        <div class="arch-layer-detail-stack">
+                            <div class="arch-layer-detail s0">
+                                <p class="arch-layer-num">01 - Continuous space</p>
+                                <p>MoRA begins with the continuous city itself: real coordinates, urban land parcels, and the spatial fabric in which human movement unfolds.</p>
                             </div>
-                        </div>
+                            <div class="arch-layer-detail s1">
+                                <p class="arch-layer-num">02 - H3 discretization</p>
+                                <p>That continuous surface is discretized into H3 cells so every modality can refer to the same units of place with consistent spatial semantics.</p>
+                            </div>
+                            <div class="arch-layer-detail s2">
+                                <p class="arch-layer-num">03 - Mobility backbone</p>
+                                <p>Human movement links those cells into a graph, giving MoRA the central structural backbone that captures how places interact in daily life.</p>
+                            </div>
+                            <div class="arch-layer-detail s3">
+                                <p class="arch-layer-num">04 - Multimodal alignment</p>
+                                <p>POI text, satellite imagery, and demographic tables are aligned onto the same graph so each modality is interpreted through these fundamental human dynamics.</p>
+                            </div>
+                    </div>
 
-                        <!-- Isometric diagram -->
-                        <div class="iso-scene">
-                            <div class="iso-wrapper">
-                                <div class="iso-layer iso-bottom" onmouseenter="updateLayerInfo('hex')" onmouseleave="resetLayerInfo()">
-                                    <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                        <defs>
-                                            <pattern id="hex-pattern-index" width="34.64" height="60" patternUnits="userSpaceOnUse" patternTransform="scale(1.2)">
-                                                <path d="M17.32 0 L34.64 10 L34.64 30 L17.32 40 L0 30 L0 10 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1" />
-                                                <path d="M17.32 60 L34.64 70 L34.64 90 L17.32 100 L0 90 L0 70 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1" />
-                                                <path d="M34.64 30 L51.96 40 L51.96 60 L34.64 70 L17.32 60 L17.32 40 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1" />
-                                                <path d="M0 30 L17.32 40 L17.32 60 L0 70 L-17.32 60 L-17.32 40 Z" fill="#0a0a0a" stroke="#1f2937" stroke-width="1" />
-                                            </pattern>
-                                        </defs>
-                                        <rect width="100%" height="100%" fill="url(#hex-pattern-index)" />
+                    <div class="arch-layer-figure">
+                        <div class="arch-iso-scene">
+                            <div class="arch-iso-wrapper">
+
+                                <!-- Stage 0: City map base -->
+                                <div class="arch-iso-layer arch-iso-bottom">
+                                    <img src="hero_map.png" class="arch-map-img" alt="">
+                                </div>
+
+                                <!-- Stage 1: H3 hex discretization (CSS pattern via ::before) -->
+                                <div class="arch-iso-layer arch-iso-h3"></div>
+
+                                <!-- Stage 2: Mobility graph with nodes at hex centers -->
+                                <div class="arch-iso-layer arch-iso-graph">
+                                    <svg viewBox="0 0 240 240" xmlns="http://www.w3.org/2000/svg">
+                                        <!-- edges -->
+                                        <line class="arch-mob-edge" x1="62" y1="60" x2="104" y2="96"/>
+                                        <line class="arch-mob-edge flow" x1="125" y1="60" x2="104" y2="96"/>
+                                        <line class="arch-mob-edge" x1="62" y1="96" x2="104" y2="96"/>
+                                        <line class="arch-mob-edge" x1="104" y1="96" x2="145" y2="96"/>
+                                        <line class="arch-mob-edge flow" x1="104" y1="96" x2="83" y2="132"/>
+                                        <line class="arch-mob-edge" x1="104" y1="96" x2="125" y2="132"/>
+                                        <line class="arch-mob-edge" x1="62" y1="96" x2="83" y2="132"/>
+                                        <line class="arch-mob-edge" x1="145" y1="96" x2="125" y2="132"/>
+                                        <line class="arch-mob-edge" x1="83" y1="132" x2="104" y2="168"/>
+                                        <line class="arch-mob-edge" x1="125" y1="132" x2="104" y2="168"/>
+                                        <!-- nodes at hex centers -->
+                                        <circle class="arch-mob-node-svg" cx="62" cy="60" r="4"/>
+                                        <circle class="arch-mob-node-svg" cx="125" cy="60" r="4"/>
+                                        <circle class="arch-mob-node-svg" cx="62" cy="96" r="4.5"/>
+                                        <circle class="arch-mob-node-svg hot" cx="104" cy="96" r="7"/>
+                                        <circle class="arch-mob-node-svg" cx="145" cy="96" r="4.5"/>
+                                        <circle class="arch-mob-node-svg" cx="83" cy="132" r="5"/>
+                                        <circle class="arch-mob-node-svg" cx="125" cy="132" r="4.5"/>
+                                        <circle class="arch-mob-node-svg" cx="104" cy="168" r="4"/>
                                     </svg>
                                 </div>
 
-                                <div class="iso-layer iso-middle" onmouseenter="updateLayerInfo('graph')" onmouseleave="resetLayerInfo()">
-                                    <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                        <line x1="40" y1="50" x2="100" y2="30" stroke="#374151" stroke-width="1" />
-                                        <line x1="100" y1="30" x2="160" y2="70" stroke="#374151" stroke-width="1" />
-                                        <line x1="40" y1="50" x2="60" y2="120" stroke="#374151" stroke-width="1" />
-                                        <line x1="100" y1="30" x2="110" y2="100" stroke="#374151" stroke-width="1" />
-                                        <line x1="160" y1="70" x2="110" y2="100" stroke="#374151" stroke-width="1" />
-                                        <line x1="60" y1="120" x2="110" y2="100" stroke="#22d3ee" stroke-width="2" style="filter: drop-shadow(0 0 4px #22d3ee);" />
-                                        <line x1="60" y1="120" x2="80" y2="170" stroke="#374151" stroke-width="1" />
-                                        <line x1="110" y1="100" x2="150" y2="150" stroke="#374151" stroke-width="1" />
-                                        <line x1="80" y1="170" x2="150" y2="150" stroke="#374151" stroke-width="1" />
-                                        <circle cx="40" cy="50" r="4" fill="#6b7280" />
-                                        <circle cx="100" cy="30" r="5" fill="#6b7280" />
-                                        <circle cx="160" cy="70" r="4" fill="#6b7280" />
-                                        <circle cx="60" cy="120" r="6" fill="#22d3ee" style="filter: drop-shadow(0 0 6px #22d3ee);" />
-                                        <circle cx="110" cy="100" r="7" fill="#22d3ee" style="filter: drop-shadow(0 0 6px #22d3ee);" />
-                                        <circle cx="80" cy="170" r="4" fill="#6b7280" />
-                                        <circle cx="150" cy="150" r="5" fill="#6b7280" />
-                                    </svg>
-                                </div>
+                                <!-- Beams: project from each modality box downward toward graph -->
+                                <div class="arch-iso-beam poi"></div>
+                                <div class="arch-iso-beam imagery"></div>
+                                <div class="arch-iso-beam demo"></div>
 
-                                <div class="iso-top-box box-1" onmouseenter="updateLayerInfo('poi')" onmouseleave="resetLayerInfo()">
-                                    <div class="iso-beam"></div>
-                                    <div style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:4px;position:relative;z-index:1;">
-                                        <i data-lucide="map-pin" class="architecture-icon-accent" style="width:20px;height:20px;margin-bottom:6px;"></i>
-                                        <div style="width:24px;height:2px;background:#3f3f46;margin-bottom:4px;"></div>
-                                        <div style="width:18px;height:2px;background:#3f3f46;"></div>
+                                <!-- Stage 3: Modality boxes -->
+                                <div class="arch-iso-modality poi">
+                                    <div class="arch-iso-modality-art">
+                                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <circle cx="20" cy="17" r="6" stroke="#fdba74" stroke-width="1.5"/>
+                                            <path d="M20 11 C14 11 10 15 10 17 C10 23 20 32 20 32 C20 32 30 23 30 17 C30 15 26 11 20 11Z" stroke="#fdba74" stroke-width="1.2" fill="rgba(253,186,116,0.12)"/>
+                                        </svg>
                                     </div>
                                 </div>
-
-                                <div class="iso-top-box box-2" onmouseenter="updateLayerInfo('imagery')" onmouseleave="resetLayerInfo()">
-                                    <div class="iso-beam"></div>
-                                    <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;position:relative;z-index:1;overflow:hidden;background:#111111;">
-                                        <svg style="width:100%;height:100%;" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                                            <path d="M0,20 Q30,40 50,10 T100,30 L100,100 L0,100 Z" fill="#1f2937" />
-                                            <path d="M0,50 Q40,70 60,40 T100,60 L100,100 L0,100 Z" fill="#374151" />
-                                            <line x1="20" y1="0" x2="40" y2="100" stroke="#4b5563" stroke-width="1" />
+                                <div class="arch-iso-modality imagery">
+                                    <div class="arch-iso-modality-art">
+                                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="6" y="9" width="28" height="22" rx="2" stroke="#60a5fa" stroke-width="1.2" fill="rgba(96,165,250,0.1)"/>
+                                            <path d="M6 23 L14 17 L20 21 L27 14 L34 20" stroke="#60a5fa" stroke-width="1.1" fill="none"/>
+                                            <circle cx="11" cy="15" r="2.5" fill="rgba(96,165,250,0.5)"/>
+                                        </svg>
+                                    </div>
+                                </div>
+                                <div class="arch-iso-modality demo">
+                                    <div class="arch-iso-modality-art">
+                                        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <rect x="6" y="6" width="11" height="11" rx="1" fill="rgba(167,139,250,0.35)" stroke="#a78bfa" stroke-width="1"/>
+                                            <rect x="23" y="6" width="11" height="11" rx="1" fill="rgba(167,139,250,0.15)" stroke="#a78bfa" stroke-width="1"/>
+                                            <rect x="6" y="23" width="11" height="11" rx="1" fill="rgba(167,139,250,0.2)" stroke="#a78bfa" stroke-width="1"/>
+                                            <rect x="23" y="23" width="11" height="11" rx="1" fill="rgba(167,139,250,0.55)" stroke="#a78bfa" stroke-width="1"/>
                                         </svg>
                                     </div>
                                 </div>
 
-                                <div class="iso-top-box box-3" onmouseenter="updateLayerInfo('demo')" onmouseleave="resetLayerInfo()">
-                                    <div class="iso-beam"></div>
-                                    <div style="width:100%;height:100%;display:flex;flex-direction:column;position:relative;z-index:1;padding:4px;">
-                                        <div style="flex:1;border:1px solid #27272a;display:grid;grid-template-columns:repeat(3,1fr);grid-template-rows:repeat(3,1fr);gap:1px;background:#27272a;">
-                                            <div style="background:#000000;"></div><div style="background:#000000;"></div><div style="background:#000000;"></div>
-                                            <div style="background:#000000;"></div><div style="background:#06b6d4;"></div><div style="background:#000000;"></div>
-                                            <div style="background:#000000;"></div><div style="background:#000000;"></div><div style="background:#000000;"></div>
-                                        </div>
-                                    </div>
-                                </div>
                             </div>
-                        </div>
-                    </div>
-
-                    <!-- Right: encoder only -->
-                    <div class="architecture-panel">
-                        <div class="encoder-box">
-                            <div class="encoder-icon">
-                                <i data-lucide="cpu" style="width:20px;height:20px;"></i>
-                            </div>
-                            <h3 class="encoder-title">Encoder</h3>
-                            <p class="encoder-copy">Contrastive alignment maps each modality onto the mobility graph so every signal is interpreted in one shared space.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Dense representations: moved below the grid -->
-                <div class="arch-dense-reps">
-                    <div class="representation-output-icon">
-                        <i data-lucide="database" style="width:20px;height:20px;"></i>
-                    </div>
-                    <div style="flex:1;">
-                        <h3 class="representation-output-title">Dense Representations</h3>
-                        <p class="representation-output-subtitle">128-dimensional vector</p>
-                        <div class="representation-output-grid" aria-hidden="true" style="max-width:none;">
-                            <div class="representation-output-cell" style="background:#06b6d4;opacity:.9;"></div>
-                            <div class="representation-output-cell" style="background:#f472b6;opacity:.62;"></div>
-                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.82;"></div>
-                            <div class="representation-output-cell" style="background:#3f3f46;opacity:.45;"></div>
-                            <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
-                            <div class="representation-output-cell" style="background:#0891b2;opacity:.74;"></div>
-                            <div class="representation-output-cell" style="background:#52525b;opacity:.55;"></div>
-                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.9;"></div>
-                            <div class="representation-output-cell" style="background:#27272a;opacity:.34;"></div>
-                            <div class="representation-output-cell" style="background:#06b6d4;opacity:.82;"></div>
-                            <div class="representation-output-cell" style="background:#f472b6;opacity:.9;"></div>
-                            <div class="representation-output-cell" style="background:#3f3f46;opacity:.5;"></div>
-                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.72;"></div>
-                            <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
-                            <div class="representation-output-cell" style="background:#52525b;opacity:.4;"></div>
-                            <div class="representation-output-cell" style="background:#0891b2;opacity:.82;"></div>
-                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.74;"></div>
-                            <div class="representation-output-cell" style="background:#3f3f46;opacity:.6;"></div>
-                            <div class="representation-output-cell" style="background:#06b6d4;opacity:.9;"></div>
-                            <div class="representation-output-cell" style="background:#38bdf8;opacity:.84;"></div>
-                            <div class="representation-output-cell" style="background:#f472b6;opacity:.52;"></div>
-                            <div class="representation-output-cell" style="background:#0891b2;opacity:.9;"></div>
-                            <div class="representation-output-cell" style="background:#27272a;opacity:.42;"></div>
-                            <div class="representation-output-cell" style="background:#ffffff;opacity:1;"></div>
                         </div>
                     </div>
                 </div>
@@ -1857,7 +4284,7 @@
                     <p class="paradigm-kicker">04 — Results</p>
                     <h2 class="paradigm-title" id="results-title">General-purpose benchmark &amp; results</h2>
                     <p class="paradigm-subtitle">
-                        We construct a comprehensive benchmark of 9 socio-economic prediction tasks spanning 4 spatial scales (point, grid, county, city) across social and economic domains — the first of its kind for human-centric geospatial evaluation.
+                        We construct a comprehensive benchmark of 9 general-purpose prediction tasks across 4 spatial scales (point, grid, county, city) in social and economic domains, explicitly emphasizing human-centric evaluation.
                     </p>
                 </div>
 
@@ -1916,7 +4343,7 @@
         <div class="results-tooltip" id="results-tooltip" role="tooltip" aria-hidden="true"></div>
 
         <!-- ============================================================ -->
-        <!--  Embedding Comparator  – insert after Demonstration          -->
+        <!--  Embedding Comparator — insert after Demonstration           -->
         <!-- ============================================================ -->
 
         <style>
@@ -1967,7 +4394,376 @@
         .cp-dim{text-align:right;font-size:.62rem;color:#444;margin-top:.2rem}
         </style>
 
-        <section id="cp-section">
+        <!-- ============================================================ -->
+        <!--  Promise Block — coordinates in, representation out          -->
+        <!-- ============================================================ -->
+        <section class="promise-section" aria-labelledby="promise-title">
+            <div class="promise-inner">
+                <div class="promise-header">
+                    <p class="paradigm-kicker">05 — Try MoRA</p>
+                    <h2 class="paradigm-title" id="promise-title">Coordinates in, intelligence out</h2>
+                    <p class="paradigm-subtitle">The distilled MoRA model compresses an entire national-scale multimodal pipeline into a single function call. No satellite tiles. No POI databases. No mobility logs. Just coordinates (longitude/latitude).</p>
+                </div>
+                <div class="promise-body">
+                    <div class="promise-left">
+                        <div class="promise-input-label">Input</div>
+                        <div class="promise-coord">31.2304° N<br>121.4737° E</div>
+                        <div class="promise-coord-sub">any coordinate works</div>
+                        <div class="promise-nope-row">
+                            <span class="promise-nope">satellite tiles</span>
+                            <span class="promise-nope">POI database</span>
+                            <span class="promise-nope">mobility logs</span>
+                            <span class="promise-nope">census data</span>
+                        </div>
+                    </div>
+                    <div class="promise-mid">
+                        <div class="promise-fn-label">High-level usage</div>
+                        <div class="promise-code">
+                            <span class="pc-cmt"># Load a distilled MoRA encoder.</span><br>
+                            model = <span class="pc-fn">load_distilled_mora</span>(<span class="pc-str">"pretrained_distilled_model/"</span>)<br><br>
+                            coord = [<span class="pc-val">121.4737</span>, <span class="pc-val">31.2304</span>] <span class="pc-cmt"># lon, lat</span><br>
+                            emb = model.<span class="pc-fn">encode</span>(coord)<br><br>
+                            <span class="pc-cmt"># emb: [128] location embedding</span>
+                        </div>
+                        <div class="promise-arrow">&darr;</div>
+                        <div class="promise-fn-label">No external datasets needed.</div>
+                    </div>
+                    <div class="promise-right">
+                        <div class="promise-input-label">Output &mdash; location fingerprint</div>
+                        <div class="promise-emb-label">128-dimensional embedding</div>
+                        <canvas id="promise-emb-canvas" class="promise-emb-canvas" aria-label="128-dimensional embedding visualised as an abstract vector sketch"></canvas>
+                        <div class="promise-emb-sub">encodes mobility &middot; POI &middot; imagery &middot; demographics</div>
+                        <div class="promise-stats">
+                            <div class="promise-stat">
+                                <div class="promise-stat-val">128</div>
+                                <div class="promise-stat-lbl">dimensions</div>
+                            </div>
+                            <div class="promise-stat">
+                                <div class="promise-stat-val">4</div>
+                                <div class="promise-stat-lbl">modalities fused</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="promise-actions-wrap">
+                <div class="promise-actions" aria-label="Paper and code links">
+                    <a class="hero-link" href="https://arxiv.org/abs/2506.01297" target="_blank" rel="noopener noreferrer">Read paper<span class="hero-link-arrow">&rarr;</span></a>
+                    <a class="hero-link" href="https://github.com/ylzhouchris/MoRA/tree/main" target="_blank" rel="noopener noreferrer">Code<span class="hero-link-arrow">&rarr;</span></a>
+                </div>
+                </div>
+            </div>
+        </section>
+
+        <style>
+        .promise-section {
+            background: var(--bg);
+            padding: clamp(88px, 12vh, 132px) 4.8vw;
+            border-top: 1px solid var(--line);
+        }
+        .promise-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .promise-section .paradigm-kicker {
+            color: #e05a2b;
+        }
+        .promise-header {
+            margin-bottom: 48px;
+            max-width: 700px;
+        }
+        .promise-body {
+            display: grid;
+            grid-template-columns: 1fr auto 1fr;
+            gap: 0;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 16px;
+            overflow: hidden;
+            background: rgba(255,255,255,0.015);
+        }
+        .promise-actions {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 0;
+        }
+        .promise-actions-wrap {
+            margin-top: 84px;
+            padding-top: 28px;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+        .promise-actions-wrap::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: min(240px, 42vw);
+            height: 1px;
+            translate: -50% 0;
+            background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.18), rgba(224,90,43,0.38), rgba(255,255,255,0.18), rgba(255,255,255,0));
+        }
+        .promise-left,
+        .promise-right {
+            padding: clamp(24px,3vw,40px) clamp(20px,2.5vw,36px);
+        }
+        .promise-mid {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 32px 28px;
+            border-left: 1px solid rgba(255,255,255,0.06);
+            border-right: 1px solid rgba(255,255,255,0.06);
+            background: rgba(255,255,255,0.02);
+        }
+        .promise-input-label {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.7rem;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.35);
+            margin-bottom: 16px;
+        }
+        .promise-coord {
+            font-family: "Cormorant Garamond", serif;
+            font-size: clamp(1.8rem, 3vw, 2.8rem);
+            font-weight: 600;
+            color: #e05a2b;
+            line-height: 1.2;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+        }
+        .promise-coord-sub {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.72rem;
+            color: rgba(203,213,225,0.45);
+            margin-bottom: 24px;
+        }
+        .promise-nope-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .promise-nope {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.68rem;
+            color: rgba(255,255,255,0.22);
+            padding: 3px 8px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            text-decoration: line-through;
+            text-decoration-color: rgba(224,90,43,0.4);
+        }
+        .promise-fn-label {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.7rem;
+            color: rgba(203,213,225,0.4);
+            letter-spacing: 0.06em;
+            text-align: center;
+        }
+        .promise-code {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.74rem;
+            line-height: 1.72;
+            text-align: left;
+            color: rgba(203,213,225,0.6);
+            background: rgba(255,255,255,0.04);
+            width: min(100%, 440px);
+            padding: 16px 18px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.07);
+            white-space: normal;
+            word-break: break-word;
+        }
+        .pc-kw { color: rgba(203,213,225,0.4); }
+        .pc-fn { color: #60a5fa; }
+        .pc-val { color: #e05a2b; }
+        .pc-str { color: #f8d36f; }
+        .pc-cmt { color: rgba(148,163,184,0.74); font-style: italic; }
+        .promise-arrow {
+            font-size: 1.4rem;
+            color: rgba(224,90,43,0.5);
+            line-height: 1;
+        }
+        .promise-emb-label {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.7rem;
+            color: rgba(203,213,225,0.4);
+            letter-spacing: 0.06em;
+            margin-bottom: 10px;
+        }
+        .promise-emb-canvas {
+            display: block;
+            width: 100%;
+            height: 88px;
+            border-radius: 10px;
+            margin-bottom: 12px;
+            background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012));
+            border: 1px solid rgba(255,255,255,0.06);
+        }
+        .promise-emb-sub {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.65rem;
+            color: rgba(203,213,225,0.3);
+            margin-bottom: 20px;
+            letter-spacing: 0.04em;
+        }
+        .promise-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .promise-stat {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 12px 10px;
+            text-align: center;
+        }
+        .promise-stat-val {
+            font-family: "Cormorant Garamond", serif;
+            font-size: clamp(1.4rem, 2vw, 1.9rem);
+            font-weight: 600;
+            color: #f8fafc;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+        .promise-stat-lbl {
+            font-family: "IBM Plex Mono", monospace;
+            font-size: 0.62rem;
+            color: rgba(203,213,225,0.38);
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+        @media (max-width: 820px) {
+            .promise-body {
+                grid-template-columns: 1fr;
+            }
+            .promise-mid {
+                border-left: none;
+                border-right: none;
+                border-top: 1px solid rgba(255,255,255,0.06);
+                border-bottom: 1px solid rgba(255,255,255,0.06);
+                padding: 24px 20px;
+            }
+            .promise-coord { font-size: 2rem; }
+        }
+        </style>
+
+        <script>
+        (function() {
+            function initParadigmScroll() {
+                var section = document.querySelector('.representation');
+                if (!section) return;
+                var ticking = false;
+
+                function clamp(value, min, max) {
+                    return Math.min(max, Math.max(min, value));
+                }
+
+                function smoothstep(value) {
+                    value = clamp(value, 0, 1);
+                    return value * value * (3 - 2 * value);
+                }
+
+                function setVar(name, value) {
+                    section.style.setProperty(name, value);
+                }
+
+                function update() {
+                    ticking = false;
+                    var rect = section.getBoundingClientRect();
+                    var vh = window.innerHeight || document.documentElement.clientHeight;
+                    var enter = smoothstep((vh - rect.top) / (vh * 0.48));
+                    var focus = smoothstep((-rect.top - vh * 0.1) / (vh * 0.38));
+                    var claim = smoothstep((-rect.top - vh * 0.28) / (vh * 0.28));
+                    var borderR = Math.round(255 + (224 - 255) * focus);
+                    var borderG = Math.round(255 + (90 - 255) * focus);
+                    var borderB = Math.round(255 + (43 - 255) * focus);
+                    var borderA = (0.08 + focus * 0.38).toFixed(3);
+
+                    setVar('--earth-opacity', (enter * (1 - focus * 0.42)).toFixed(3));
+                    setVar('--earth-scale', (0.985 + enter * 0.015 - focus * 0.025).toFixed(3));
+                    setVar('--earth-y', (18 * (1 - enter)).toFixed(1) + 'px');
+                    setVar('--mora-opacity', enter.toFixed(3));
+                    setVar('--mora-scale', (0.985 + enter * 0.015 + focus * 0.058).toFixed(3));
+                    setVar('--mora-y', (18 * (1 - enter) - focus * 8).toFixed(1) + 'px');
+                    setVar('--mora-focus', focus.toFixed(3));
+                    setVar('--mora-border-color', 'rgba(' + borderR + ', ' + borderG + ', ' + borderB + ', ' + borderA + ')');
+                    setVar('--mora-left-width', (1 + focus * 2).toFixed(1) + 'px');
+                    setVar('--mora-fill-alpha', (focus * 0.11).toFixed(3));
+                    setVar('--mora-glow-alpha', (focus * 0.18).toFixed(3));
+                    setVar('--claim-opacity', claim.toFixed(3));
+                    setVar('--claim-y', (18 * (1 - claim)).toFixed(1) + 'px');
+                }
+
+                function requestUpdate() {
+                    if (ticking) return;
+                    ticking = true;
+                    window.requestAnimationFrame(update);
+                }
+
+                window.addEventListener('scroll', requestUpdate, { passive: true });
+                window.addEventListener('resize', requestUpdate);
+                update();
+            }
+
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initParadigmScroll);
+            } else {
+                initParadigmScroll();
+            }
+        })();
+        </script>
+
+        <script>
+        (function() {
+            function drawPromiseEmb() {
+                var cv = document.getElementById('promise-emb-canvas');
+                if (!cv) return;
+                var dpr = window.devicePixelRatio || 1;
+                var w = cv.parentElement.clientWidth;
+                var h = 88;
+                cv.width = w * dpr;
+                cv.height = h * dpr;
+                cv.style.width = w + 'px';
+                cv.style.height = h + 'px';
+                var ctx = cv.getContext('2d');
+                ctx.scale(dpr, dpr);
+                var n = 128;
+                var bw = w / n;
+                var center = h / 2;
+                var maxAmp = 24;
+
+                ctx.clearRect(0, 0, w, h);
+
+                for (var i = 0; i < n; i++) {
+                    var wave = Math.sin(i * 0.21 + 0.8) * 0.58 + Math.cos(i * 0.06 + 1.7) * 0.24;
+                    var amp = Math.max(3, Math.abs(wave) * maxAmp);
+                    var x = i * bw;
+                    var barW = Math.max(bw - 1.2, 1);
+                    var gradient = ctx.createLinearGradient(0, center - amp, 0, center + amp);
+                    gradient.addColorStop(0, 'rgba(255, 214, 102, 0.95)');
+                    gradient.addColorStop(0.5, 'rgba(251, 146, 60, 0.78)');
+                    gradient.addColorStop(1, 'rgba(224, 90, 43, 0.4)');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(x, center - amp, barW, amp * 2);
+                }
+            }
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', drawPromiseEmb);
+            } else {
+                drawPromiseEmb();
+            }
+            window.addEventListener('resize', drawPromiseEmb);
+        })();
+        </script>
+
+
+<section id="cp-section" hidden aria-hidden="true">
         <div class="cp-inner">
           <div class="cp-header">
             <span class="cp-label">Embedding Comparator</span>
@@ -2015,6 +4811,9 @@
         <script>
         (function(){
         "use strict";
+
+        var $section = document.getElementById("cp-section");
+        if (!$section || $section.hidden) return;
 
         var CITIES=["beijing","shanghai","shenzhen","chengdu","wuhan","chongqing"];
         var ZOOM={beijing:[116.43,39.84],shanghai:[121.43,31.16],shenzhen:[114.1,22.5],chengdu:[104.14,30.76],wuhan:[114.24,30.49],chongqing:[106.46,29.6]};
@@ -2288,6 +5087,81 @@
             updateLayerInfo("default");
         }
 
+        function initArchitectureScroll() {
+            const section = document.querySelector(".architecture-section");
+            if (!section) return;
+
+            let ticking = false;
+            let activeStage = -1;
+
+            function clamp(value, min, max) {
+                return Math.min(max, Math.max(min, value));
+            }
+
+            function smoothstep(value) {
+                value = clamp(value, 0, 1);
+                return value * value * (3 - 2 * value);
+            }
+
+            function setVar(name, value) {
+                section.style.setProperty(name, value);
+            }
+
+            function setStage(stage) {
+                if (stage === activeStage) return;
+                activeStage = stage;
+                section.classList.toggle("arch-layer-stage-0", stage === 0);
+                section.classList.toggle("arch-layer-stage-1", stage === 1);
+                section.classList.toggle("arch-layer-stage-2", stage === 2);
+                section.classList.toggle("arch-layer-stage-3", stage === 3);
+            }
+
+            function update() {
+                ticking = false;
+                const rect = section.getBoundingClientRect();
+                const scrollable = Math.max(1, section.offsetHeight - window.innerHeight);
+                const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
+                const stage = progress < 0.25 ? 0 : progress < 0.50 ? 1 : progress < 0.75 ? 2 : 3;
+                const h3 = smoothstep((progress - 0.25) / 0.16);
+                const mob = smoothstep((progress - 0.50) / 0.16);
+                const mod = smoothstep((progress - 0.75) / 0.16);
+                const step0 = 1 - smoothstep((progress - 0.20) / 0.10);
+                const step1 = smoothstep((progress - 0.25) / 0.10) * (1 - smoothstep((progress - 0.46) / 0.10));
+                const step2 = smoothstep((progress - 0.50) / 0.10) * (1 - smoothstep((progress - 0.71) / 0.10));
+                const step3 = smoothstep((progress - 0.75) / 0.10);
+                const lift = -10 * h3 - 10 * mob - 8 * mod;
+                const rotateX = 58 - 3 * mob - 2 * mod;
+
+                setVar("--arch-h3-opacity", h3.toFixed(3));
+                setVar("--arch-h3-z", (46 + h3 * 32).toFixed(1) + "px");
+                setVar("--arch-h3-svg-y", (10 - h3 * 10).toFixed(1) + "px");
+                setVar("--arch-mob-opacity", mob.toFixed(3));
+                setVar("--arch-mob-z", (92 + mob * 40).toFixed(1) + "px");
+                setVar("--arch-mob-svg-y", (14 - mob * 14).toFixed(1) + "px");
+                setVar("--arch-mod-opacity", mod.toFixed(3));
+                setVar("--arch-proj-opacity", (mod * 0.72).toFixed(3));
+                setVar("--arch-mod-y", (24 * (1 - mod)).toFixed(1) + "px");
+                setVar("--arch-mod-scale", (0.96 + mod * 0.04).toFixed(3));
+                setVar("--arch-stack-transform", `translate(-50%, calc(-50% + ${lift.toFixed(1)}px)) rotateX(${rotateX.toFixed(1)}deg) rotateZ(-42deg)`);
+                [step0, step1, step2, step3].forEach((value, index) => {
+                    const opacity = Math.max(0, Math.min(1, value));
+                    setVar(`--arch-step-${index}`, opacity.toFixed(3));
+                    setVar(`--arch-step-${index}-y`, (16 * (1 - opacity)).toFixed(1) + "px");
+                });
+                setStage(stage);
+            }
+
+            function requestUpdate() {
+                if (ticking) return;
+                ticking = true;
+                requestAnimationFrame(update);
+            }
+
+            window.addEventListener("scroll", requestUpdate, { passive: true });
+            window.addEventListener("resize", requestUpdate);
+            update();
+        }
+
         function initResultsTooltip() {
             const tooltip = document.getElementById("results-tooltip");
             const radar = document.getElementById("results-radar");
@@ -2423,9 +5297,9 @@
 
                 tooltip.innerHTML = `
                     <p class="results-tooltip-title">${task.name}</p>
-                    <p class="results-tooltip-row"><span>MoRA</span><strong>R² ${format(task.mora)}</strong></p>
-                    <p class="results-tooltip-row"><span>AlphaEarth</span><strong>R² ${format(task.alpha)}</strong></p>
-                    <p class="results-tooltip-row"><span>SatCLIP</span><strong>R² ${format(task.sat)}</strong></p>
+                    <p class="results-tooltip-row"><span>MoRA</span><strong>R2 ${format(task.mora)}</strong></p>
+                    <p class="results-tooltip-row"><span>AlphaEarth</span><strong>R2 ${format(task.alpha)}</strong></p>
+                    <p class="results-tooltip-row"><span>SatCLIP</span><strong>R2 ${format(task.sat)}</strong></p>
                     <div class="results-tooltip-delta">${deltaText}</div>
                     <div class="results-tooltip-meta">
                         <div>Category: <strong>${task.category}</strong></div>
@@ -2672,10 +5546,13 @@
             requestAnimationFrame(render);
         }
 
+
+
         window.addEventListener("DOMContentLoaded", () => {
             refreshLucideIcons();
             resetLayerInfo();
             initFusionAnimation();
+            initArchitectureScroll();
             initResultsTooltip();
         });
     </script>
@@ -2698,53 +5575,44 @@
             canvas.width = W;
             canvas.height = H;
             canvas.style.height = cssH + 'px';
+            ctx.fillStyle = '#050505';
+            ctx.fillRect(0, 0, W, H);
             init();
         }
 
         function init() {
+            const nodeClr = 'rgba(232,229,221,.55)';
+            const flowClr1 = 'rgba(232,115,74,.65)';
+
             nodes = [];
-            for (let i = 0; i < 280; i++) {
-                const s = Math.random();
+            for (let i = 0; i < 300; i++) {
                 nodes.push({
                     x: Math.random() * W,
                     y: Math.random() * H,
-                    r: s < 0.02  ? (6 + Math.random() * 6) * DPR
-                     : s < 0.10  ? (2.5 + Math.random() * 2.5) * DPR
-                     :             (0.6 + Math.random() * 1.0) * DPR,
+                    r: Math.random() < 0.05
+                        ? (1.5 + Math.random() * 2.5) * DPR
+                        : (0.4 + Math.random() * 1.0) * DPR,
+                    c: nodeClr,
                 });
             }
 
-            const weights = nodes.map(n => n.r * n.r);
-            const totalW = weights.reduce((s, w) => s + w, 0);
-            function weightedPick() {
-                let v = Math.random() * totalW;
-                for (let i = 0; i < nodes.length; i++) {
-                    v -= weights[i];
-                    if (v <= 0) return nodes[i];
-                }
-                return nodes[nodes.length - 1];
-            }
-
             flows = [];
-            for (let i = 0; i < 220; i++) {
-                const a = weightedPick();
-                const b = weightedPick();
+            for (let i = 0; i < 200; i++) {
+                const a = nodes[Math.floor(Math.random() * nodes.length)];
+                const b = nodes[Math.floor(Math.random() * nodes.length)];
                 if (a === b) continue;
-                const isOrange = Math.random() > 0.32;
-                const sign = Math.random() > 0.5 ? 1 : -1;
-                const curve = 0.15 + Math.random() * 0.22;
+                const strength = Math.random();
                 flows.push({
                     ax: a.x, ay: a.y,
                     bx: b.x, by: b.y,
-                    // quadratic control point — clamped to canvas bounds
-                    cx: Math.max(W * 0.02, Math.min(W * 0.98, (a.x + b.x) / 2 + sign * (a.y - b.y) * curve)),
-                    cy: Math.max(H * 0.02, Math.min(H * 0.98, (a.y + b.y) / 2 + sign * (b.x - a.x) * curve)),
+                    cx: (a.x + b.x) / 2 + (a.y - b.y) * 0.25,
+                    cy: (a.y + b.y) / 2 + (b.x - a.x) * 0.25,
                     progress: Math.random(),
-                    speed: 0.0012 + Math.random() * 0.004,
-                    isOrange,
-                    width: isOrange ? (1.8 + Math.random() * 2.2) * DPR : (0.7 + Math.random() * 0.9) * DPR,
-                    opacity: isOrange ? 0.55 + Math.random() * 0.38 : 0.18 + Math.random() * 0.22,
-                    tailLen: 0.09 + Math.random() * 0.11,
+                    speed: 0.002 + Math.random() * 0.006,
+                    color: flowClr1,
+                    width: (0.55 + Math.random() * 1.0) * DPR,
+                    opacity: 0.24 + strength * 0.52,
+                    tailLen: 0.10,
                 });
             }
         }
@@ -2758,67 +5626,46 @@
         }
 
         function draw() {
-            // full clear — static tracks redrawn each frame so they're always visible
+            ctx.globalAlpha = 0.12;
             ctx.fillStyle = '#050505';
             ctx.fillRect(0, 0, W, H);
+            ctx.globalAlpha = 1;
 
-            // 1. static track lines (always visible on dark bg via white low-opacity)
+            // 1. animated mobility flows: light particles with short curved tails
             ctx.lineCap = 'round';
-            flows.forEach(f => {
-                ctx.beginPath();
-                ctx.moveTo(f.ax, f.ay);
-                ctx.quadraticCurveTo(f.cx, f.cy, f.bx, f.by);
-                ctx.strokeStyle = f.isOrange ? 'rgba(255,210,180,0.10)' : 'rgba(180,210,255,0.09)';
-                ctx.lineWidth = f.width * 0.55;
-                ctx.globalAlpha = 1;
-                ctx.stroke();
-            });
-
-            // 2. nodes
-            nodes.forEach(n => {
-                ctx.beginPath();
-                ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
-                ctx.fillStyle = 'rgba(220,212,200,1)';
-                ctx.globalAlpha = n.r > 5 * DPR ? 0.90 : n.r > 2 * DPR ? 0.68 : 0.42;
-                ctx.fill();
-                ctx.globalAlpha = 1;
-            });
-
-            // 3. animated streaks — elongated segments following the curve
             flows.forEach(f => {
                 f.progress += f.speed;
                 if (f.progress > 1) f.progress = 0;
 
                 const t = f.progress;
-                const t0 = Math.max(0, t - f.tailLen);
+                const pt = bezierPt(f, t);
 
-                // draw streak as multiple short segments with increasing opacity (tail→head gradient)
-                const steps = 10;
-                ctx.lineCap = 'round';
-                ctx.lineJoin = 'round';
-                const orangeRGB = '240,108,58';
-                const blueRGB  = '100,155,220';
-                const rgb = f.isOrange ? orangeRGB : blueRGB;
-                for (let i = 1; i <= steps; i++) {
-                    const alpha = i / steps;           // 0 at tail, 1 at head
-                    const st0 = t0 + (t - t0) * ((i - 1) / steps);
-                    const st1 = t0 + (t - t0) * (i / steps);
-                    const pt0 = bezierPt(f, st0);
-                    const pt1 = bezierPt(f, st1);
-                    ctx.beginPath();
-                    ctx.moveTo(pt0.x, pt0.y);
-                    ctx.lineTo(pt1.x, pt1.y);
-                    ctx.strokeStyle = `rgba(${rgb},${(alpha * f.opacity).toFixed(3)})`;
-                    ctx.lineWidth = f.width * (0.3 + 0.7 * alpha);
-                    ctx.stroke();
-                }
-
-                // bright head dot
-                const head = bezierPt(f, t);
                 ctx.beginPath();
-                ctx.arc(head.x, head.y, f.width * 0.9, 0, Math.PI * 2);
-                ctx.fillStyle = f.isOrange ? 'rgba(255,170,120,1)' : 'rgba(160,205,255,1)';
-                ctx.globalAlpha = Math.min(1, f.opacity * 1.25);
+                ctx.arc(pt.x, pt.y, f.width * 1.6, 0, Math.PI * 2);
+                ctx.globalAlpha = f.opacity * 0.85;
+                ctx.fillStyle = f.color;
+                ctx.fill();
+                ctx.globalAlpha = 1;
+
+                if (t > 0.06) {
+                    const tail = bezierPt(f, Math.max(0, t - f.tailLen));
+                    ctx.beginPath();
+                    ctx.moveTo(tail.x, tail.y);
+                    ctx.lineTo(pt.x, pt.y);
+                    ctx.strokeStyle = f.color;
+                    ctx.lineWidth = f.width;
+                    ctx.globalAlpha = f.opacity * 0.3;
+                    ctx.stroke();
+                    ctx.globalAlpha = 1;
+                }
+            });
+
+            // 2. node field: mostly tiny points with a few larger anchors
+            nodes.forEach(n => {
+                ctx.beginPath();
+                ctx.arc(n.x, n.y, n.r, 0, Math.PI * 2);
+                ctx.fillStyle = n.c;
+                ctx.globalAlpha = 0.55;
                 ctx.fill();
                 ctx.globalAlpha = 1;
             });
