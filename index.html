@@ -2200,7 +2200,7 @@
         .architecture-section.arch-layer-stage-2 .arch-layer-detail.s2,
         .architecture-section.arch-layer-stage-3 .arch-layer-detail.s3 {
             opacity: 1;
-            transform: translateY(-50%);
+            transform: translateY(0);
             pointer-events: auto;
         }
 
@@ -2278,21 +2278,21 @@
         .arch-layer-detail-stack {
             position: relative;
             width: min(860px, 90%);
-            min-height: 88px;
-            margin: 18px auto 0;
+            min-height: 54px;
+            margin: 4px auto -10px;
         }
 
         .arch-layer-detail {
             position: absolute;
             left: 0;
             right: 0;
-            top: 50%;
+            top: 0;
             padding: 0 6px;
             border: 0;
             background: transparent;
             box-shadow: none;
             opacity: 0;
-            transform: translateY(calc(-50% + 10px));
+            transform: translateY(8px);
             transition: opacity 220ms linear, transform 220ms linear;
             pointer-events: none;
             text-align: left;
@@ -2354,8 +2354,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
-            gap: 2px;
-            padding: clamp(28px, 4vh, 42px) 0 clamp(28px, 4vh, 40px);
+            gap: 0;
+            padding: clamp(10px, 1.8vh, 16px) 0 clamp(24px, 3.4vh, 34px);
             background: transparent;
         }
 
@@ -3230,18 +3230,21 @@
 
         @media (max-width: 900px) {
             .architecture-inner.arch-layer-inner {
-                position: relative;
-                height: auto;
-                min-height: 100vh;
+                position: sticky;
+                top: 0;
+                height: 100svh;
+                min-height: 100svh;
                 grid-template-columns: 1fr;
+                grid-template-rows: auto 1fr;
+                overflow: hidden;
             }
 
-            .architecture-section { min-height: auto; }
+            .architecture-section { min-height: 320svh; }
 
             .arch-layer-copy {
                 border-right: none;
                 border-bottom: 1px solid rgba(255,255,255,0.06);
-                padding: 40px 20px 32px;
+                padding: 28px 20px 18px;
             }
 
             .arch-layer-copy .paradigm-title {
@@ -3255,8 +3258,8 @@
 
             .arch-layer-detail-stack {
                 width: min(720px, calc(100% - 32px));
-                min-height: 128px;
-                margin: 14px auto 0;
+                min-height: 54px;
+                margin: 2px auto -10px;
             }
 
             .arch-layer-canvas > .arch-layer-steps-wrap {
@@ -3265,7 +3268,7 @@
                 left: auto;
                 width: min(720px, calc(100% - 32px));
                 transform: none;
-                margin: 28px auto 0;
+                margin: 6px auto 0;
                 pointer-events: auto;
             }
 
@@ -3274,7 +3277,8 @@
             }
 
             .arch-layer-canvas {
-                min-height: 640px;
+                min-height: 0;
+                padding: 8px 0 8px;
             }
 
             .arch-layer-figure {
@@ -3282,7 +3286,13 @@
                 aspect-ratio: 585 / 865;
                 min-height: 0;
                 height: auto;
-                margin-top: 28px;
+                margin-top: 0;
+            }
+
+            .arch-model-zone {
+                top: 31.2%;
+                height: 34.6%;
+                border-radius: 12px;
             }
 
             .arch-modality-panel {
@@ -3956,7 +3966,7 @@
             }
 
             .results-section {
-                padding: 14vh 18px 12vh;
+                padding: 7vh 18px 12vh;
             }
 
             .architecture-header {
@@ -5040,7 +5050,6 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
 
         function initArchitectureScroll() {
             const section = document.querySelector(".architecture-section");
-            const canvas = section ? section.querySelector(".arch-layer-canvas") : null;
             if (!section) return;
 
             let ticking = false;
@@ -5070,21 +5079,9 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
 
             function update() {
                 ticking = false;
-                const isMobileLayout = window.matchMedia("(max-width: 900px)").matches;
-                let progress;
-
-                if (isMobileLayout && canvas) {
-                    const rect = canvas.getBoundingClientRect();
-                    const vh = Math.max(window.innerHeight || 0, 1);
-                    const start = vh * 0.72;
-                    const end = -rect.height + vh * 0.28;
-                    const travel = Math.max(1, start - end);
-                    progress = clamp((start - rect.top) / travel, 0, 1);
-                } else {
-                    const rect = section.getBoundingClientRect();
-                    const scrollable = Math.max(1, section.offsetHeight - window.innerHeight);
-                    progress = clamp(-rect.top / scrollable, 0, 1);
-                }
+                const rect = section.getBoundingClientRect();
+                const scrollable = Math.max(1, section.offsetHeight - window.innerHeight);
+                const progress = clamp(-rect.top / scrollable, 0, 1);
 
                 const stage = progress < 0.25 ? 0 : progress < 0.50 ? 1 : progress < 0.75 ? 2 : 3;
                 const h3 = smoothstep((progress - 0.25) / 0.16);
