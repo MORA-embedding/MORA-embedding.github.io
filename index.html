@@ -2279,7 +2279,7 @@
             position: relative;
             width: min(860px, 90%);
             min-height: 88px;
-            margin: 18px auto 18px;
+            margin: 18px auto 0;
         }
 
         .arch-layer-detail {
@@ -3256,7 +3256,7 @@
             .arch-layer-detail-stack {
                 width: min(720px, calc(100% - 32px));
                 min-height: 128px;
-                margin: 14px auto 12px;
+                margin: 14px auto 0;
             }
 
             .arch-layer-canvas > .arch-layer-steps-wrap {
@@ -4234,7 +4234,7 @@ unfold within them.</p>
             <div class="architecture-inner arch-layer-inner">
                 <div class="arch-layer-copy">
                     <p class="paradigm-kicker">03 — Model architecture</p>
-                    <h2 class="paradigm-title" id="architecture-title-layer">Human mobility as the structural backbone</h2>
+                    <h2 class="paradigm-title" id="architecture-title-layer">Mobility as backbone for multimodal alignment</h2>
                     <p class="paradigm-subtitle">
                         By using a human mobility graph as the central backbone for multimodal alignment, MoRA ensures POI text, satellite imagery, and demographic signals are interpreted through the lens of fundamental human dynamics.
                     </p>
@@ -4262,7 +4262,7 @@ unfold within them.</p>
                             </div>
                             <div class="arch-layer-detail s3">
                                 <p class="arch-layer-num">04 - Multimodal alignment</p>
-                                <p>POI text, satellite imagery, and demographic tables are aligned onto the same graph so each modality is interpreted through these fundamental human dynamics.</p>
+                                <p>POI text, satellite imagery, and demographic tables are aligned onto the mobility graph through contrastive learning.</p>
                             </div>
                     </div>
 
@@ -4687,36 +4687,63 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
             }
             .promise-body {
                 grid-template-columns: 1fr;
+                gap: 14px;
+                border: 0;
+                border-radius: 0;
+                overflow: visible;
+                background: transparent;
             }
             .promise-left,
+            .promise-mid,
             .promise-right {
-                padding: 22px 18px;
+                padding: 20px 18px;
+                border: 1px solid rgba(255,255,255,0.08);
+                border-radius: 16px;
+                background: rgba(255,255,255,0.03);
+                box-shadow: 0 16px 36px rgba(0,0,0,0.18);
             }
             .promise-mid {
                 border-left: none;
                 border-right: none;
-                border-top: 1px solid rgba(255,255,255,0.06);
-                border-bottom: 1px solid rgba(255,255,255,0.06);
-                padding: 22px 16px;
                 align-items: stretch;
+                gap: 12px;
+            }
+            .promise-fn-label {
+                font-size: 0.66rem;
+                letter-spacing: 0.1em;
             }
             .promise-code {
                 max-width: 100%;
-                font-size: 0.68rem;
-                line-height: 1.65;
+                font-size: 0.64rem;
+                line-height: 1.6;
                 min-height: 0;
-                padding: 14px 14px;
+                padding: 12px 12px;
+                white-space: pre-wrap;
+                overflow-wrap: anywhere;
+                word-break: break-word;
             }
-            .promise-arrow .arrow-desktop {
+            .promise-arrow {
                 display: none;
             }
-            .promise-arrow .arrow-mobile {
-                display: inline;
-            }
             .promise-emb-canvas {
-                height: 92px;
+                height: 96px;
             }
-            .promise-coord { font-size: 2rem; }
+            .promise-coord {
+                font-size: 2rem;
+            }
+            .promise-nope-row {
+                gap: 8px;
+            }
+            .promise-nope {
+                font-size: 0.64rem;
+            }
+            .promise-emb-sub {
+                line-height: 1.5;
+                margin-bottom: 16px;
+            }
+            .promise-stat {
+                padding: 10px 8px;
+            }
             .promise-actions-wrap {
                 margin-top: 56px;
                 padding-top: 22px;
