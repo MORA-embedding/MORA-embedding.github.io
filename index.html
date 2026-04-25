@@ -4405,44 +4405,27 @@ unfold within them.</p>
                     <h2 class="paradigm-title" id="promise-title">Coordinates in, intelligence out</h2>
                     <p class="paradigm-subtitle">The distilled MoRA model compresses an entire national-scale multimodal pipeline into a single function call. No satellite tiles. No POI databases. No mobility logs. Just coordinates (longitude/latitude).</p>
                 </div>
-                <div class="promise-body">
-                    <div class="promise-left">
-                        <div class="promise-input-label">Input</div>
-                        <div class="promise-coord">31.2304° N<br>121.4737° E</div>
-                        <div class="promise-coord-sub">any coordinate works</div>
-                        <div class="promise-nope-row">
-                            <span class="promise-nope">satellite tiles</span>
-                            <span class="promise-nope">POI database</span>
-                            <span class="promise-nope">mobility logs</span>
-                            <span class="promise-nope">census data</span>
-                        </div>
-                    </div>
-                    <div class="promise-mid">
-                        <div class="promise-fn-label">High-level usage</div>
+                <div class="promise-cards">
+                    <article class="promise-card">
+                        <div class="promise-card-label">Input</div>
+                        <div class="promise-card-value">31.2304° N<br>121.4737° E</div>
+                        <p class="promise-card-copy">One coordinate pair is enough. MoRA inference does not require satellite tiles, POI databases, mobility logs, or census tables at runtime.</p>
+                    </article>
+                    <article class="promise-card promise-card-code">
+                        <div class="promise-card-label">Usage</div>
                         <pre class="promise-code"><code>model = <span class="pc-fn">load_distilled_mora</span>(<span class="pc-str">model_path</span>)
 
 coord = [<span class="pc-val">121.4737</span>, <span class="pc-val">31.2304</span>] <span class="pc-cmt"># lon, lat</span>
 
 emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
-                        <div class="promise-arrow"><span class="arrow-desktop">&rarr;</span><span class="arrow-mobile">&darr;</span></div>
-                        <div class="promise-fn-label">No external datasets needed.</div>
-                    </div>
-                    <div class="promise-right">
-                        <div class="promise-input-label">Output &mdash; location fingerprint</div>
-                        <div class="promise-emb-label">128-dimensional embedding</div>
+                        <p class="promise-card-copy">A single `encode(coord)` call returns a ready-to-use location fingerprint.</p>
+                    </article>
+                    <article class="promise-card">
+                        <div class="promise-card-label">Output</div>
+                        <div class="promise-card-value">128-D embedding</div>
                         <canvas id="promise-emb-canvas" class="promise-emb-canvas" aria-label="128-dimensional embedding visualised as an abstract vector sketch"></canvas>
-                        <div class="promise-emb-sub">encodes mobility &middot; POI &middot; imagery &middot; demographics</div>
-                        <div class="promise-stats">
-                            <div class="promise-stat">
-                                <div class="promise-stat-val">128</div>
-                                <div class="promise-stat-lbl">dimensions</div>
-                            </div>
-                            <div class="promise-stat">
-                                <div class="promise-stat-val">4</div>
-                                <div class="promise-stat-lbl">modalities fused</div>
-                            </div>
-                        </div>
-                    </div>
+                        <p class="promise-card-copy">Encodes mobility, POI, imagery, and demographics into one compact vector representation.</p>
+                    </article>
                 </div>
                 <div class="promise-actions-wrap">
                 <div class="promise-actions" aria-label="Paper and code links">
@@ -4470,18 +4453,11 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
             margin-bottom: 48px;
             max-width: 760px;
         }
-        .promise-body {
+        .promise-cards {
             display: grid;
-            grid-template-columns: minmax(220px, 0.86fr) minmax(340px, 1.1fr) minmax(260px, 0.92fr);
-            gap: 0;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 16px;
             align-items: stretch;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            overflow: hidden;
-            background: rgba(255,255,255,0.015);
-        }
-        .promise-body > * {
-            min-width: 0;
         }
         .promise-actions {
             display: flex;
@@ -4507,69 +4483,42 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
             translate: -50% 0;
             background: linear-gradient(90deg, rgba(255,255,255,0), rgba(255,255,255,0.18), rgba(224,90,43,0.38), rgba(255,255,255,0.18), rgba(255,255,255,0));
         }
-        .promise-left,
-        .promise-right {
+        .promise-card {
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: clamp(24px,3vw,40px) clamp(20px,2.5vw,36px);
-        }
-        .promise-mid {
-            display: flex;
-            flex-direction: column;
-            align-items: stretch;
-            justify-content: center;
             gap: 14px;
-            padding: 32px 28px;
+            padding: clamp(24px,3vw,34px) clamp(20px,2.5vw,30px);
             min-width: 0;
-            border-left: 1px solid rgba(255,255,255,0.06);
-            border-right: 1px solid rgba(255,255,255,0.06);
-            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 18px;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.018));
+            box-shadow: 0 18px 40px rgba(0,0,0,0.18);
         }
-        .promise-input-label {
+        .promise-card-code {
+            justify-content: space-between;
+        }
+        .promise-card-label {
             font-family: "IBM Plex Mono", monospace;
             font-size: 0.7rem;
             letter-spacing: 0.12em;
             text-transform: uppercase;
             color: rgba(255,255,255,0.35);
-            margin-bottom: 16px;
         }
-        .promise-coord {
+        .promise-card-value {
             font-family: "Cormorant Garamond", serif;
-            font-size: clamp(1.8rem, 3vw, 2.8rem);
+            font-size: clamp(1.9rem, 3vw, 2.7rem);
             font-weight: 600;
-            color: #e05a2b;
-            line-height: 1.2;
+            color: #f8fafc;
+            line-height: 1.08;
             letter-spacing: -0.02em;
-            margin-bottom: 8px;
         }
-        .promise-coord-sub {
-            font-family: "IBM Plex Mono", monospace;
-            font-size: 0.72rem;
-            color: rgba(203,213,225,0.45);
-            margin-bottom: 24px;
-        }
-        .promise-nope-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-        }
-        .promise-nope {
-            font-family: "IBM Plex Mono", monospace;
-            font-size: 0.68rem;
-            color: rgba(255,255,255,0.22);
-            padding: 3px 8px;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 4px;
-            text-decoration: line-through;
-            text-decoration-color: rgba(224,90,43,0.4);
-        }
-        .promise-fn-label {
-            font-family: "IBM Plex Mono", monospace;
-            font-size: 0.7rem;
-            color: rgba(203,213,225,0.4);
-            letter-spacing: 0.06em;
-            text-align: left;
+        .promise-card-copy {
+            margin: 0;
+            color: rgba(203,213,225,0.72);
+            font-family: "IBM Plex Sans Condensed", "IBM Plex Sans", sans-serif;
+            font-size: 0.96rem;
+            line-height: 1.56;
         }
         .promise-code {
             margin: 0;
@@ -4601,81 +4550,19 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
         .pc-val { color: #e05a2b; }
         .pc-str { color: #f8d36f; }
         .pc-cmt { color: rgba(148,163,184,0.74); font-style: italic; }
-        .promise-arrow {
-            font-size: 1.25rem;
-            color: rgba(224,90,43,0.5);
-            line-height: 1;
-            text-align: center;
-        }
-        .promise-arrow .arrow-mobile {
-            display: none;
-        }
-        .promise-emb-label {
-            font-family: "IBM Plex Mono", monospace;
-            font-size: 0.7rem;
-            color: rgba(203,213,225,0.4);
-            letter-spacing: 0.06em;
-            margin-bottom: 10px;
-        }
         .promise-emb-canvas {
             display: block;
             width: 100%;
-            height: 124px;
+            height: 118px;
+            max-width: 100%;
+            box-sizing: border-box;
             border-radius: 10px;
-            margin-bottom: 12px;
             background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.012));
             border: 1px solid rgba(255,255,255,0.06);
         }
-        .promise-emb-sub {
-            font-family: "IBM Plex Mono", monospace;
-            font-size: 0.65rem;
-            color: rgba(203,213,225,0.3);
-            margin-bottom: 20px;
-            letter-spacing: 0.04em;
-        }
-        .promise-stats {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-        }
-        .promise-stat {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 8px;
-            padding: 12px 10px;
-            text-align: center;
-        }
-        .promise-stat-val {
-            font-family: "Cormorant Garamond", serif;
-            font-size: clamp(1.4rem, 2vw, 1.9rem);
-            font-weight: 600;
-            color: #f8fafc;
-            line-height: 1;
-            margin-bottom: 4px;
-        }
-        .promise-stat-lbl {
-            font-family: "IBM Plex Mono", monospace;
-            font-size: 0.62rem;
-            color: rgba(203,213,225,0.38);
-            letter-spacing: 0.06em;
-            text-transform: uppercase;
-        }
         @media (max-width: 1080px) {
-            .promise-body {
-                grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-            }
-            .promise-left {
-                grid-column: 1 / 2;
-            }
-            .promise-mid {
-                grid-column: 1 / 2;
-                border-right: 1px solid rgba(255,255,255,0.06);
-                border-top: 1px solid rgba(255,255,255,0.06);
-            }
-            .promise-right {
-                grid-column: 2 / 3;
-                grid-row: 1 / span 2;
-                border-left: 1px solid rgba(255,255,255,0.06);
+            .promise-cards {
+                grid-template-columns: 1fr;
             }
         }
         @media (max-width: 820px) {
@@ -4685,32 +4572,11 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
             .promise-header {
                 margin-bottom: 32px;
             }
-            .promise-body {
-                grid-template-columns: 1fr;
+            .promise-cards {
                 gap: 14px;
-                border: 0;
-                border-radius: 0;
-                overflow: visible;
-                background: transparent;
             }
-            .promise-left,
-            .promise-mid,
-            .promise-right {
+            .promise-card {
                 padding: 20px 18px;
-                border: 1px solid rgba(255,255,255,0.08);
-                border-radius: 16px;
-                background: rgba(255,255,255,0.03);
-                box-shadow: 0 16px 36px rgba(0,0,0,0.18);
-            }
-            .promise-mid {
-                border-left: none;
-                border-right: none;
-                align-items: stretch;
-                gap: 12px;
-            }
-            .promise-fn-label {
-                font-size: 0.66rem;
-                letter-spacing: 0.1em;
             }
             .promise-code {
                 max-width: 100%;
@@ -4722,27 +4588,14 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
                 overflow-wrap: anywhere;
                 word-break: break-word;
             }
-            .promise-arrow {
-                display: none;
-            }
             .promise-emb-canvas {
                 height: 96px;
             }
-            .promise-coord {
+            .promise-card-value {
                 font-size: 2rem;
             }
-            .promise-nope-row {
-                gap: 8px;
-            }
-            .promise-nope {
-                font-size: 0.64rem;
-            }
-            .promise-emb-sub {
-                line-height: 1.5;
-                margin-bottom: 16px;
-            }
-            .promise-stat {
-                padding: 10px 8px;
+            .promise-card-copy {
+                font-size: 0.9rem;
             }
             .promise-actions-wrap {
                 margin-top: 56px;
@@ -5187,6 +5040,7 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
 
         function initArchitectureScroll() {
             const section = document.querySelector(".architecture-section");
+            const canvas = section ? section.querySelector(".arch-layer-canvas") : null;
             if (!section) return;
 
             let ticking = false;
@@ -5216,9 +5070,22 @@ emb = model.<span class="pc-fn">encode</span>(coord)</code></pre>
 
             function update() {
                 ticking = false;
-                const rect = section.getBoundingClientRect();
-                const scrollable = Math.max(1, section.offsetHeight - window.innerHeight);
-                const progress = Math.min(1, Math.max(0, -rect.top / scrollable));
+                const isMobileLayout = window.matchMedia("(max-width: 900px)").matches;
+                let progress;
+
+                if (isMobileLayout && canvas) {
+                    const rect = canvas.getBoundingClientRect();
+                    const vh = Math.max(window.innerHeight || 0, 1);
+                    const start = vh * 0.72;
+                    const end = -rect.height + vh * 0.28;
+                    const travel = Math.max(1, start - end);
+                    progress = clamp((start - rect.top) / travel, 0, 1);
+                } else {
+                    const rect = section.getBoundingClientRect();
+                    const scrollable = Math.max(1, section.offsetHeight - window.innerHeight);
+                    progress = clamp(-rect.top / scrollable, 0, 1);
+                }
+
                 const stage = progress < 0.25 ? 0 : progress < 0.50 ? 1 : progress < 0.75 ? 2 : 3;
                 const h3 = smoothstep((progress - 0.25) / 0.16);
                 const mob = smoothstep((progress - 0.50) / 0.16);
